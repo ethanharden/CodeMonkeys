@@ -8,17 +8,16 @@ using DataAccess;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddRazorPages();
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer
 (builder.Configuration.GetConnectionString("DefaultConnection")));
 
 //builder.Services.AddSingleton<IEmailSender, EmailSender>();
 
 //builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
- //   .AddDefaultTokenProviders()
- //   .AddEntityFrameworkStores<ApplicationDbContext>();
+//   .AddDefaultTokenProviders()
+//   .AddEntityFrameworkStores<AppDbContext>();
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -53,7 +52,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{area=Customer}/{controller=Home}/{action=Index}/{id?}");
 
-app.Run();
+app.Run(); 
 
 //void SeedDatabase()
 //{

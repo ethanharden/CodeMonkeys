@@ -1,0 +1,91 @@
+﻿@page
+@model SchedulingSystemWeb.Pages.Availabilities.UpsertModel
+
+@{
+    ViewData["Title"] = Model.objAvailability.Id == 0 ? "Create Availability" : "Edit Availability";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <input type="hidden" asp-for="objAvailability.Id" />
+
+            <div class="form-group">
+                <label asp-for="objAvailability.StartTime" class="control-label"></label>
+                <input asp-for="objAvailability.StartTime" class="form-control" type="datetime-local" />
+                <span asp-validation-for="objAvailability.StartTime" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="objAvailability.EndTime" class="control-label"></label>
+                <input asp-for="objAvailability.EndTime" class="form-control" type="datetime-local" />
+                <span asp-validation-for="objAvailability.EndTime" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="objAvailability.Recurring" class="control-label"></label>
+                <input asp-for="objAvailability.Recurring" class="form-check-input" />
+                <span asp-validation-for="objAvailability.Recurring" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="objAvailability.RecurringEndDate" class="control-label"></label>
+                <input asp-for="objAvailability.RecurringEndDate" class="form-control" type="date" />
+                <span asp-validation-for="objAvailability.RecurringEndDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="objAvailability.isUnavailable" class="control-label"></label>
+                <input asp-for="objAvailability.isUnavailable" class="form-check-input" />
+                <span asp-validation-for="objAvailability.isUnavailable" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Days of Week</label>
+                @foreach (DayOfWeek day in Enum.GetValues(typeof(DayOfWeek)))
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="DaysOfWeek" value="@day" @(Model.objAvailability.DaysOfWeek.Contains(day) ? "checked=\"checked\"" : "") />
+                        <label class="form-check-label">@day</label>
+                    </div>
+                }
+            </div>
+
+            <button type="submit" class="btn btn-primary">@ViewData["Title"]</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            @if(TempData["Success"] != null)
+            {
+                <text>
+                Swal.fire({
+                    title: 'Success!',
+                    text: '@TempData["Success"]',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+                </text>
+            }
+
+            @if(TempData["error"] != null)
+            {
+                <text>
+                Swal.fire({
+                    title: 'Error!',
+                    text: '@TempData["error"]',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                </text>
+            }
+        });
+    </script>
+}

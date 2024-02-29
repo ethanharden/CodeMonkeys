@@ -1,5 +1,6 @@
 ﻿using Infrastructure.Interfaces;
 using Infrastructure.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,6 +64,20 @@ namespace DataAccess
                 }
                 return _ProviderProfile;
             }
+        }
+        public int Commit()
+        {
+            return _DbContext.SaveChanges();
+        }
+
+        public async Task<int> CommitAsync()
+        {
+            return await _DbContext.SaveChangesAsync();
+        }
+
+        public void Dispose()
+        {
+            _DbContext.Dispose();
         }
 
     }
