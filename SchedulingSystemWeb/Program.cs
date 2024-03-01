@@ -15,9 +15,9 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer
 
 //builder.Services.AddSingleton<IEmailSender, EmailSender>();
 
-//builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-//   .AddDefaultTokenProviders()
-//   .AddEntityFrameworkStores<AppDbContext>();
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddDefaultTokenProviders()
+    .AddEntityFrameworkStores<AppDbContext>();
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -45,6 +45,7 @@ app.UseStaticFiles();
 app.UseRouting();
 //SeedDatabase();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
