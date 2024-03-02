@@ -8,5 +8,16 @@ namespace Infrastructure.Models
 {
     public class ProviderProfile
     {
+
+        [Key]
+        public string ProviderProfileID { get; set; }
+
+        public string RemoteLink {  get; set; }
+        public string BookingPrompt { get; set; }
+
+
+        [ForeignKey("UserId")]
+        public User? User { get; set; }
+
     }
 }
