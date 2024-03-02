@@ -19,6 +19,9 @@ namespace DataAccess
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet <ProviderProfile> ProviderProfiles { get; set; }
+        public DbSet <ApplicationUser> ApplicationUsers { get; set; }
+        public DbSet <CustomerProfile> CustomerProfiles { get; set; }
+        public DbSet <RecurringType> RecurringTypes { get; set; }
 
     }
 }

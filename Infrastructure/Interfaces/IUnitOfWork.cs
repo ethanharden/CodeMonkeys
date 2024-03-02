@@ -14,6 +14,9 @@ namespace Infrastructure.Interfaces
         public IGenericRepository<Booking> Booking { get; }
         public IGenericRepository<Location> Location { get;}
         public IGenericRepository<ProviderProfile> ProviderProfile { get; }
+        public IGenericRepository<ApplicationUser> ApplicationUser { get; }
+        public IGenericRepository<RecurringType> RecurringType { get; }
+        public IGenericRepository<CustomerProfile> CustomerProfile { get; }
         int Commit();
 
         Task<int> CommitAsync();

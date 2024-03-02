@@ -8,17 +8,12 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Models
 {
-    public class ProviderProfile
+    public class CustomerProfile
     {
-
         [Key]
-        public int ProviderProfileID { get; set; }
-        
+        public int Id { get; set; }
         [ForeignKey("UserId")]
-        public int User { get; set; }
-        public string RemoteLink {  get; set; }
-        public string BookingPrompt { get; set; }
-        public string DepartmentString {  get; set; }
-
+        public int WNumber {  get; set; }
+        
     }
 }

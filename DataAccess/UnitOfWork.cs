@@ -20,6 +20,9 @@ namespace DataAccess
         public IGenericRepository<Booking> _Booking;
         public IGenericRepository<Location> _Location;
         public IGenericRepository<ProviderProfile> _ProviderProfile;
+        public IGenericRepository<RecurringType> _RecurringType;
+        public IGenericRepository<CustomerProfile> _CustomerProfile;
+        public IGenericRepository<ApplicationUser> _ApplicationUser;
      
         public IGenericRepository<Availability> Availability
         {
@@ -65,6 +68,44 @@ namespace DataAccess
                 return _ProviderProfile;
             }
         }
+
+        public IGenericRepository<RecurringType> RecurringType
+        {
+            get
+            {
+                if (_RecurringType == null)
+                {
+                    _RecurringType = new GenericRepository<RecurringType>(_DbContext);
+                }
+                return _RecurringType;
+            }
+        }
+
+        public IGenericRepository<CustomerProfile> CustomerProfile
+        {
+            get
+            {
+                if (_CustomerProfile == null)
+                {
+                    _CustomerProfile = new GenericRepository<CustomerProfile>(_DbContext);
+                }
+                return _CustomerProfile;
+            }
+        }
+
+        public IGenericRepository<ApplicationUser> ApplicationUser
+        {
+            get
+            {
+                if (_ApplicationUser == null)
+                {
+                    _ApplicationUser = new GenericRepository<ApplicationUser>(_DbContext);
+                }
+                return _ApplicationUser;
+            }
+        }
+
+
         public int Commit()
         {
             return _DbContext.SaveChanges();

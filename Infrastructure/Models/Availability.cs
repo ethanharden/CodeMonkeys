@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Infrastructure.Models
 {
@@ -13,8 +14,18 @@ namespace Infrastructure.Models
         [Key]
         public int Id { get; set; }
 
+        [ForeignKey("ProviderId")]
+        public ProviderProfile ProviderProfile { get; set; }
+
+        [ForeignKey("RecurringTypeId")]
+        public RecurringType RecurringType {  get; set; }
+
         [Required]
-        public List<DayOfWeek> DaysOfWeek { get; set; } = new List<DayOfWeek>();
+        public int LocationId { get; set; }
+
+        [Required]
+        public DayOfWeek DayOfTheWeek { get; set; }
+
         [Required]
         [DisplayName("Start Time")]
         public DateTime StartTime { get; set; }
@@ -25,8 +36,6 @@ namespace Infrastructure.Models
         public bool Recurring { get; set; }
         [DisplayName("End Date")]
         public DateTime? RecurringEndDate { get; set; }
-        [Required]
-        public bool isUnavailable { get; set; } //switched to unavailable so on screen we can ask "Is this Unavailability?" Which makes more sense
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
