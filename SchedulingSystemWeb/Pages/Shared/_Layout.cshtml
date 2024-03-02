@@ -26,7 +26,31 @@
                             <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Availabilities/Index">Availability</a>
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Teacher/Availabilities/Index">Availability</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Teacher/Locations/Index">Locations</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Teacher/CustomerProfile/Index">Customer Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Student/Bookings/Index">Bookings</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Student/ProviderProfile/Index">Provider Profile</a>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link text-dark dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Content Managment</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" asp-area="" asp-page="/Admin/Roles/Index">Roles</a>
+                                <a class="dropdown-item" asp-area="" asp-page="/Admin/Users/UserIndex">Users</a>
+                            </div>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/About">About</a>
                         </li>
                     </ul>
                     <partial name="_LoginPartial" />
@@ -36,6 +60,7 @@
     </header>
     <div class="container">
         <main role="main" class="pb-3">
+            <partial name="_ToastrNotification" />
             @RenderBody()
         </main>
     </div>

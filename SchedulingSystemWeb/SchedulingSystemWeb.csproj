@@ -8,6 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Pages\NewFile.txt" />
+    <None Remove="Pages\Shared\NewFile.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.2" />
@@ -24,7 +29,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Pages\Student\" />
+    <None Include="Pages\Admin\Roles\Index.cshtml" />
+    <None Include="Pages\Admin\Roles\Upsert.cshtml" />
+    <None Include="Pages\Admin\Users\Update.cshtml" />
+    <None Include="Pages\Admin\Users\UserIndex.cshtml" />
   </ItemGroup>
 
 </Project>

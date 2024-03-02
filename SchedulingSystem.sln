@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34408.163
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchedulingSystemWeb", "SchedulingSystemWeb\SchedulingSystemWeb.csproj", "{E033E332-4266-4EDB-9D5D-7ADB80C2469B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulingSystemWeb", "SchedulingSystemWeb\SchedulingSystemWeb.csproj", "{E033E332-4266-4EDB-9D5D-7ADB80C2469B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{FF853797-69CD-4D81-9220-B009B76469A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{FF853797-69CD-4D81-9220-B009B76469A8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{E961EE48-D0FA-4019-81BA-ADF98FA7112F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccess", "DataAccess\DataAccess.csproj", "{E961EE48-D0FA-4019-81BA-ADF98FA7112F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utility", "Utility\Utility.csproj", "{6DD73DDD-0DA9-4694-A2E8-19D55E627254}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utility", "Utility\Utility.csproj", "{6DD73DDD-0DA9-4694-A2E8-19D55E627254}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
