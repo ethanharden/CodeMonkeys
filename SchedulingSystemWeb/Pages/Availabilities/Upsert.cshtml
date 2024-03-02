@@ -1,0 +1,154 @@
+﻿@page
+@model SchedulingSystemWeb.Pages.Availabilities.UpsertModel
+@{
+    ViewData["Title"] = Model.objAvailability.Id == 0 ? "Create Availability" : "Edit Availability";
+}
+<h4>Availability</h4>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>@ViewData["Title"]</h2>
+        </div>
+        <div class="card-body">
+            <form method="post" class="needs-validation" novalidate>
+                <input type="hidden" asp-for="objAvailability.Id" />
+
+                <!-- Start Time -->
+                <div class="form-group">
+                    <label asp-for="objAvailability.StartTime" class="control-label"></label>
+                    <input asp-for="objAvailability.StartTime" class="form-control" type="datetime-local" />
+                    <span asp-validation-for="objAvailability.StartTime" class="text-danger"></span>
+                </div>
+
+                <!-- End Time -->
+                <div class="form-group">
+                    <label asp-for="objAvailability.EndTime" class="control-label"></label>
+                    <input asp-for="objAvailability.EndTime" class="form-control" type="datetime-local" id="endTime" />
+                    <span asp-validation-for="objAvailability.EndTime" class="text-danger"></span>
+                </div>
+
+                <!-- Duration -->
+                <div class="form-group">
+                    <label for="duration" class="control-label">Duration</label>
+                    <select id="duration" class="form-control">
+                        @for (int i = 15; i <= 300; i += 15)
+                        {
+                            <option value="@i">@TimeSpan.FromMinutes(i).ToString(@"hh\:mm")</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Recurring -->
+                <div class="form-group">
+                    <label asp-for="objAvailability.Recurring" class="control-label"></label>
+                    <input asp-for="objAvailability.Recurring" class="form-check-input" id="recurring" />
+                    <span asp-validation-for="objAvailability.Recurring" class="text-danger"></span>
+                </div>
+
+                <!-- Recurring EndDate -->
+                <div class="form-group" id="recurringEndDateGroup" style="display:none;">
+                    <label asp-for="objAvailability.RecurringEndDate" class="control-label"></label>
+                    <input asp-for="objAvailability.RecurringEndDate" class="form-control" type="date" />
+                    <span asp-validation-for="objAvailability.RecurringEndDate" class="text-danger"></span>
+                </div>
+
+                <!-- Unavailability -->
+                <div class="form-group">
+                    <label asp-for="objAvailability.isUnavailable" class="control-label">Is this unavailability?</label>
+                    <input asp-for="objAvailability.isUnavailable" class="form-check-input" />
+                    <span asp-validation-for="objAvailability.isUnavailable" class="text-danger"></span>
+                </div>
+
+                <!-- Days of Week -->
+                <div class="form-group">
+                    <label class="control-label">Days of Week</label>
+                    @{
+                        var dayOfWeekValues = Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>();
+                        foreach (var day in dayOfWeekValues)
+                        {
+                            // Create a unique identifier for each checkbox
+                            var checkboxId = $"DaysOfWeek_{day}";
+                            // Determine if the checkbox should be checked
+                            var isChecked = Model.objAvailability.DaysOfWeek.Contains(day) ? "checked=\"checked\"" : "";
+
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       id="@checkboxId"
+                                       name="DaysOfWeek"
+                                       value="@day"
+                                @Html.Raw(isChecked) />
+                                <label class="form-check-label" for="@checkboxId">@day</label>
+                            </div>
+                        }
+                    }
+                </div>
+
+                <button type="submit" class="btn btn-success">@ViewData["Title"]</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Display alerts
+            @if (TempData["Success"] != null)
+            {
+                <text>
+                        Swal.fire({
+                            title: 'Success!',
+                            text: '@TempData["Success"]',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        });
+                </text>
+            }
+            @if (TempData["error"] != null)
+            {
+                <text>
+                        Swal.fire({
+                            title: 'Error!',
+                            text: '@TempData["error"]',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                </text>
+            }
+
+            // Update EndTime
+            function updateEndTime() {
+                var startTime = document.getElementById('objAvailability_StartTime').value;
+                var duration = document.getElementById('duration').value;
+                if (startTime) {
+                    var startTimeDate = new Date(startTime);
+                    var endTimeDate = new Date(startTimeDate.getTime() + parseInt(duration) * 60000);
+                    document.getElementById('endTime').value = endTimeDate.toISOString().slice(0, 16);
+                }
+            }
+
+            // Event listener for StartTime
+            document.getElementById('objAvailability_StartTime').addEventListener('change', updateEndTime);
+            document.getElementById('duration').addEventListener('change', updateEndTime);
+
+            updateEndTime();
+
+            // Toggle RecurringEndDate
+            var recurringCheckbox = document.getElementById('recurring');
+            var recurringEndDateGroup = document.getElementById('recurringEndDateGroup');
+
+            function toggleRecurringEndDate() {
+                recurringEndDateGroup.style.display = recurringCheckbox.checked ? 'block' : 'none';
+            }
+
+            recurringCheckbox.addEventListener('change', toggleRecurringEndDate);
+
+            //initial display
+            toggleRecurringEndDate();
+        });
+    </script>
+}

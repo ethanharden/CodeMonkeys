@@ -20,3 +20,104 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+
+
+
+/* Calendar container styling */
+#calendar {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Calendar event styling */
+.fc-event {
+    color: #fff; /* Set text color */
+    padding: 4px 8px; /* Add some padding inside events */
+    border: none; /* Remove default borders */
+    font-size: 0.85em; /* Adjust font size */
+}
+
+    /* Available times styling */
+    .fc-event.available {
+        background-color: #28a745; /* Bootstrap success color for available times */
+    }
+
+    /* Unavailable times styling */
+    .fc-event.unavailable {
+        background-color: #dc3545; /* Bootstrap danger color for unavailable times */
+    }
+
+/* Button styling for 'Create New Availability' */
+.btn-create-availability {
+    background-color: #007bff; /* Bootstrap primary color */
+    color: #fff;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+    .btn-create-availability:hover {
+        background-color: #0056b3; /* Darken color on hover */
+    }
+
+/* Responsive tweaks for calendar on smaller screens */
+@media (max-width: 767px) {
+    #calendar {
+        padding: 0.5rem;
+    }
+
+    .fc-event {
+        font-size: 0.75em; /* Smaller text on smaller screens */
+    }
+}
+
+/* Style the card */
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+/* Style the form inputs */
+.form-control {
+    border-radius: 0.25rem;
+    border: 1px solid #ced4da;
+}
+
+/* Style the checkboxes */
+.form-check-input {
+    width: 20px;
+    height: 20px;
+    margin-top: 0;
+    margin-right: 0.25rem;
+    vertical-align: middle;
+}
+
+/* Style the submit button */
+.btn-success {
+    color: #fff;
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+    .btn-success:hover {
+        color: #fff;
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+
+
+
+/* Ensure the footer is pushed to the bottom of the viewport */
+footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 60px; /* Height of the footer */
+    line-height: 60px; /* Vertically center the text inside the footer */
+    background-color: #f5f5f5;
+}
