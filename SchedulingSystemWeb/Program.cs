@@ -55,9 +55,3 @@ app.MapControllerRoute(
 
 app.Run(); 
 
-//void SeedDatabase()
-//{
-//    using var scope = app.Services.CreateScope();
-//    var dbInitializer = scope.ServiceProvider.GetRequiredService<DbInitializer>();
-//    dbInitializer.Initialize();
-//}
