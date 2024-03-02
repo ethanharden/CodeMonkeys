@@ -18,7 +18,10 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer
 //  .AddDefaultTokenProviders()
 //    .AddEntityFrameworkStores<AppDbContext>();
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddDefaultTokenProviders().AddEntityFrameworkStores<AppDbContext>();
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>() // ApplicationUser should extend IdentityUser
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = $"/Identity/Account/Login";

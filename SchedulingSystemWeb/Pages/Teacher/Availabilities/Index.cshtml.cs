@@ -24,7 +24,6 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         //    objAvailabilitiesList = _unitOfWork.Availability.GetAll();
         //    var events = objAvailabilitiesList.Select(a => new
         //    {
-        //        title = a.isUnavailable ? "Unavailable" : "Available",
         //        start = a.StartTime,
         //        end = a.EndTime,
         //        allDay = false

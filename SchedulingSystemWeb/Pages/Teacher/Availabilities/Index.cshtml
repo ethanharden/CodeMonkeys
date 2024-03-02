@@ -62,7 +62,6 @@
                 <td>@obj.EndTime.ToString("g")</td>
                 <td>@(obj.Recurring ? "Yes" : "No")</td>
                 <td>@(obj.RecurringEndDate?.ToString("d") ?? "N/A")</td>
-                <td>@(obj.isUnavailable ? "Yes" : "No")</td>
                 <td>
                     <div class="w-75 btn-group" role="group">
                         <a asp-page="Upsert" asp-route-id="@obj.Id" class="btn btn-primary mx-2">

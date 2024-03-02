@@ -36,9 +36,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         //}
         //public async Task<IActionResult> OnPostAsync(List<string> DaysOfWeek)
         //{
-            
-        //    objAvailability.DaysOfWeek = DaysOfWeek.Select(day => Enum.Parse<DayOfWeek>(day)).ToList();
-
+           
         //    if (!ModelState.IsValid)
         //    {
         //        TempData["error"] = "Data Incomplete";

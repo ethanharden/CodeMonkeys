@@ -13,9 +13,10 @@ namespace Infrastructure.Models
     {
         [Key]
         public int Id { get; set; }
+        public int WNumber { get; set; } 
         [Required]
         public string Subject { get; set; }
-        
+        [Required]
         public string Note { get; set; }
         [Required]
         public DateTime StartTime { get; set; }
@@ -26,6 +27,6 @@ namespace Infrastructure.Models
         [ForeignKey("ProviderId")]
         public ProviderProfile? ProviderProfile { get; set; }
         [ForeignKey("UserId")]
-        public CustomerProfile? CustomerProfile { get; set; }
+        public ApplicationUser? User { get; set; }
     }
 }
