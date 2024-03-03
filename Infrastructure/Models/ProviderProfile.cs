@@ -13,9 +13,14 @@ namespace Infrastructure.Models
 
         [Key]
         public int ProviderProfileID { get; set; }
-        
+
+        [Required]
+        [Display(Name = "User")]
+        public string UserId { get; set; }
+
         [ForeignKey("UserId")]
-        public int User { get; set; }
+        public ApplicationUser? User { get; set; }
+
         public string RemoteLink {  get; set; }
         public string BookingPrompt { get; set; }
         public string DepartmentString {  get; set; }

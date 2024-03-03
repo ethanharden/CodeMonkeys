@@ -9,26 +9,28 @@ namespace SchedulingSystemWeb.Pages.Availabilities
 {
     public class IndexModel : PageModel
     {
-        //private readonly UnitOfWork _unitOfWork;
+        private readonly UnitOfWork _unitOfWork;
+        public IEnumerable<Availability> AvailabilitiesList { get; set; }
+        public string CalendarEvents { get; set; }
 
-        //public IEnumerable<Availability> objAvailabilitiesList { get; set; }
-        //public string CalendarEvents { get; set; }
+        public IndexModel(UnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
 
-        //public IndexModel(UnitOfWork unitOfWork)
-        //{
-        //    _unitOfWork = unitOfWork;
-        //}
+        public void OnGet()
+        {
+            AvailabilitiesList = _unitOfWork.Availability.GetAll(includes: "ProviderProfile,ProviderProfile.User");
 
-        //public void OnGet()
-        //{
-        //    objAvailabilitiesList = _unitOfWork.Availability.GetAll();
-        //    var events = objAvailabilitiesList.Select(a => new
-        //    {
-        //        start = a.StartTime,
-        //        end = a.EndTime,
-        //        allDay = false
-        //    }).ToList();
-        //    CalendarEvents = JsonSerializer.Serialize(events);
-        //}
+            var events = AvailabilitiesList.Select(a => new
+            {
+                title = $"Availability for {a.ProviderProfile.User.UserName}", // Adjust according to actual data model
+                start = a.StartTime.ToString("s"), // ISO format
+                end = a.EndTime.ToString("s"),
+                allDay = false
+            }).ToList();
+            CalendarEvents = System.Text.Json.JsonSerializer.Serialize(events);
+        }
     }
+
 }

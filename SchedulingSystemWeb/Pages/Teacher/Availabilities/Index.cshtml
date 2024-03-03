@@ -1,30 +1,62 @@
 ﻿@page
 @model SchedulingSystemWeb.Pages.Availabilities.IndexModel
-
 <h2 class="text-primary">Availability</h2>
-@* Todo reference which producer's calender this is*@
 
-@* <div class="container">
-    <!--Calendar container -->
-    <div id="calendar"></div>
+<!-- Tabs -->
+<ul class="nav nav-tabs" id="availabilityTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="week-tab" data-bs-toggle="tab" data-bs-target="#week" type="button" role="tab" aria-controls="week" aria-selected="true">Week</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="month-tab" data-bs-toggle="tab" data-bs-target="#month" type="button" role="tab" aria-controls="month" aria-selected="false">Month</button>
+    </li>
+</ul>
+
+<!-- Tab content -->
+<div class="tab-content" id="availabilityTabsContent">
+    <div class="tab-pane fade show active" id="week" role="tabpanel" aria-labelledby="week-tab">
+        <!-- Weekly Calendar -->
+        <div id="weeklyCalendar"></div>
+    </div>
+    <div class="tab-pane fade" id="month" role="tabpanel" aria-labelledby="month-tab">
+        <!-- Monthly Calendar -->
+        <div id="monthlyCalendar"></div>
+    </div>
 </div>
 
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
+            // Define the calendar options
+            var calendarOptions = {
                 initialView: 'timeGridWeek',
-                events: @Html.Raw(Json.Serialize(Model.CalendarEvents)),
-                // Configure other calendar options as needed
+                events: @Html.Raw(Model.CalendarEvents),
+                // Add more options as needed
+            };
+
+            // Initialize the weekly calendar
+            var weeklyCalendarEl = document.getElementById('weeklyCalendar');
+            var weeklyCalendar = new FullCalendar.Calendar(weeklyCalendarEl, {
+                ...calendarOptions,
+                initialView: 'timeGridWeek',
             });
-            calendar.render();
+            weeklyCalendar.render();
+
+            // Initialize the monthly calendar
+            var monthlyCalendarEl = document.getElementById('monthlyCalendar');
+            var monthlyCalendar = new FullCalendar.Calendar(monthlyCalendarEl, {
+                ...calendarOptions,
+                initialView: 'dayGridMonth',
+            });
+            monthlyCalendar.render();
         });
     </script>
 }
 
 
-@* This code is just to check that availabilites work with the database *@
+
+
+@* This code is just to check that availabilites work with the database
 @*
 @page
 @model SchedulingSystemWeb.Pages.Availabilities.IndexModel
