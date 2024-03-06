@@ -1,54 +1,155 @@
 ﻿@page
 @model SchedulingSystemWeb.Pages.Availabilities.IndexModel
-<h2 class="text-primary">Availability</h2>
+@using System.Globalization
+@{
+    ViewData["Title"] = "Availability Calendar";
+    var firstDayOfMonth = new DateTime(Model.CurrentDate.Year, Model.CurrentDate.Month, 1);
+    var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+    int daysInMonth = DateTime.DaysInMonth(Model.CurrentDate.Year, Model.CurrentDate.Month);
+    int firstDayOfWeek = (int)CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek;
+    int currentDayOfWeek = (int)firstDayOfMonth.DayOfWeek;
+    int leadingDays = (currentDayOfWeek - firstDayOfWeek + 7) % 7;
+}
 
-<!-- Tabs -->
-<ul class="nav nav-tabs" id="availabilityTabs" role="tablist">
+<h2 class="text-primary">@ViewData["Title"]</h2>
+
+<!-- Tab navigation buttons -->
+<ul class="nav nav-tabs" id="calendarTabs" role="tablist">
     <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="week-tab" data-bs-toggle="tab" data-bs-target="#week" type="button" role="tab" aria-controls="week" aria-selected="true">Week</button>
+        <button class="nav-link active" id="weekly-tab" data-bs-toggle="tab" data-bs-target="#weekly" type="button" role="tab" aria-controls="weekly" aria-selected="true">Weekly</button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="month-tab" data-bs-toggle="tab" data-bs-target="#month" type="button" role="tab" aria-controls="month" aria-selected="false">Month</button>
+        <button class="nav-link" id="monthly-tab" data-bs-toggle="tab" data-bs-target="#monthly" type="button" role="tab" aria-controls="monthly" aria-selected="false">Monthly</button>
     </li>
 </ul>
-
 <!-- Tab content -->
-<div class="tab-content" id="availabilityTabsContent">
-    <div class="tab-pane fade show active" id="week" role="tabpanel" aria-labelledby="week-tab">
-        <!-- Weekly Calendar -->
-        <div id="weeklyCalendar"></div>
+<div class="tab-content" id="calendarTabsContent">
+    <!-- Weekly Schedule Tab -->
+    <div class="tab-pane fade show active" id="weekly" role="tabpanel" aria-labelledby="weekly-tab">
+        <div class="container">
+            <!-- Weekly Calendar and its navigation buttons -->
+            <div class="container">
+                <!-- Weekly Calendar -->
+                <button type="button" class="btn btn-primary" onclick="location.href='?handler=PreviousWeek'">Previous Week</button>
+                <button type="button" class="btn btn-primary" onclick="location.href='?handler=NextWeek'">Next Week</button>
+                <button type="button" class="btn btn-secondary" onclick="location.href='?handler=Today'">Today</button>
+                @if (Model.WeekDays.Any())
+                {
+                    <h3>@Model.CurrentMonthName Week of @Model.WeekDays.First().ToString("dd") - @Model.WeekDays.Last().ToString("dd")</h3>
+                }
+                else
+                {
+                    <h3>@Model.CurrentMonthName</h3>
+                }
+                <table class="calendar">
+                    <thead>
+                        <tr class="week-header">
+                            <th class="time-header">Time</th>
+                            @foreach (var day in Model.WeekDays)
+                            {
+                                <th class="day-header @((day.Date == DateTime.Today) ? "today" : "")">
+                                    @day.ToString("ddd dd")
+                                </th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (var hour = 0; hour < 24; hour++)
+                        {
+                            <tr class="week-row">
+                                <td class="hour">@hour:00</td>
+                                @foreach (var day in Model.WeekDays)
+                                {
+                                    <td class="hour-cell"></td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    <div class="tab-pane fade" id="month" role="tabpanel" aria-labelledby="month-tab">
-        <!-- Monthly Calendar -->
-        <div id="monthlyCalendar"></div>
+    
+    <!-- Monthly Schedule Tab -->
+    <div class="tab-pane fade" id="monthly" role="tabpanel" aria-labelledby="monthly-tab">
+        <div class="container">
+            <!-- Monthly Calendar and its navigation buttons -->
+             <div class="container">
+                <!-- Monthly Calendar -->
+                <button type="button" class="btn btn-primary" onclick="location.href='?handler=PreviousMonth'">Previous Month</button>
+                <button type="button" class="btn btn-primary" onclick="location.href='?handler=NextMonth'">Next Month</button>
+                <button type="button" class="btn btn-secondary" onclick="location.href='?handler=TodayMonth'">Today</button>
+                <h3>@Model.CurrentMonthName @Model.CurrentDate.Year</h3>
+                <table id="monthly-calendar" class="calendar">
+                    <thead>
+                        <tr class="month-header">
+                            @for (int i = 0; i < 7; i++)
+                            {
+                                <th class="day-header">
+                                    @CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedDayName((DayOfWeek)((firstDayOfWeek + i) % 7))
+                                </th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < leadingDays + daysInMonth; i++)
+                        {
+                            if (i % 7 == 0)
+                            {
+                                @:<tr class="week-row">
+                            }
+                
+                            if (i < leadingDays)
+                            {
+                                <td class="empty-day"></td>
+                            }
+                            else
+                            {
+                                <td class="month-day @(firstDayOfMonth.AddDays(i - leadingDays).Date == DateTime.Today.Date ? "today" : "")">
+                                    @firstDayOfMonth.AddDays(i - leadingDays).Day
+                                </td>
+                            }
+
+                            if ((i + 1) % 7 == 0)
+                            {
+                                @:</tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Define the calendar options
-            var calendarOptions = {
-                initialView: 'timeGridWeek',
-                events: @Html.Raw(Model.CalendarEvents),
-                // Add more options as needed
-            };
+        // Handle the tab switching and also call the Today handler
+        document.querySelectorAll('.nav-link').forEach(function(navLink) {
+            navLink.addEventListener('click', function (e) {
+                let currentTab = new bootstrap.Tab(navLink);
+                currentTab.show();
 
-            // Initialize the weekly calendar
-            var weeklyCalendarEl = document.getElementById('weeklyCalendar');
-            var weeklyCalendar = new FullCalendar.Calendar(weeklyCalendarEl, {
-                ...calendarOptions,
-                initialView: 'timeGridWeek',
-            });
-            weeklyCalendar.render();
+                // Check the id of the clicked tab and call the respective Today handler
+                if (navLink.id === 'weekly-tab') {
+                    window.location.href = '?handler=Today';
+                } else if (navLink.id === 'monthly-tab') {
+                    window.location.href = '?handler=TodayMonth';
+                }
 
-            // Initialize the monthly calendar
-            var monthlyCalendarEl = document.getElementById('monthlyCalendar');
-            var monthlyCalendar = new FullCalendar.Calendar(monthlyCalendarEl, {
-                ...calendarOptions,
-                initialView: 'dayGridMonth',
+                e.preventDefault();
             });
-            monthlyCalendar.render();
+        });
+
+        // Original code to set the active tab on page load based on TempData
+        document.addEventListener('DOMContentLoaded', (event) => {
+            let activeTab = '@TempData["ActiveTab"]';
+            if (activeTab === "monthly") {
+                new bootstrap.Tab(document.querySelector('#monthly-tab')).show();
+            } else {
+                new bootstrap.Tab(document.querySelector('#weekly-tab')).show();
+            }
         });
     </script>
 }

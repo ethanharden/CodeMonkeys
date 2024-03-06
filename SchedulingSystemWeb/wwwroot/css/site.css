@@ -21,72 +21,10 @@ body {
   margin-bottom: 60px;
 }
 
-
-
-
-/* Calendar container styling */
-#calendar {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 1rem;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.highlight {
+    background-color: #90ee90; /* Light green to indicate the event */
 }
 
-/* Calendar event styling */
-.fc-event {
-    color: #fff; /* Set text color */
-    padding: 4px 8px; /* Add some padding inside events */
-    border: none; /* Remove default borders */
-    font-size: 0.85em; /* Adjust font size */
-}
-
-    /* Available times styling */
-    .fc-event.available {
-        background-color: #28a745; /* Bootstrap success color for available times */
-    }
-
-    /* Unavailable times styling */
-    .fc-event.unavailable {
-        background-color: #dc3545; /* Bootstrap danger color for unavailable times */
-    }
-
-/* Button styling for 'Create New Availability' */
-.btn-create-availability {
-    background-color: #007bff; /* Bootstrap primary color */
-    color: #fff;
-    border-radius: 5px;
-    padding: 0.5rem 1rem;
-    margin: 1rem 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-    .btn-create-availability:hover {
-        background-color: #0056b3; /* Darken color on hover */
-    }
-
-/* Responsive tweaks for calendar on smaller screens */
-@media (max-width: 767px) {
-    #calendar {
-        padding: 0.5rem;
-    }
-
-    .fc-event {
-        font-size: 0.75em; /* Smaller text on smaller screens */
-    }
-}
-
-/* Style the card */
-.card {
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-}
-
-/* Style the form inputs */
-.form-control {
-    border-radius: 0.25rem;
-    border: 1px solid #ced4da;
-}
 
 /* Style the checkboxes */
 .form-check-input {
@@ -120,4 +58,100 @@ footer {
     height: 60px; /* Height of the footer */
     line-height: 60px; /* Vertically center the text inside the footer */
     background-color: #f5f5f5;
+}
+
+.calendar {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.time-header {
+    text-align: left;
+    background-color: #f8f9fa;
+    white-space: nowrap;
+}
+
+.week-header .day-header {
+    text-align: center;
+    background-color: #f8f9fa;
+    border-right: 1px solid #ddd;
+}
+
+.hour {
+    padding: 5px;
+    background-color: #f8f9fa;
+    text-align: right;
+    border-right: 1px solid #ddd;
+}
+
+.hour-cell {
+    border-top: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
+
+.week-row:last-child .hour-cell {
+    border-bottom: 1px solid #ddd;
+}
+
+.day-header.today {
+    background-color: #ffffcc;
+}
+.month-header th {
+    text-align: center;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+}
+
+.week-row td {
+    border: 1px solid #ddd;
+    height: 150px; /* Adjust height as needed */
+    vertical-align: top;
+    padding: 5px;
+    text-align: left;
+}
+
+.week-row td .month-day {
+    font-size: 1rem; /* Adjust this value as needed */
+}
+
+.month-day {
+    background-color: #fff; /* Default background for days */
+}
+
+.month-day.today {
+    background-color: #ffffcc; /* Highlight for today */
+}
+
+.empty-day {
+    background-color: #eaeaea; /* Different background for padding days */
+}
+
+/*event */
+.event {
+    background-color: #ffecd1;
+    padding: 5px;
+    margin: 5px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+/* Clear floats after headers */
+.week-header::after, .week-row::after, .month-header::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+    .day-header, .hour {
+        padding: 5px;
+        font-size: 0.8em;
+    }
+
+    .month-day {
+        min-height: 80px;
+        padding: 5px;
+    }
 }
