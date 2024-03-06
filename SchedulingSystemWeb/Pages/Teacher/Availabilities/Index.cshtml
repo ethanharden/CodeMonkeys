@@ -30,9 +30,10 @@
             <!-- Weekly Calendar and its navigation buttons -->
             <div class="container">
                 <!-- Weekly Calendar -->
-                <button type="button" class="btn btn-primary" onclick="location.href='?handler=PreviousWeek'">Previous Week</button>
-                <button type="button" class="btn btn-primary" onclick="location.href='?handler=NextWeek'">Next Week</button>
-                <button type="button" class="btn btn-secondary" onclick="location.href='?handler=Today'">Today</button>
+                <br>
+                <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=PreviousWeek'">Previous Week</button>
+                <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=NextWeek'">Next Week</button>
+                <button type="button" class="btn btn-secondary" style="float: right;" onclick="location.href='?handler=Today'">Today</button>
                 @if (Model.WeekDays.Any())
                 {
                     <h3>@Model.CurrentMonthName Week of @Model.WeekDays.First().ToString("dd") - @Model.WeekDays.Last().ToString("dd")</h3>
@@ -76,9 +77,10 @@
             <!-- Monthly Calendar and its navigation buttons -->
              <div class="container">
                 <!-- Monthly Calendar -->
-                <button type="button" class="btn btn-primary" onclick="location.href='?handler=PreviousMonth'">Previous Month</button>
-                <button type="button" class="btn btn-primary" onclick="location.href='?handler=NextMonth'">Next Month</button>
-                <button type="button" class="btn btn-secondary" onclick="location.href='?handler=TodayMonth'">Today</button>
+                <br />
+                <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=PreviousMonth'">Previous Month</button>
+                <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=NextMonth'">Next Month</button>
+                <button type="button" class="btn btn-secondary" style="float: right;" onclick="location.href='?handler=TodayMonth'">Today</button>
                 <h3>@Model.CurrentMonthName @Model.CurrentDate.Year</h3>
                 <table id="monthly-calendar" class="calendar">
                     <thead>

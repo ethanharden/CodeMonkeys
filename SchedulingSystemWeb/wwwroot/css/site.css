@@ -65,6 +65,12 @@ footer {
     border-collapse: collapse;
     table-layout: fixed;
 }
+.calendar-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1em; /* Or any desired spacing */
+}
 
 .time-header {
     text-align: left;
