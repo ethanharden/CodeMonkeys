@@ -31,17 +31,34 @@
             <div class="container">
                 <!-- Weekly Calendar -->
                 <br>
-                <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=PreviousWeek'">Previous Week</button>
                 <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=NextWeek'">Next Week</button>
-                <button type="button" class="btn btn-secondary" style="float: right;" onclick="location.href='?handler=Today'">Today</button>
+                <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=PreviousWeek'">Previous Week</button>
+               
+                <button type="button" class="btn btn-secondary" style="float: right;" onclick="location.href='?handler=TodayWeek'">Today</button>
                 @if (Model.WeekDays.Any())
-                {
-                    <h3>@Model.CurrentMonthName Week of @Model.WeekDays.First().ToString("dd") - @Model.WeekDays.Last().ToString("dd")</h3>
+{
+                    var firstDay = Model.WeekDays.First();
+                    var lastDay = Model.WeekDays.Last();
+                    string displayWeek;
+
+                    if (firstDay.Month != lastDay.Month)
+                    {
+                        // Week spans two different months
+                        displayWeek = firstDay.ToString("MMMM dd") + " - " + lastDay.ToString("MMMM dd");
+                    }
+                    else
+                    {
+                        // Week is within the same month
+                        displayWeek = firstDay.ToString("MMMM") + " Week of " + firstDay.ToString("dd") + " - " + lastDay.ToString("dd");
+                    }
+
+                    <h3>@displayWeek</h3>
                 }
                 else
                 {
                     <h3>@Model.CurrentMonthName</h3>
                 }
+
                 <table class="calendar">
                     <thead>
                         <tr class="week-header">
@@ -56,15 +73,26 @@
                     </thead>
                     <tbody>
                         @for (var hour = 0; hour < 24; hour++)
-                        {
-                            <tr class="week-row">
-                                <td class="hour">@hour:00</td>
-                                @foreach (var day in Model.WeekDays)
-                                {
-                                    <td class="hour-cell"></td>
-                                }
-                            </tr>
-                        }
+                    {
+                        <tr class="week-row">
+                            <td class="hour">@hour:00</td>
+                            @foreach (var day in Model.WeekDays)
+                            {
+                                <td class="hour-cell @((day.Date == DateTime.Today) ? "today" : "")">
+                                    <!-- Display bookings for the day and hour -->
+                                    @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == day.Date && b.StartTime.Hour == hour))
+                                    {
+                                        <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
+                                    }
+                                    <!-- Display availabilities for the day and hour -->
+                                    @foreach(var availability in Model.ViewAvailabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour))
+                                    {
+                                        <div class="availability-event">Available</div>
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
                     </tbody>
                 </table>
             </div>
@@ -78,8 +106,8 @@
              <div class="container">
                 <!-- Monthly Calendar -->
                 <br />
-                <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=PreviousMonth'">Previous Month</button>
                 <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=NextMonth'">Next Month</button>
+                <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=PreviousMonth'">Previous Month</button>               
                 <button type="button" class="btn btn-secondary" style="float: right;" onclick="location.href='?handler=TodayMonth'">Today</button>
                 <h3>@Model.CurrentMonthName @Model.CurrentDate.Year</h3>
                 <table id="monthly-calendar" class="calendar">
@@ -94,35 +122,59 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @for (int i = 0; i < leadingDays + daysInMonth; i++)
+                       @for (int i = 0; i < leadingDays + daysInMonth; i++)
+                    {
+                        if (i % 7 == 0)
                         {
-                            if (i % 7 == 0)
-                            {
-                                @:<tr class="week-row">
-                            }
-                
-                            if (i < leadingDays)
-                            {
-                                <td class="empty-day"></td>
-                            }
-                            else
-                            {
-                                <td class="month-day @(firstDayOfMonth.AddDays(i - leadingDays).Date == DateTime.Today.Date ? "today" : "")">
-                                    @firstDayOfMonth.AddDays(i - leadingDays).Day
-                                </td>
-                            }
-
-                            if ((i + 1) % 7 == 0)
-                            {
-                                @:</tr>
-                            }
+                            @:<tr class="week-row">
                         }
+
+                        if (i < leadingDays)
+                        {
+                            <td class="empty-day"></td>
+                        }
+                        else
+                        {
+                            var currentDay = firstDayOfMonth.AddDays(i - leadingDays);
+                            <td class="month-day @(currentDay.Date == DateTime.Today.Date ? "today" : "")">
+                                @currentDay.Day
+                                <!-- Display bookings for the day -->
+                                @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == currentDay))
+                                {
+                                    <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
+                                }
+                                <!-- Display availabilities for the day -->
+                                @foreach(var availability in Model.ViewAvailabilities.Where(a => a.StartTime.Date == currentDay))
+                                {
+                                    <div class="availability-event">@availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")</div>
+                                }
+                            </td>
+                        }
+
+                        if ((i + 1) % 7 == 0)
+                        {
+                            @:</tr>
+                        }
+                    }
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
+
+<h1>Testing Section</h1>
+<br />
+@foreach(var booking in Model.Bookings)
+{
+    <p>@booking.StartTime.ToString("HH:mm") - @booking.Subject</p>
+}
+@foreach(var availability in Model.Availabilities)
+{
+    <p>@availability.Id: Available from @availability.StartTime.ToString("HH:mm") to @availability.EndTime.ToString("HH:mm")</p>
+}
+
+<h2>End of testing</h2>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
@@ -155,61 +207,3 @@
         });
     </script>
 }
-
-
-
-
-@* This code is just to check that availabilites work with the database
-@*
-@page
-@model SchedulingSystemWeb.Pages.Availabilities.IndexModel
-
-<div class="container">
-    <div class="row pt-4">
-        <div class="col-6">
-            <h2 class="text-primary">Availability List</h2>
-        </div>
-        <div class="col-6 text-end">
-            <a asp-page="Upsert" asp-route-id="0" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> Create New Availability
-            </a>
-        </div>
-    </div> <!---End of bootstrap row-->
-
-    <table class="table table-bordered table-hover table-striped" style="width:100%">
-        <thead>
-            <tr>
-                <th>Days of Week</th>
-                <th>Start Time</th>
-                <th>End Time</th>
-                <th>Recurring</th>
-                <th>End Date</th>
-                <th>Unavailable</th>
-                <th>&nbsp;</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var obj in Model.objAvailabilitiesList)
-            {
-            <tr>
-                <td>@string.Join(", ", obj.DaysOfWeek)</td>
-                <td>@obj.StartTime.ToString("g")</td>
-                <td>@obj.EndTime.ToString("g")</td>
-                <td>@(obj.Recurring ? "Yes" : "No")</td>
-                <td>@(obj.RecurringEndDate?.ToString("d") ?? "N/A")</td>
-                <td>
-                    <div class="w-75 btn-group" role="group">
-                        <a asp-page="Upsert" asp-route-id="@obj.Id" class="btn btn-primary mx-2">
-                            <i class="bi bi-pencil-square"></i> Edit
-                        </a>
-                        <a asp-page="/Availability/Delete" asp-route-id="@obj.Id" class="btn btn-danger mx-2" onclick="return confirm('Are you sure you want to delete this?');">
-                            <i class="bi bi-trash-fill"></i> Delete
-                        </a>
-                    </div>
-                </td>
-            </tr>
-            }
-        </tbody>
-    </table>
-</div>
- *@ 

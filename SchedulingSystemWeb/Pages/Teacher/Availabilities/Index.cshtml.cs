@@ -1,3 +1,5 @@
+using DataAccess;
+using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
@@ -8,12 +10,63 @@ namespace SchedulingSystemWeb.Pages.Availabilities
 {
     public class IndexModel : PageModel
     {
+        private readonly UnitOfWork _unitOfWork;
+        public IEnumerable<Booking> Bookings { get; set; }
+        public IEnumerable<Availability> Availabilities { get; set; }
+
+        public IEnumerable<Booking> ViewBookings { get; set; }
+        public IEnumerable<Availability> ViewAvailabilities { get; set; }
+
         public DateTime CurrentDate { get; private set; }
         public List<DateTime> WeekDays { get; private set; } = new List<DateTime>();
         public List<DateTime> MonthDays { get; private set; }
         public string CurrentMonthName { get; private set; }
 
-        public void OnGet()
+        public IndexModel(UnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+            Bookings = new List<Booking>();
+            Availabilities = new List<Availability>();
+            SeedData();
+        }
+        public void SeedData()
+        {
+            // Temporary seeding of Availabilities and objBookingList
+            Availabilities = new List<Availability>
+            {
+                new Availability
+                {
+                    Id = 1,
+                    DayOfTheWeek = DayOfWeek.Friday,
+                    StartTime = new DateTime(2024, 3, 15, 9, 0, 0),
+                    EndTime = new DateTime(2024, 3, 15, 12, 0, 0),
+                    Recurring = false
+                },
+                new Availability
+                {
+                    Id = 2,
+                    DayOfTheWeek = DayOfWeek.Monday,
+                    StartTime = new DateTime(2024, 4, 1, 9, 0, 0),
+                    EndTime = new DateTime(2024, 4, 1, 12, 0, 0),
+                    Recurring = false
+                }
+            };
+
+            Bookings = new List<Booking>
+            {
+                new Booking
+                {
+                    Id = 1,
+                    Subject = "Team Meeting",
+                    Note = "Discuss project milestones",
+                    StartTime = new DateTime(2024, 3, 14, 14, 0, 0),
+                    Duration = 2,
+                }
+            };
+        }
+
+
+        public async Task OnGetAsync()
         {
             CurrentDate = (DateTime?)TempData["CurrentDate"] ?? DateTime.Today;
             TempData.Keep("CurrentDate");
@@ -21,6 +74,8 @@ namespace SchedulingSystemWeb.Pages.Availabilities
 
             WeekDays = GetWeekDays(CurrentDate);
             MonthDays = GetMonthDays(CurrentDate);
+
+            await FetchDataForCurrentViewAsync();
         }
 
         private List<DateTime> GetWeekDays(DateTime currentDate)
@@ -55,86 +110,83 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             return monthDays;
         }
 
-        public IActionResult OnGetPreviousWeek()
+        public async Task<IActionResult> OnGetPreviousWeekAsync()
         {
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(-7);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
-            CurrentMonthName = CurrentDate.ToString("MMMM");
-            WeekDays = GetWeekDays(CurrentDate);
-            MonthDays = GetMonthDays(CurrentDate);
-            return Page();
-        }
-        public IActionResult OnGetToday()
-        {
-            CurrentDate = DateTime.Today;
-            TempData["CurrentDate"] = CurrentDate;
-            TempData["ActiveTab"] = "weekly";
+            await FetchDataForCurrentViewAsync();
             return RedirectToPage();
         }
 
-        public IActionResult OnGetNextWeek()
+        public async Task<IActionResult> OnGetNextWeekAsync()
         {
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(7);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
-            CurrentMonthName = CurrentDate.ToString("MMMM");
-            WeekDays = GetWeekDays(CurrentDate);
-            MonthDays = GetMonthDays(CurrentDate);
-            return Page();
+            await FetchDataForCurrentViewAsync();
+            return RedirectToPage();
         }
 
-        public IActionResult OnGetPreviousMonth()
+        public async Task<IActionResult> OnGetPreviousMonthAsync()
         {
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(-1);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
             CurrentMonthName = CurrentDate.ToString("MMMM");
             MonthDays = GetMonthDays(CurrentDate);
+            await FetchDataForCurrentViewAsync();
             return Page();
         }
 
-        public IActionResult OnGetNextMonth()
+        public async Task<IActionResult> OnGetNextMonthAsync()
         {
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(1);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
-            CurrentMonthName = CurrentDate.ToString("MMMM");
-            MonthDays = GetMonthDays(CurrentDate);
-            return Page();
+            await FetchDataForCurrentViewAsync();
+            return RedirectToPage();
         }
 
-        public IActionResult OnGetTodayMonth()
+        public async Task<IActionResult> OnGetTodayWeekAsync()
+        {
+            CurrentDate = DateTime.Today;
+            TempData["CurrentDate"] = CurrentDate;
+            TempData["ActiveTab"] = "weekly";
+            await FetchDataForCurrentViewAsync();
+            return RedirectToPage(); 
+        }
+
+        public async Task<IActionResult> OnGetTodayMonthAsync()
         {
             CurrentDate = DateTime.Today;
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
+            await FetchDataForCurrentViewAsync(); 
             return RedirectToPage();
         }
+
+        private async Task FetchDataForCurrentViewAsync()
+        {
+            // Adjust these lines to match your actual method names and parameters
+            DateTime startOfMonth = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
+            DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
+
+
+            //These will be used when the database is working, for now ignore them
+            //ViewBookings = await _unitOfWork.Booking.GetAllAsync(
+            //    b => b.StartTime >= startOfMonth && b.StartTime <= endOfMonth);
+
+            //ViewAvailabilities = await _unitOfWork.Availability.GetAllAsync(
+            //    a => a.StartTime >= startOfMonth && a.StartTime <= endOfMonth
+            //    );
+
+            // Filter bookings within the month.
+            ViewBookings = Bookings.Where(b => b.StartTime.Date >= startOfMonth && b.StartTime.Date <= endOfMonth);
+
+            // Filter availabilities within the month. Adjust this logic if your availabilities work differently.
+            ViewAvailabilities = Availabilities.Where(a => a.StartTime.Date >= startOfMonth && a.StartTime.Date <= endOfMonth);
+        }
+
     }
 }
-
-        //ignore this for now
-
-        //private readonly UnitOfWork _unitOfWork;
-        //public IEnumerable<Availability> AvailabilitiesList { get; set; }
-        //public string CalendarEvents { get; set; }
-
-        //public IndexModel(UnitOfWork unitOfWork)
-        //{
-        //    _unitOfWork = unitOfWork;
-        //}
-
-        //public void OnGet()
-        //{
-        //    AvailabilitiesList = _unitOfWork.Availability.GetAll(includes: "ProviderProfile,ProviderProfile.User");
-
-        //    var events = AvailabilitiesList.Select(a => new
-        //    {
-        //        title = $"Availability for {a.ProviderProfile.User.UserName}", // Adjust according to actual data model
-        //        start = a.StartTime.ToString("s"), // ISO format
-        //        end = a.EndTime.ToString("s"),
-        //        allDay = false
-        //    }).ToList();
-        //    CalendarEvents = System.Text.Json.JsonSerializer.Serialize(events);
-        //}

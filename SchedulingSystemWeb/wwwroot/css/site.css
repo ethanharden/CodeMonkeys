@@ -142,6 +142,28 @@ footer {
     text-align: center;
 }
 
+.booking-event {
+    background-color: red;
+    color: white;
+    padding: 2px;
+    margin-top: 2px;
+}
+
+.availability-event {
+    background-color: green;
+    color: white;
+    padding: 2px;
+    margin-top: 2px;
+}
+
+.empty-day {
+    background-color: #eee;
+}
+
+.table td, .table th {
+    vertical-align: top; /* Align content to the top of the cell */
+}
+
 /* Clear floats after headers */
 .week-header::after, .week-row::after, .month-header::after {
     content: "";
