@@ -74,25 +74,25 @@ namespace DataAccess
 
             var ApplicationUsers = new List<ApplicationUser>
             {
-                new ApplicationUser { FirstName = "John", 
-                    LastName = "Doe", 
-                    PhoneNum = "801-555-5555", 
+                new ApplicationUser { FirstName = "John",
+                    LastName = "Doe",
+                    PhoneNum = "801-555-5555",
                     ProfilePicture = ""},
-                new ApplicationUser { FirstName = "Jane", 
-                    LastName = "Doe", 
-                    PhoneNum = "801-555-5556", 
+                new ApplicationUser { FirstName = "Jane",
+                    LastName = "Doe",
+                    PhoneNum = "801-555-5556",
                     ProfilePicture = ""},
-                new ApplicationUser { FirstName = "Richard", 
-                    LastName = "Fry", 
-                    PhoneNum = "801-555-5557", 
+                new ApplicationUser { FirstName = "Richard",
+                    LastName = "Fry",
+                    PhoneNum = "801-555-5557",
                     ProfilePicture = ""},
-                new ApplicationUser { FirstName = "Pat", 
-                    LastName = "DeJong", 
-                    PhoneNum = "801-555-5558", 
+                new ApplicationUser { FirstName = "Pat",
+                    LastName = "DeJong",
+                    PhoneNum = "801-555-5558",
                     ProfilePicture = ""},
-                new ApplicationUser { FirstName = "Julie", 
-                    LastName = "Christenson", 
-                    PhoneNum = "801-555-5559", 
+                new ApplicationUser { FirstName = "Julie",
+                    LastName = "Christenson",
+                    PhoneNum = "801-555-5559",
                     ProfilePicture = ""},
             };
 
@@ -104,23 +104,23 @@ namespace DataAccess
 
             var ProviderProfiles = new List<ProviderProfile>
             {
-                //Pat
-                new ProviderProfile { ProviderProfileID = 1, 
-                    UserId = "4", 
-                    RemoteLink = "", 
-                    BookingPrompt = "", 
+                //Pat Dejong
+                new ProviderProfile { ProviderProfileID = 1,
+                    UserId = "4",
+                    RemoteLink = "",
+                    BookingPrompt = "",
                     DepartmentString = ""},
-                //Rich
-                new ProviderProfile { ProviderProfileID = 2, 
-                    UserId = "3", 
-                    RemoteLink = "", 
-                    BookingPrompt = "", 
+                //Rich Fry
+                new ProviderProfile { ProviderProfileID = 2,
+                    UserId = "3",
+                    RemoteLink = "",
+                    BookingPrompt = "",
                     DepartmentString = ""},
-                //Julie
-                new ProviderProfile { ProviderProfileID = 3, 
-                    UserId = "5", 
-                    RemoteLink = "", 
-                    BookingPrompt = "", 
+                //Julie Christenson
+                new ProviderProfile { ProviderProfileID = 3,
+                    UserId = "5",
+                    RemoteLink = "",
+                    BookingPrompt = "",
                     DepartmentString = ""}
             };
 
@@ -135,12 +135,12 @@ namespace DataAccess
             var CustomerProfiles = new List<CustomerProfile>
             {
                 //John Doe
-                new CustomerProfile { Id = 1, 
-                    UserId = "1", 
+                new CustomerProfile { Id = 1,
+                    UserId = "1",
                     WNumber = 01333732 },
                 //Jane Doe
-                new CustomerProfile { Id = 2, 
-                    UserId = "2", 
+                new CustomerProfile { Id = 2,
+                    UserId = "2",
                     WNumber = 01333733 }
             };
 
@@ -152,10 +152,10 @@ namespace DataAccess
 
             var Locations = new List<Location>
             {
-                new Location { LocationId = 1, 
-                    LocationName = "Ogden Campus", 
-                    Address1 = "3848 Harrison Blvd", 
-                    Address2 = "", 
+                new Location { LocationId = 1,
+                    LocationName = "Ogden Campus",
+                    Address1 = "3848 Harrison Blvd",
+                    Address2 = "",
                     AddressCity = "Ogden",
                     BuildingName = "Norda",
                     RoomNumber = 101
@@ -187,11 +187,11 @@ namespace DataAccess
             var RecurringTypes = new List<RecurringType>
             {
                 new RecurringType { Id = 1,
-                Name = "wtf is this",
-                DaysBetween = 5},
+                Name = "Weekly",
+                DaysBetween = 7},
                 new RecurringType { Id = 2,
-                Name = "wtf is this",
-                DaysBetween = 7}
+                Name = "bi-weekly",
+                DaysBetween = 14}
             };
 
             foreach (var c in RecurringTypes)
@@ -207,13 +207,13 @@ namespace DataAccess
                     Subject = "Comp Sci",
                     Note = "CBTD Help",
                     //StartTime = "help"
-                    Duration = 30,
+                    Duration = 15,
                     Attatchment = "",
                     //Meeting with Fry,
-                    ProviderProfile = 2,
-                    User = 3 }
-                };
-            }
+                    ProviderId = 1,
+                    UserId = 3 
+                }     
+            };
         }
     }
 }
