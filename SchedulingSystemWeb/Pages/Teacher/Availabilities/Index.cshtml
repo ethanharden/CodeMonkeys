@@ -31,6 +31,9 @@
             <div class="container">
                 <!-- Weekly Calendar -->
                 <br>
+                <button type="button" class="btn btn-success mb-3" onclick="window.location.href='@Url.Page("/Teacher/Availabilities/Upsert")'">
+                    Create Availability
+                </button>
                 <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=NextWeek'">Next Week</button>
                 <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=PreviousWeek'">Previous Week</button>
                
@@ -80,14 +83,22 @@
                             {
                                 <td class="hour-cell @((day.Date == DateTime.Today) ? "today" : "")">
                                     <!-- Display bookings for the day and hour -->
-                                    @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == day.Date && b.StartTime.Hour == hour))
+                                    @foreach(var booking in Model.Bookings.Where(b => b.StartTime.Date == day.Date && b.StartTime.Hour == hour))
                                     {
                                         <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
                                     }
                                     <!-- Display availabilities for the day and hour -->
-                                    @foreach(var availability in Model.ViewAvailabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour))
+                                    @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour))
                                     {
-                                        <div class="availability-event">Available</div>
+                                        <a asp-page="/Teacher/Availabilities/Upsert" asp-route-id="@availability.Id" class="availability-link">
+                                            <div class="card text-white bg-success mb-3">
+                                                <div class="card-header">Available</div>
+                                                <div class="card-body">
+                                                    @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
+                                                </div>
+                                                <br>
+                                            </div>
+                                        </a>
                                     }
                                 </td>
                             }
@@ -106,6 +117,9 @@
              <div class="container">
                 <!-- Monthly Calendar -->
                 <br />
+                <button type="button" class="btn btn-success mb-3" onclick="window.location.href='@Url.Page("/Teacher/Availabilities/Upsert")'">
+                    Create Availability
+                </button>
                 <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=NextMonth'">Next Month</button>
                 <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=PreviousMonth'">Previous Month</button>               
                 <button type="button" class="btn btn-secondary" style="float: right;" onclick="location.href='?handler=TodayMonth'">Today</button>
@@ -139,16 +153,22 @@
                             <td class="month-day @(currentDay.Date == DateTime.Today.Date ? "today" : "")">
                                 @currentDay.Day
                                 <!-- Display bookings for the day -->
-                                @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == currentDay))
+                                @foreach(var booking in Model.Bookings.Where(b => b.StartTime.Date == currentDay))
                                 {
                                     <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
                                 }
                                 <!-- Display availabilities for the day -->
-                                @foreach(var availability in Model.ViewAvailabilities.Where(a => a.StartTime.Date == currentDay))
+                                @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == currentDay))
                                 {
-                                    <div class="availability-event">@availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")</div>
+                                    <a asp-page="/Teacher/Availabilities/Upsert" asp-route-id="@availability.Id" class="availability-link">
+                                        <div class="card-header">Available</div>
+                                        <div class="card-body">
+                                            @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
+                                        </div>
+                                        <br>
+                                    </a>
                                 }
-                            </td>
+                                </td>
                         }
 
                         if ((i + 1) % 7 == 0)
@@ -162,19 +182,6 @@
         </div>
     </div>
 </div>
-
-<h1>Testing Section</h1>
-<br />
-@foreach(var booking in Model.Bookings)
-{
-    <p>@booking.StartTime.ToString("HH:mm") - @booking.Subject</p>
-}
-@foreach(var availability in Model.Availabilities)
-{
-    <p>@availability.Id: Available from @availability.StartTime.ToString("HH:mm") to @availability.EndTime.ToString("HH:mm")</p>
-}
-
-<h2>End of testing</h2>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
@@ -204,6 +211,13 @@
             } else {
                 new bootstrap.Tab(document.querySelector('#weekly-tab')).show();
             }
+        });
+    </script>
+    <script>
+        document.querySelectorAll('.availability-link').forEach(function(availabilityLink) {
+            availabilityLink.addEventListener('dblclick', function() {
+                window.location.href = this.getAttribute('href');
+            });
         });
     </script>
 }

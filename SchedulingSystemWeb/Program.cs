@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using DataAccess;
 using Infrastructure.Models;
+using Infrastructure.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 
 builder.Services.AddScoped<UnitOfWork>();
+builder.Services.AddScoped<ICalendarService, CalendarService>();
 //builder.Services.AddScoped<DbInitializer>();
 var app = builder.Build();
 

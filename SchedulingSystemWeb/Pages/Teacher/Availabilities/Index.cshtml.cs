@@ -1,4 +1,5 @@
 using DataAccess;
+using Infrastructure.Interfaces;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -11,6 +12,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
     public class IndexModel : PageModel
     {
         private readonly UnitOfWork _unitOfWork;
+        private readonly ICalendarService _calendarService;
         public IEnumerable<Booking> Bookings { get; set; }
         public IEnumerable<Availability> Availabilities { get; set; }
 
@@ -22,8 +24,9 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         public List<DateTime> MonthDays { get; private set; }
         public string CurrentMonthName { get; private set; }
 
-        public IndexModel(UnitOfWork unitOfWork)
+        public IndexModel(UnitOfWork unitOfWork, ICalendarService calendarService)
         {
+            _calendarService = calendarService;
             _unitOfWork = unitOfWork;
             Bookings = new List<Booking>();
             Availabilities = new List<Availability>();
@@ -31,7 +34,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         }
         public void SeedData()
         {
-            // Temporary seeding of Availabilities and objBookingList
+            // Temporary seeding of Availabilities and Bookings
             Availabilities = new List<Availability>
             {
                 new Availability
@@ -72,42 +75,10 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             TempData.Keep("CurrentDate");
             CurrentMonthName = CurrentDate.ToString("MMMM");
 
-            WeekDays = GetWeekDays(CurrentDate);
-            MonthDays = GetMonthDays(CurrentDate);
+            WeekDays = _calendarService.GetWeekDays(CurrentDate);
+            MonthDays = _calendarService.GetMonthDays(CurrentDate);
 
             await FetchDataForCurrentViewAsync();
-        }
-
-        private List<DateTime> GetWeekDays(DateTime currentDate)
-        {
-            var firstDayOfWeek = CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek;
-            var startDate = currentDate.Date;
-
-            while (startDate.DayOfWeek != firstDayOfWeek)
-            {
-                startDate = startDate.AddDays(-1);
-            }
-
-            var weekDays = new List<DateTime>();
-            for (int i = 0; i < 7; i++)
-            {
-                weekDays.Add(startDate.AddDays(i));
-            }
-
-            return weekDays;
-        }
-
-        private List<DateTime> GetMonthDays(DateTime currentDate)
-        {
-            var daysInMonth = DateTime.DaysInMonth(currentDate.Year, currentDate.Month);
-            var monthDays = new List<DateTime>();
-
-            for (int day = 1; day <= daysInMonth; day++)
-            {
-                monthDays.Add(new DateTime(currentDate.Year, currentDate.Month, day));
-            }
-
-            return monthDays;
         }
 
         public async Task<IActionResult> OnGetPreviousWeekAsync()
@@ -118,7 +89,6 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             await FetchDataForCurrentViewAsync();
             return RedirectToPage();
         }
-
         public async Task<IActionResult> OnGetNextWeekAsync()
         {
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(7);
@@ -127,18 +97,16 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             await FetchDataForCurrentViewAsync();
             return RedirectToPage();
         }
-
         public async Task<IActionResult> OnGetPreviousMonthAsync()
         {
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(-1);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
             CurrentMonthName = CurrentDate.ToString("MMMM");
-            MonthDays = GetMonthDays(CurrentDate);
+            MonthDays = _calendarService.GetMonthDays(CurrentDate);
             await FetchDataForCurrentViewAsync();
             return Page();
         }
-
         public async Task<IActionResult> OnGetNextMonthAsync()
         {
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(1);
@@ -147,7 +115,6 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             await FetchDataForCurrentViewAsync();
             return RedirectToPage();
         }
-
         public async Task<IActionResult> OnGetTodayWeekAsync()
         {
             CurrentDate = DateTime.Today;
@@ -156,7 +123,6 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             await FetchDataForCurrentViewAsync();
             return RedirectToPage(); 
         }
-
         public async Task<IActionResult> OnGetTodayMonthAsync()
         {
             CurrentDate = DateTime.Today;
@@ -172,8 +138,8 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             DateTime startOfMonth = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
             DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
-
-            //These will be used when the database is working, for now ignore them
+            //TEMP
+            // Filter bookings within the month.
             //ViewBookings = await _unitOfWork.Booking.GetAllAsync(
             //    b => b.StartTime >= startOfMonth && b.StartTime <= endOfMonth);
 
@@ -181,10 +147,9 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             //    a => a.StartTime >= startOfMonth && a.StartTime <= endOfMonth
             //    );
 
-            // Filter bookings within the month.
-            ViewBookings = Bookings.Where(b => b.StartTime.Date >= startOfMonth && b.StartTime.Date <= endOfMonth);
 
-            // Filter availabilities within the month. Adjust this logic if your availabilities work differently.
+            //TEMP
+            ViewBookings = Bookings.Where(b => b.StartTime.Date >= startOfMonth && b.StartTime.Date <= endOfMonth);
             ViewAvailabilities = Availabilities.Where(a => a.StartTime.Date >= startOfMonth && a.StartTime.Date <= endOfMonth);
         }
 

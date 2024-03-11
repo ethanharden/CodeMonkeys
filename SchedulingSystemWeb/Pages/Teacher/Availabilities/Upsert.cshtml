@@ -1,147 +1,332 @@
 ﻿@page
 @model SchedulingSystemWeb.Pages.Availabilities.UpsertModel
+@using System.Globalization
 @{
-    //ViewData["Title"] = Model.objAvailability.Id == 0 ? "Create Availability" : "Edit Availability";
+    ViewData["Title"] = Model.objAvailability.Id == 0 ? "Create Availability" : "Edit Availability";
+    var firstDayOfMonth = new DateTime(Model.CurrentDate.Year, Model.CurrentDate.Month, 1);
+    var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+    int daysInMonth = DateTime.DaysInMonth(Model.CurrentDate.Year, Model.CurrentDate.Month);
+    int firstDayOfWeek = (int)CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek;
+    int currentDayOfWeek = (int)firstDayOfMonth.DayOfWeek;
+    int leadingDays = (currentDayOfWeek - firstDayOfWeek + 7) % 7;
 }
+
 <h4>Availability</h4>
 
-@* <div class="container mt-4">
-    <div class="card">
-        <div class="card-header">
-            <h2>@ViewData["Title"]</h2>
-        </div>
-        <div class="card-body">
-            <form method="post" class="needs-validation" novalidate>
-                <input type="hidden" asp-for="objAvailability.Id" />
+<div class="row">
+    <div class="col-md-6">
+        <!-- Form goes here -->
+        <div class="col-md-6">
+        <form method="post">
+            <!-- Hidden field for Id -->
+            <input type="hidden" asp-for="objAvailability.Id" />
+        
+            <!-- Start Time -->
+            <div class="form-group">
+                <label asp-for="objAvailability.StartTime" class="control-label"></label>
+                <input asp-for="objAvailability.StartTime" class="form-control" type="datetime-local" />
+                <span asp-validation-for="objAvailability.StartTime" class="text-danger"></span>
+            </div>
 
-                <!-- Start Time -->
-                <div class="form-group">
-                    <label asp-for="objAvailability.StartTime" class="control-label"></label>
-                    <input asp-for="objAvailability.StartTime" class="form-control" type="datetime-local" />
-                    <span asp-validation-for="objAvailability.StartTime" class="text-danger"></span>
-                </div>
+            <!-- End Time -->
+            <div class="form-group">
+                <label asp-for="objAvailability.EndTime" class="control-label"></label>
+                <input asp-for="objAvailability.EndTime" class="form-control" type="datetime-local" />
+                <span asp-validation-for="objAvailability.EndTime" class="text-danger"></span>
+            </div>
 
-                <!-- End Time -->
-                <div class="form-group">
-                    <label asp-for="objAvailability.EndTime" class="control-label"></label>
-                    <input asp-for="objAvailability.EndTime" class="form-control" type="datetime-local" id="endTime" />
-                    <span asp-validation-for="objAvailability.EndTime" class="text-danger"></span>
-                </div>
-
-                <!-- Duration -->
-                <div class="form-group">
-                    <label for="duration" class="control-label">Duration</label>
-                    <select id="duration" class="form-control">
-                        @for (int i = 15; i <= 300; i += 15)
-                        {
-                            <option value="@i">@TimeSpan.FromMinutes(i).ToString(@"hh\:mm")</option>
-                        }
-                    </select>
-                </div>
-
-                <!-- Recurring -->
-                <div class="form-group">
-                    <label asp-for="objAvailability.Recurring" class="control-label"></label>
-                    <input asp-for="objAvailability.Recurring" class="form-check-input" id="recurring" />
-                    <span asp-validation-for="objAvailability.Recurring" class="text-danger"></span>
-                </div>
-
-                <!-- Recurring EndDate -->
-                <div class="form-group" id="recurringEndDateGroup" style="display:none;">
-                    <label asp-for="objAvailability.RecurringEndDate" class="control-label"></label>
-                    <input asp-for="objAvailability.RecurringEndDate" class="form-control" type="date" />
-                    <span asp-validation-for="objAvailability.RecurringEndDate" class="text-danger"></span>
-                </div>
-
-                <!-- Days of Week -->
-                <div class="form-group">
-                    <label class="control-label">Days of Week</label>
-                    @{
-                        var dayOfWeekValues = Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>();
-                        foreach (var day in dayOfWeekValues)
-                        {
-                            // Create a unique identifier for each checkbox
-                            var checkboxId = $"DaysOfWeek_{day}";
-                            // Determine if the checkbox should be checked
-                            var isChecked = Model.objAvailability.DaysOfWeek.Contains(day) ? "checked=\"checked\"" : "";
-
-                            <div class="form-check">
-                                <input class="form-check-input"
-                                       type="checkbox"
-                                       id="@checkboxId"
-                                       name="DaysOfWeek"
-                                       value="@day"
-                                @Html.Raw(isChecked) />
-                                <label class="form-check-label" for="@checkboxId">@day</label>
-                            </div>
-                        }
+            <!-- Duration -->
+            <div class="form-group">
+                <label for="duration" class="control-label">Duration</label>
+                <select id="duration" class="form-control">
+                    @for (int i = 15; i <= 300; i += 15)
+                    {
+                        <option value="@i">@TimeSpan.FromMinutes(i).ToString(@"hh\:mm")</option>
                     }
-                </div>
+                </select>
+            </div>
 
-                <button type="submit" class="btn btn-success">@ViewData["Title"]</button>
-            </form>
+            <!-- Days of Week -->
+            <div class="form-group">
+                <label class="control-label">Days of Week</label>
+                @{
+                    var dayOfWeekValues = Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>();
+                    foreach (var day in dayOfWeekValues)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input"
+                                    type="checkbox"
+                                    name="SelectedDaysOfWeek"
+                                    value="@day" />
+                            <label class="form-check-label">@day</label>
+                        </div>
+                    }
+                }
+            </div>
+
+            <!--Recurring section-->
+            <div class="form-group">
+                <label asp-for="objAvailability.Recurring" class="control-label">Recurring</label>
+                <input asp-for="objAvailability.Recurring" class="form-check-input" type="checkbox" id="recurringCheckbox" />
+            </div>
+
+            <div class="form-group" id="recurringEndDateGroup" style="display:none;">
+                <label asp-for="objAvailability.RecurringEndDate" class="control-label">Recurring End Date</label>
+                <input asp-for="objAvailability.RecurringEndDate" class="form-control" type="date" />
+                <span asp-validation-for="objAvailability.RecurringEndDate" class="text-danger"></span>
+            </div>
+
+            <!-- Submit button -->
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
         </div>
+    </div>
+    <!--Calendar-->
+    <div class="col-md-6">
+        <h2 class="text-primary">@ViewData["Title"]</h2>
+
+        <!-- Tab navigation buttons -->
+        <ul class="nav nav-tabs" id="calendarTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="weekly-tab" data-bs-toggle="tab" data-bs-target="#weekly" type="button" role="tab" aria-controls="weekly" aria-selected="true">Weekly</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="monthly-tab" data-bs-toggle="tab" data-bs-target="#monthly" type="button" role="tab" aria-controls="monthly" aria-selected="false">Monthly</button>
+            </li>
+        </ul>
+        <!-- Tab content -->
+        <div class="tab-content" id="calendarTabsContent">
+            <!-- Weekly Schedule Tab -->
+            <div class="tab-pane fade show active" id="weekly" role="tabpanel" aria-labelledby="weekly-tab">
+                <div class="container">
+                    <!-- Weekly Calendar and its navigation buttons -->
+                    <div class="container">
+                        <!-- Weekly Calendar -->
+                        <br>
+                        <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=NextWeek'">Next Week</button>
+                        <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=PreviousWeek'">Previous Week</button>
+               
+                        <button type="button" class="btn btn-secondary" style="float: right;" onclick="location.href='?handler=TodayWeek'">Today</button>
+                        @if (Model.WeekDays.Any())
+        {
+                            var firstDay = Model.WeekDays.First();
+                            var lastDay = Model.WeekDays.Last();
+                            string displayWeek;
+
+                            if (firstDay.Month != lastDay.Month)
+                            {
+                                // Week spans two different months
+                                displayWeek = firstDay.ToString("MMMM dd") + " - " + lastDay.ToString("MMMM dd");
+                            }
+                            else
+                            {
+                                // Week is within the same month
+                                displayWeek = firstDay.ToString("MMMM") + " Week of " + firstDay.ToString("dd") + " - " + lastDay.ToString("dd");
+                            }
+
+                            <h3>@displayWeek</h3>
+                        }
+                        else
+                        {
+                            <h3>@Model.CurrentMonthName</h3>
+                        }
+
+                        <table class="calendar">
+                            <thead>
+                                <tr class="week-header">
+                                    <th class="time-header">Time</th>
+                                    @foreach (var day in Model.WeekDays)
+                                    {
+                                        <th class="day-header @((day.Date == DateTime.Today) ? "today" : "")">
+                                            @day.ToString("ddd dd")
+                                        </th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (var hour = 0; hour < 24; hour++)
+                            {
+                                <tr class="week-row">
+                                    <td class="hour">@hour:00</td>
+                                    @foreach (var day in Model.WeekDays)
+                                    {
+                                        <td class="hour-cell @((day.Date == DateTime.Today) ? "today" : "")">
+                                            <!-- Display availabilities for the day and hour -->
+                                            @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour))
+                                            {
+                                                <a asp-page="/Availabilities/Upsert" asp-route-id="@availability.Id" class="availability-link">
+                                                    <div class="card text-white bg-success mb-3">
+                                                        <div class="card-header">Available</div>
+                                                        <div class="card-body">
+                                                            @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
+                                                        </div>
+                                                        <br>
+                                                    </div>
+                                                </a>
+                                            }
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Monthly Schedule Tab -->
+            <div class="tab-pane fade" id="monthly" role="tabpanel" aria-labelledby="monthly-tab">
+                <div class="container">
+                    <!-- Monthly Calendar and its navigation buttons -->
+                     <div class="container">
+                        <!-- Monthly Calendar -->
+                        <br />
+                        <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=NextMonth'">Next Month</button>
+                        <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=PreviousMonth'">Previous Month</button>               
+                        <button type="button" class="btn btn-secondary" style="float: right;" onclick="location.href='?handler=TodayMonth'">Today</button>
+                        <h3>@Model.CurrentMonthName @Model.CurrentDate.Year</h3>
+                        <table id="monthly-calendar" class="calendar">
+                            <thead>
+                                <tr class="month-header">
+                                    @for (int i = 0; i < 7; i++)
+                                    {
+                                        <th class="day-header">
+                                            @CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedDayName((DayOfWeek)((firstDayOfWeek + i) % 7))
+                                        </th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                               @for (int i = 0; i < leadingDays + daysInMonth; i++)
+                            {
+                                if (i % 7 == 0)
+                                {
+                                    @:<tr class="week-row">
+                                }
+
+                                if (i < leadingDays)
+                                {
+                                    <td class="empty-day"></td>
+                                }
+                                else
+                                {
+                                    var currentDay = firstDayOfMonth.AddDays(i - leadingDays);
+                                    <td class="month-day @(currentDay.Date == DateTime.Today.Date ? "today" : "")">
+                                        @currentDay.Day
+                                        <!-- Display availabilities for the day -->
+                                        @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == currentDay))
+                                        {
+                                            <a asp-page="/Availabilities/Upsert" asp-route-id="@availability.Id" class="card-link">
+                                                <div class="card-header">Available</div>
+                                                <div class="card-body">
+                                                    @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
+                                                </div>
+                                                <br>
+                                            </a>
+                                        }
+                                        </td>
+                                }
+
+                                if ((i + 1) % 7 == 0)
+                                {
+                                    @:</tr>
+                                }
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Handle the tab switching and also call the Today handler
+        document.querySelectorAll('.nav-link').forEach(function (navLink) {
+            navLink.addEventListener('click', function (e) {
+                let currentTab = new bootstrap.Tab(navLink);
+                currentTab.show();
 
+                // Check the id of the clicked tab and call the respective Today handler
+                if (navLink.id === 'weekly-tab') {
+                    window.location.href = '?handler=Today';
+                } else if (navLink.id === 'monthly-tab') {
+                    window.location.href = '?handler=TodayMonth';
+                }
+
+                e.preventDefault();
+            });
+        });
+
+        // Original code to set the active tab on page load based on TempData
+        document.addEventListener('DOMContentLoaded', (event) => {
+            let activeTab = '@TempData["ActiveTab"]';
+            if (activeTab === "monthly") {
+                new bootstrap.Tab(document.querySelector('#monthly-tab')).show();
+            } else {
+                new bootstrap.Tab(document.querySelector('#weekly-tab')).show();
+            }
+        });
+    </script>
+    <!--Recurring -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Display alerts
-            @if (TempData["Success"] != null)
-            {
-                <text>
-                        Swal.fire({
-                            title: 'Success!',
-                            text: '@TempData["Success"]',
-                            icon: 'success',
-                            confirmButtonText: 'OK'
-                        });
-                </text>
-            }
-            @if (TempData["error"] != null)
-            {
-                <text>
-                        Swal.fire({
-                            title: 'Error!',
-                            text: '@TempData["error"]',
-                            icon: 'error',
-                            confirmButtonText: 'OK'
-                        });
-                </text>
-            }
+            function toggleRecurringEndDate() {
+                var recurringCheckbox = document.getElementById('recurringCheckbox');
+                var recurringEndDateGroup = document.getElementById('recurringEndDateGroup');
+                var recurringEndDateInput = document.getElementById('objAvailability_RecurringEndDate');
 
-            // Update EndTime
-            function updateEndTime() {
-                var startTime = document.getElementById('objAvailability_StartTime').value;
-                var duration = document.getElementById('duration').value;
-                if (startTime) {
-                    var startTimeDate = new Date(startTime);
-                    var endTimeDate = new Date(startTimeDate.getTime() + parseInt(duration) * 60000);
-                    document.getElementById('endTime').value = endTimeDate.toISOString().slice(0, 16);
+                if (recurringCheckbox.checked) {
+                    recurringEndDateGroup.style.display = 'block';
+                } else {
+                    recurringEndDateGroup.style.display = 'none';
+                    // Clear the value of the recurring end date when the checkbox is unchecked
+                    recurringEndDateInput.value = '';
                 }
             }
 
-            // Event listener for StartTime
-            document.getElementById('objAvailability_StartTime').addEventListener('change', updateEndTime);
-            document.getElementById('duration').addEventListener('change', updateEndTime);
-
-            updateEndTime();
-
-            // Toggle RecurringEndDate
-            var recurringCheckbox = document.getElementById('recurring');
-            var recurringEndDateGroup = document.getElementById('recurringEndDateGroup');
-
-            function toggleRecurringEndDate() {
-                recurringEndDateGroup.style.display = recurringCheckbox.checked ? 'block' : 'none';
-            }
-
+            var recurringCheckbox = document.getElementById('recurringCheckbox');
             recurringCheckbox.addEventListener('change', toggleRecurringEndDate);
 
-            //initial display
+            // reload page if recurring is checked when editing
             toggleRecurringEndDate();
         });
     </script>
-} *@
+    <!--Duration/ EndTime-->
+    <script>
+        // Update EndTime
+        function updateEndTime() {
+            var startTime = document.getElementById('objAvailability_StartTime').value;
+            var duration = document.getElementById('duration').value;
+            if (startTime) {
+                var startTimeDate = new Date(startTime);
+                var endTimeDate = new Date(startTimeDate.getTime() + parseInt(duration) * 60000);
+                document.getElementById('endTime').value = endTimeDate.toISOString().slice(0, 16);
+            }
+        }
+
+        // Event listener for StartTime
+        document.getElementById('objAvailability_StartTime').addEventListener('change', updateEndTime);
+        document.getElementById('duration').addEventListener('change', updateEndTime);
+
+        updateEndTime();
+
+        // Toggle RecurringEndDate
+        var recurringCheckbox = document.getElementById('recurring');
+        var recurringEndDateGroup = document.getElementById('recurringEndDateGroup');
+
+        function toggleRecurringEndDate() {
+            recurringEndDateGroup.style.display = recurringCheckbox.checked ? 'block' : 'none';
+        }
+
+        recurringCheckbox.addEventListener('change', toggleRecurringEndDate);
+
+        //initial display
+        toggleRecurringEndDate();
+    });
+    </script>
+}

@@ -1,4 +1,212 @@
 ﻿@page
 @model SchedulingSystemWeb.Pages.Student.Bookings.IndexModel
+@using System.Globalization
 @{
+    ViewData["Title"] = "Availability Calendar";
+    var firstDayOfMonth = new DateTime(Model.CurrentDate.Year, Model.CurrentDate.Month, 1);
+    var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+    int daysInMonth = DateTime.DaysInMonth(Model.CurrentDate.Year, Model.CurrentDate.Month);
+    int firstDayOfWeek = (int)CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek;
+    int currentDayOfWeek = (int)firstDayOfMonth.DayOfWeek;
+    int leadingDays = (currentDayOfWeek - firstDayOfWeek + 7) % 7;
+}
+
+<h2 class="text-primary">@ViewData["Title"]</h2>
+
+<!-- Tab navigation buttons -->
+<ul class="nav nav-tabs" id="calendarTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="weekly-tab" data-bs-toggle="tab" data-bs-target="#weekly" type="button" role="tab" aria-controls="weekly" aria-selected="true">Weekly</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="monthly-tab" data-bs-toggle="tab" data-bs-target="#monthly" type="button" role="tab" aria-controls="monthly" aria-selected="false">Monthly</button>
+    </li>
+</ul>
+<!-- Tab content -->
+<div class="tab-content" id="calendarTabsContent">
+    <!-- Weekly Schedule Tab -->
+    <div class="tab-pane fade show active" id="weekly" role="tabpanel" aria-labelledby="weekly-tab">
+        <div class="container">
+            <!-- Weekly Calendar and its navigation buttons -->
+            <div class="container">
+                <!-- Weekly Calendar -->
+                <br>
+                <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=NextWeek'">Next Week</button>
+                <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=PreviousWeek'">Previous Week</button>
+               
+                <button type="button" class="btn btn-secondary" style="float: right;" onclick="location.href='?handler=TodayWeek'">Today</button>
+                @if (Model.WeekDays.Any())
+{
+                    var firstDay = Model.WeekDays.First();
+                    var lastDay = Model.WeekDays.Last();
+                    string displayWeek;
+
+                    if (firstDay.Month != lastDay.Month)
+                    {
+                        // Week spans two different months
+                        displayWeek = firstDay.ToString("MMMM dd") + " - " + lastDay.ToString("MMMM dd");
+                    }
+                    else
+                    {
+                        // Week is within the same month
+                        displayWeek = firstDay.ToString("MMMM") + " Week of " + firstDay.ToString("dd") + " - " + lastDay.ToString("dd");
+                    }
+
+                    <h3>@displayWeek</h3>
+                }
+                else
+                {
+                    <h3>@Model.CurrentMonthName</h3>
+                }
+
+                <table class="calendar">
+                    <thead>
+                        <tr class="week-header">
+                            <th class="time-header">Time</th>
+                            @foreach (var day in Model.WeekDays)
+                            {
+                                <th class="day-header @((day.Date == DateTime.Today) ? "today" : "")">
+                                    @day.ToString("ddd dd")
+                                </th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (var hour = 0; hour < 24; hour++)
+                    {
+                        <tr class="week-row">
+                            <td class="hour">@hour:00</td>
+                            @foreach (var day in Model.WeekDays)
+                            {
+                                <td class="hour-cell @((day.Date == DateTime.Today) ? "today" : "")">
+                                    <!-- Display bookings for the day and hour -->
+                                    @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == day.Date && b.StartTime.Hour == hour))
+                                    {
+                                        <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
+                                    }
+                                    <!-- Display availabilities for the day and hour -->
+                                    @foreach(var availability in Model.ViewAvailabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour))
+                                    {
+                                        <a asp-page="/Student/Bookings/Upsert" asp-route-id="@availability.Id" class="availability-link">
+                                            <div class="card text-white bg-success mb-3">
+                                                <div class="card-header">Available</div>
+                                                <div class="card-body">
+                                                    @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <br>
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Monthly Schedule Tab -->
+    <div class="tab-pane fade" id="monthly" role="tabpanel" aria-labelledby="monthly-tab">
+        <div class="container">
+            <!-- Monthly Calendar and its navigation buttons -->
+             <div class="container">
+                <!-- Monthly Calendar -->
+                <br />
+                <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=NextMonth'">Next Month</button>
+                <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=PreviousMonth'">Previous Month</button>               
+                <button type="button" class="btn btn-secondary" style="float: right;" onclick="location.href='?handler=TodayMonth'">Today</button>
+                <h3>@Model.CurrentMonthName @Model.CurrentDate.Year</h3>
+                <table id="monthly-calendar" class="calendar">
+                    <thead>
+                        <tr class="month-header">
+                            @for (int i = 0; i < 7; i++)
+                            {
+                                <th class="day-header">
+                                    @CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedDayName((DayOfWeek)((firstDayOfWeek + i) % 7))
+                                </th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                       @for (int i = 0; i < leadingDays + daysInMonth; i++)
+                    {
+                        if (i % 7 == 0)
+                        {
+                            @:<tr class="week-row">
+                        }
+
+                        if (i < leadingDays)
+                        {
+                            <td class="empty-day"></td>
+                        }
+                        else
+                        {
+                            var currentDay = firstDayOfMonth.AddDays(i - leadingDays);
+                            <td class="month-day @(currentDay.Date == DateTime.Today.Date ? "today" : "")">
+                                @currentDay.Day
+                                <!-- Display bookings for the day -->
+                                @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == currentDay))
+                                {
+                                    <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
+                                }
+                                <!-- Display availabilities for the day -->
+                                @foreach(var availability in Model.ViewAvailabilities.Where(a => a.StartTime.Date == currentDay))
+                                {
+                                    <a asp-page="/Student/Bookings/Upsert" asp-route-id="@availability.Id" class="availability-link">
+                                        <div class="card text-white bg-success mb-3">
+                                            <div class="card-header">Available</div>
+                                            <div class="card-body">
+                                                @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <br>
+                                }
+                            </td>
+                        }
+
+                        if ((i + 1) % 7 == 0)
+                        {
+                            @:</tr>
+                        }
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Handle the tab switching and also call the Today handler
+        document.querySelectorAll('.nav-link').forEach(function(navLink) {
+            navLink.addEventListener('click', function (e) {
+                let currentTab = new bootstrap.Tab(navLink);
+                currentTab.show();
+
+                // Check the id of the clicked tab and call the respective Today handler
+                if (navLink.id === 'weekly-tab') {
+                    window.location.href = '?handler=Today';
+                } else if (navLink.id === 'monthly-tab') {
+                    window.location.href = '?handler=TodayMonth';
+                }
+
+                e.preventDefault();
+            });
+        });
+
+        // Original code to set the active tab on page load based on TempData
+        document.addEventListener('DOMContentLoaded', (event) => {
+            let activeTab = '@TempData["ActiveTab"]';
+            if (activeTab === "monthly") {
+                new bootstrap.Tab(document.querySelector('#monthly-tab')).show();
+            } else {
+                new bootstrap.Tab(document.querySelector('#weekly-tab')).show();
+            }
+        });
+    </script>
 }

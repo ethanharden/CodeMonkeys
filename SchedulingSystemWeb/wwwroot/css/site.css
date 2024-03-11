@@ -164,6 +164,16 @@ footer {
     vertical-align: top; /* Align content to the top of the cell */
 }
 
+.card-link {
+    text-decoration: none;
+    color: inherit; /* Make the link color inherit from the parent element */
+}
+
+.card-link:hover, .card-link:focus {
+    text-decoration: none;
+    color: inherit;
+}
+
 /* Clear floats after headers */
 .week-header::after, .week-row::after, .month-header::after {
     content: "";
