@@ -105,19 +105,19 @@ namespace DataAccess
             var ProviderProfiles = new List<ProviderProfile>
             {
                 //Pat Dejong
-                new ProviderProfile { ProviderProfileID = 1,
+                new ProviderProfile {
                     UserId = "4",
                     RemoteLink = "",
                     BookingPrompt = "",
                     DepartmentString = ""},
                 //Rich Fry
-                new ProviderProfile { ProviderProfileID = 2,
+                new ProviderProfile {
                     UserId = "3",
                     RemoteLink = "",
                     BookingPrompt = "",
                     DepartmentString = ""},
                 //Julie Christenson
-                new ProviderProfile { ProviderProfileID = 3,
+                new ProviderProfile {
                     UserId = "5",
                     RemoteLink = "",
                     BookingPrompt = "",
@@ -135,11 +135,11 @@ namespace DataAccess
             var CustomerProfiles = new List<CustomerProfile>
             {
                 //John Doe
-                new CustomerProfile { Id = 1,
+                new CustomerProfile {
                     UserId = "1",
                     WNumber = 01333732 },
                 //Jane Doe
-                new CustomerProfile { Id = 2,
+                new CustomerProfile {
                     UserId = "2",
                     WNumber = 01333733 }
             };
@@ -152,7 +152,7 @@ namespace DataAccess
 
             var Locations = new List<Location>
             {
-                new Location { LocationId = 1,
+                new Location {
                     LocationName = "Ogden Campus",
                     Address1 = "3848 Harrison Blvd",
                     Address2 = "",
@@ -160,7 +160,7 @@ namespace DataAccess
                     BuildingName = "Norda",
                     RoomNumber = 101
                 },
-                new Location { LocationId = 2,
+                new Location {
                     LocationName = "Davis Campus",
                     Address1 = "2750 University Park Blvd",
                     Address2 = "",
@@ -168,7 +168,7 @@ namespace DataAccess
                     BuildingName = "D2",
                     RoomNumber = 102
                 },
-                new Location { LocationId = 3,
+                new Location {
                     LocationName = "Farmington Campus",
                     Address1 = "240 N East Promontory",
                     Address2 = "",
@@ -186,10 +186,10 @@ namespace DataAccess
 
             var RecurringTypes = new List<RecurringType>
             {
-                new RecurringType { Id = 1,
+                new RecurringType {
                 Name = "Weekly",
                 DaysBetween = 7},
-                new RecurringType { Id = 2,
+                new RecurringType {
                 Name = "bi-weekly",
                 DaysBetween = 14}
             };
@@ -202,7 +202,7 @@ namespace DataAccess
 
             var Bookings = new List<Booking>
             {
-                new Booking { Id = 1,
+                new Booking {
                     WNumber = 01333732,
                     Subject = "Comp Sci",
                     Note = "CBTD Help",
@@ -210,8 +210,8 @@ namespace DataAccess
                     Duration = 15,
                     Attatchment = "",
                     //Meeting with Fry,
-                    ProviderId = 1,
-                    UserId = 3 
+                    providerId = new ProviderProfile(),
+                    User = User
                 }     
             };
         }
