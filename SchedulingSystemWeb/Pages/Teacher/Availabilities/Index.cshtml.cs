@@ -43,7 +43,6 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                     DayOfTheWeek = DayOfWeek.Friday,
                     StartTime = new DateTime(2024, 3, 15, 9, 0, 0),
                     EndTime = new DateTime(2024, 3, 15, 12, 0, 0),
-                    Recurring = false
                 },
                 new Availability
                 {
@@ -51,7 +50,6 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                     DayOfTheWeek = DayOfWeek.Monday,
                     StartTime = new DateTime(2024, 4, 1, 9, 0, 0),
                     EndTime = new DateTime(2024, 4, 1, 12, 0, 0),
-                    Recurring = false
                 }
             };
 

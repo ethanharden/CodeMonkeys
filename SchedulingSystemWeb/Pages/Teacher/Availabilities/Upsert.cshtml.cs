@@ -43,7 +43,6 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                     DayOfTheWeek = DayOfWeek.Friday,
                     StartTime = new DateTime(2024, 3, 15, 9, 0, 0),
                     EndTime = new DateTime(2024, 3, 15, 12, 0, 0),
-                    Recurring = false
                 },
                 new Availability
                 {
@@ -51,7 +50,6 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                     DayOfTheWeek = DayOfWeek.Monday,
                     StartTime = new DateTime(2024, 4, 1, 9, 0, 0),
                     EndTime = new DateTime(2024, 4, 1, 12, 0, 0),
-                    Recurring = false
                 }
             };
         }
@@ -63,12 +61,12 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             TempData.Keep("CurrentDate");
             CurrentMonthName = CurrentDate.ToString("MMMM");
 
-            WeekDays = GetWeekDays(CurrentDate);
-            MonthDays = GetMonthDays(CurrentDate);
+            WeekDays = _calendarService.GetWeekDays(CurrentDate);
+            MonthDays = _calendarService.GetMonthDays(CurrentDate);
 
             await FetchDataForCurrentViewAsync();
 
-            if (id.HasValue || id != 0)
+            if (id.HasValue)
             {
                 //TEMP
                 objAvailability = Availabilities.FirstOrDefault(a => a.Id == id.Value);
@@ -104,8 +102,6 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                         DayOfTheWeek = day,
                         StartTime = objAvailability.StartTime,
                         EndTime = objAvailability.EndTime,
-                        Recurring = objAvailability.Recurring,
-                        RecurringEndDate = objAvailability.RecurringEndDate,
                     };
 
                     // Save to database
@@ -122,8 +118,6 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                     // Update properties of `existingAvailability` with values from `objAvailability`
                     existingAvailability.StartTime = objAvailability.StartTime;
                     existingAvailability.EndTime = objAvailability.EndTime;
-                    existingAvailability.Recurring = objAvailability.Recurring;
-                    existingAvailability.RecurringEndDate = objAvailability.RecurringEndDate;
 
                     //Temp
                     //_unitOfWork.Availability.Update(existingAvailability);             
@@ -163,7 +157,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
             CurrentMonthName = CurrentDate.ToString("MMMM");
-            MonthDays = GetMonthDays(CurrentDate);
+            MonthDays = _calendarService.GetMonthDays(CurrentDate);
             await FetchDataForCurrentViewAsync();
             return Page();
         }

@@ -17,8 +17,8 @@ namespace Infrastructure.Models
         [ForeignKey("ProviderId")]
         public ProviderProfile ProviderProfile { get; set; }
 
-        [ForeignKey("RecurringTypeId")]
-        public RecurringType RecurringType {  get; set; }
+        [ForeignKey("AvailabilityGroup")]
+        public AvailabilityGroup? AvailabilityGroup { get; set; }
 
         [Required]
         public int LocationId { get; set; }
@@ -32,36 +32,7 @@ namespace Infrastructure.Models
         [Required]
         [DisplayName("End Time")]
         public DateTime EndTime { get; set; }
-        [Required]
-        public bool Recurring { get; set; }
-        [DisplayName("End Date")]
-        public DateTime? RecurringEndDate { get; set; }
 
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            // Ensuring EndTime is after StartTime
-            if (EndTime <= StartTime)
-            {
-                yield return new ValidationResult(
-                    "EndTime must be after StartTime",
-                    new[] { nameof(EndTime) });
-            }
-
-            // ensure end date is after current date
-            if (Recurring && RecurringEndDate.HasValue && RecurringEndDate.Value.Date <= DateTime.Now.Date)
-            {
-                yield return new ValidationResult(
-                    "End Date must be a future date",
-                    new[] { nameof(RecurringEndDate) });
-            }
-
-            //ensure end date is after start date
-            if (Recurring && RecurringEndDate.HasValue && RecurringEndDate.Value <= StartTime)
-            {
-                yield return new ValidationResult(
-                    "End Date must be after Start Date",
-                    new[] { nameof(RecurringEndDate) });
-            }
-        }
+        
     }
 }
