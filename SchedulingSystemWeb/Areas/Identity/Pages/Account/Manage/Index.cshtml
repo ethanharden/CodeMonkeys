@@ -1,0 +1,103 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Profile";
+    ViewData["ActivePage"] = ManageNavPages.Index;
+}
+
+<h3>@ViewData["Title"]</h3>
+<partial name="_StatusMessage" for="StatusMessage" />
+@{
+    if(Model.ProfilePicture == null)
+    {
+        <div class="col-2 pt-4">
+            <p class="alert-heading">No Profile Image</p>
+        </div>
+    }
+    else
+    {
+        <div class="col-2 pt-4">
+            <img src="@Model.ProfilePicture"
+                 style="border-radius:5px; width:100%; border:1px solid #bbb9b9" />
+        </div>
+    }
+}
+
+<div class="row">
+    <div class="col-md-6">
+        @{
+            if (!Model.Edit)
+            {
+                <label>Email:</label>
+                <input asp-for="Username" class="form-control" disabled />
+                <label asp-for="FirstName" class="form-label"></label>
+                <input asp-for="FirstName" class="form-control" disabled />
+                <label asp-for="LastName" class="form-label"></label>
+                <input asp-for="LastName" class="form-control" disabled />
+                <label asp-for="PhoneNum" class="form-label"></label>
+                <input asp-for="PhoneNum" class="form-control" disabled />
+                
+            
+                    if (Model.IsProvider)
+                    {
+                        <label asp-for="RemoteLink" class="form-label"></label>
+                        <input asp-for="RemoteLink" class="form-control" disabled />
+                        <label asp-for="BookingPrompt" class="form-label"></label>
+                        <input asp-for="BookingPrompt" class="form-control" disabled />
+                        <label asp-for="Department" class="form-label"></label>
+                        <input asp-for="Department" class="form-control" disabled />
+                    }
+                    else
+                    {
+                        <label asp-for="WNumber" class="form-label"></label>
+                    <input asp-for="WNumber" class="form-control" disabled />
+                }
+                <form method="post">
+                    <button type="submit" asp-page-handler="Edit" class="btn btn-primary">Edit</button>
+                </form>
+
+            }
+            else // EDIT mode
+            {
+                <form id="profile-form" method="post" enctype="multipart/form-data">
+                    <label>Email:</label>
+                    <input asp-for="Username" class="form-control" disabled />
+                    <label asp-for="FirstName" class="form-label"></label>
+                    <input asp-for="FirstName" class="form-control"  />
+                    <label asp-for="LastName" class="form-label"></label>
+                    <input asp-for="LastName" class="form-control"  />
+                    <label asp-for="PhoneNum" class="form-label"></label>
+                    <input asp-for="PhoneNum" class="form-control"  />
+                    <label class="form-label">Profile Picture</label>
+                    <input type="file" class="form-control" id="uploadBox" name="file" />
+
+                    @if (Model.IsProvider)
+                    {
+                        <label asp-for="RemoteLink" class="form-label"></label>
+                        <input asp-for="RemoteLink" class="form-control"  />
+                        <label asp-for="BookingPrompt" class="form-label"></label>
+                        <input asp-for="BookingPrompt" class="form-control"  />
+                        <label asp-for="Department" class="form-label"></label>
+                        <input asp-for="Department" class="form-control"  />
+                    }
+                    else
+                    {
+                        <label asp-for="WNumber" class="form-label"></label>
+                        <input asp-for="WNumber" class="form-control"  />
+                    }
+
+                    <button id="update-profile-button" asp-page-handler="Submit" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
+                    </form>
+
+            }
+        }
+        
+
+
+        
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
