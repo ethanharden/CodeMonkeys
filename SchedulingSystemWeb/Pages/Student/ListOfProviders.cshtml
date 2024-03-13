@@ -24,7 +24,7 @@
             <td style="width:50%">@obj.Email</td>
                 <td>
                     <!-- Button to navigate to another page -->
-                    <a asp-page="AnotherPage" asp-route-fullname="@obj.FullName" asp-route-email="@obj.Email" class="btn btn-primary">Go to Another Page</a>
+                    <a asp-page="/Student/Bookings/Upsert" asp-route-fullname="@obj.FullName" asp-route-email="@obj.Email" class="btn btn-primary">Go to Another Page</a>
                 </td>
         </tr>
         }
