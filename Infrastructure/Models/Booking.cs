@@ -28,5 +28,8 @@ namespace Infrastructure.Models
         public ProviderProfile? ProviderProfile { get; set; }
         [ForeignKey("UserId")]
         public ApplicationUser? User { get; set; }
+
+        [ForeignKey("AvailabilityId")]
+        public Availability Availability { get; set; }
     }
 }
