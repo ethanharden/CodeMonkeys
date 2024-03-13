@@ -1,0 +1,31 @@
+﻿@page
+@model SchedulingSystemWeb.Pages.Student.ListOfProvidersModel
+@{
+}
+<table>
+    <thead>
+        <tr>
+            <th>
+                Provider Name
+            </th>
+            <th>
+                Provider Email
+            </th>
+            <th>
+                &nbsp;
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var obj in Model.objApplicationUserList)
+        {
+        <tr>
+            <td style="width:50%">@obj.FullName</td>
+            <td style="width:50%">@obj.Email</td>
+        </tr>
+        }
+    </tbody>
+
+
+
+</table>
