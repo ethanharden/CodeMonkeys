@@ -190,7 +190,7 @@ namespace DataAccess
                 Name = "Weekly",
                 DaysBetween = 7},
                 new RecurringType {
-                Name = "bi-weekly",
+                Name = "Bi-Weekly",
                 DaysBetween = 14}
             };
 
@@ -203,16 +203,29 @@ namespace DataAccess
             var Bookings = new List<Booking>
             {
                 new Booking {
+                    Id = 1,
                     WNumber = 01333732,
                     Subject = "Comp Sci",
                     Note = "CBTD Help",
-                    //StartTime = "help"
+                    StartTime = DateTime.Now,
                     Duration = 15,
                     Attatchment = "",
-                    //Meeting with Fry,
-                    providerId = new ProviderProfile(),
-                    User = User
+                    ProviderId = 1,
+
                 }     
+            };
+
+            foreach (var c in Bookings)
+            {
+                _db.Bookings.Add(c);
+            }
+            _db.SaveChanges();
+
+            var Availabilitys = new List<Availability>
+            {
+                new Availability {
+
+                }
             };
         }
     }
