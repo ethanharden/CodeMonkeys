@@ -12,10 +12,12 @@ namespace DataAccess
     public class DbInitializer : IDbInitializer
     {
         private readonly AppDbContext _db;
+        private readonly UnitOfWork _unitOfWork;
 
-        public DbInitializer(AppDbContext db)
+        public DbInitializer(AppDbContext db, UnitOfWork unitOfWork)
         {
             _db = db;
+            _unitOfWork = unitOfWork;
         }
 
         public void Initialize()
@@ -210,7 +212,8 @@ namespace DataAccess
                     StartTime = DateTime.Now,
                     Duration = 15,
                     Attatchment = "",
-                    ProviderId = 1,
+                    ProviderProfile = _unitOfWork.ProviderProfile.Get(p=> p.ProviderProfileID == 3),
+                    User = _unitOfWork.ApplicationUser.Get(p=> p.Id == "1"),
 
                 }     
             };
