@@ -11,6 +11,9 @@ namespace Infrastructure.Models
 {
     public class AvailabilityGroup
     {
+        [Key]
+        public int Id { get; set; }
+
         [Required]
         public IEnumerable<Availability> AvailabilityList { get; set; }
 

@@ -211,7 +211,7 @@ namespace DataAccess
                     Note = "CBTD Help",
                     StartTime = DateTime.Now,
                     Duration = 15,
-                    Attatchment = "",
+                    Attachment = "",
                     ProviderProfile = _unitOfWork.ProviderProfile.Get(p=> p.ProviderProfileID == 3),
                     User = _unitOfWork.ApplicationUser.Get(p=> p.Id == "1"),
 

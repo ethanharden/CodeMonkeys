@@ -11,6 +11,7 @@ namespace Infrastructure.Interfaces
     public interface IUnitOfWork
     {
         public IGenericRepository<Availability> Availability { get; }
+        public IGenericRepository<AvailabilityGroup> AvailabilityGroup { get; }
         public IGenericRepository<Booking> Booking { get; }
         public IGenericRepository<Location> Location { get;}
         public IGenericRepository<ProviderProfile> ProviderProfile { get; }

@@ -17,7 +17,7 @@ namespace Infrastructure.Models
         [ForeignKey("ProviderId")]
         public ProviderProfile ProviderProfile { get; set; }
 
-        [ForeignKey("AvailabilityGroup")]
+        [ForeignKey("AvailabilityGroupId")]
         public AvailabilityGroup? AvailabilityGroup { get; set; }
 
         [Required]

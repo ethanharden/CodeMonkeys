@@ -22,7 +22,7 @@ namespace Infrastructure.Models
         public DateTime StartTime { get; set; }
         [Required]
         public int Duration { get; set; }
-        public string Attatchment {  get; set; }
+        public string Attachment {  get; set; }
 
         [ForeignKey("ProviderId")]
         public ProviderProfile? ProviderProfile { get; set; }
@@ -30,6 +30,6 @@ namespace Infrastructure.Models
         public ApplicationUser? User { get; set; }
 
         [ForeignKey("AvailabilityId")]
-        public Availability Availability { get; set; }
+        public Availability objAvailability { get; set; }
     }
 }

@@ -23,7 +23,8 @@ namespace DataAccess
         public IGenericRepository<RecurringType> _RecurringType;
         public IGenericRepository<CustomerProfile> _CustomerProfile;
         public IGenericRepository<ApplicationUser> _ApplicationUser;
-     
+        public IGenericRepository<AvailabilityGroup> _AvailabilityGroup;
+
         public IGenericRepository<Availability> Availability
         {
             get
@@ -33,6 +34,17 @@ namespace DataAccess
                     _Availability = new GenericRepository<Availability>(_DbContext);
                 }
                 return _Availability;
+            }
+        }
+        public IGenericRepository<AvailabilityGroup> AvailabilityGroup
+        {
+            get
+            {
+                if (_AvailabilityGroup == null)
+                {
+                    _AvailabilityGroup = new GenericRepository<AvailabilityGroup>(_DbContext);
+                }
+                return _AvailabilityGroup;
             }
         }
         public IGenericRepository<Booking> Booking
