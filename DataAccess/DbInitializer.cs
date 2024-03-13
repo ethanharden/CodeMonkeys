@@ -12,10 +12,12 @@ namespace DataAccess
     public class DbInitializer : IDbInitializer
     {
         private readonly AppDbContext _db;
+        private readonly UnitOfWork _unitOfWork;
 
-        public DbInitializer(AppDbContext db)
+        public DbInitializer(AppDbContext db, UnitOfWork unitOfWork)
         {
             _db = db;
+            _unitOfWork = unitOfWork;
         }
 
         public void Initialize()
@@ -190,7 +192,7 @@ namespace DataAccess
                 Name = "Weekly",
                 DaysBetween = 7},
                 new RecurringType {
-                Name = "bi-weekly",
+                Name = "Bi-Weekly",
                 DaysBetween = 14}
             };
 
@@ -203,16 +205,30 @@ namespace DataAccess
             var Bookings = new List<Booking>
             {
                 new Booking {
+                    Id = 1,
                     WNumber = 01333732,
                     Subject = "Comp Sci",
                     Note = "CBTD Help",
-                    //StartTime = "help"
+                    StartTime = DateTime.Now,
                     Duration = 15,
                     Attatchment = "",
-                    //Meeting with Fry,
-                    providerId = new ProviderProfile(),
-                    User = User
+                    ProviderProfile = _unitOfWork.ProviderProfile.Get(p=> p.ProviderProfileID == 3),
+                    User = _unitOfWork.ApplicationUser.Get(p=> p.Id == "1"),
+
                 }     
+            };
+
+            foreach (var c in Bookings)
+            {
+                _db.Bookings.Add(c);
+            }
+            _db.SaveChanges();
+
+            var Availabilitys = new List<Availability>
+            {
+                new Availability {
+
+                }
             };
         }
     }
