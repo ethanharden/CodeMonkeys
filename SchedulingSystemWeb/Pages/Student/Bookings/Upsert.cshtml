@@ -2,3 +2,62 @@
 @model SchedulingSystemWeb.Pages.Student.Bookings.UpsertModel
 @{
 }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Form</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-2">
+                <a class="nav-link text-dark" asp-area="" asp-page="/Student/Bookings/Index"><button class="btn btn-secondary">Back</button></a>
+            </div>
+            <div class="col-md-5">
+                <form>
+                    <div class="form-group">
+                        <label for="meetingName">Meeting Name:</label>
+                        <input type="text" class="form-control" id="meetingName" placeholder="Enter meeting name">
+                    </div>
+                    <div class="form-group">
+                        <label for="professorName">Professor Name:</label>
+                        <input type="text" class="form-control" id="professorName" value="Professor Fry" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Location:</label>
+                        <input type="text" class="form-control" id="location" value="Virtual" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="course">Course:</label>
+                        <input type="text" class="form-control" id="course" placeholder="Enter course">
+                    </div>
+                    <div class="form-group">
+                        <label for="course">Description: (Optional)</label>
+                        <textarea class="form-control" id="description" placeholder="Enter description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="fileUpload">File Upload:</label>
+                        <input type="file" class="form-control-file" id="fileUpload">
+                    </div>
+                    <div class="form-group">
+                        <input class="btn btn-success" asp-page="/Student/Home/Index" type="submit"/>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-5">
+                <div class="form-group">
+                    <label for="meetingTime">Time:</label>
+                    <input type="text" class="form-control" id="meetingTime" value="3:30 P.M. - 4:00 P.M." disabled>
+                </div>
+                <div class="form-group">
+                    <label for="meetingDate">Date:</label>
+                    <input type="text" class="form-control" id="meetingDate" value="2/14/2024" disabled>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
