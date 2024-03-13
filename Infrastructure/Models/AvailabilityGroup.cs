@@ -22,14 +22,6 @@ namespace Infrastructure.Models
         public RecurringType RecurringType { get; set; }
 
         [Required]
-        [DisplayName("Start Time")]
-        public DateTime StartTime { get; set; }
-
-        [Required]
-        [DisplayName("End Time")]
-        public DateTime EndTime { get; set; }
-
-        [Required]
 
         [DisplayName("End Date")]
         public DateTime? RecurringEndDate { get; set; }
