@@ -23,7 +23,7 @@ namespace SchedulingSystemWeb.Pages.Student
         }
         public async Task<IActionResult> OnGetAsync()
         {
-            objApplicationUserList = await _userManager.GetUsersInRoleAsync("TEACHER");
+            objApplicationUserList = await _userManager.GetUsersInRoleAsync("PROVIDER");
             //objApplicationUserList = _unitOfWork.ApplicationUser.GetAll(null);
             return Page();
 
