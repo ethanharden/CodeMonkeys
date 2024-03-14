@@ -1,4 +1,5 @@
-﻿using Infrastructure.Interfaces;
+/*
+using Infrastructure.Interfaces;
 using Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -12,6 +13,7 @@ namespace DataAccess
     public class DbInitializer : IDbInitializer
     {
         private readonly AppDbContext _db;
+
         private readonly UnitOfWork _unitOfWork;
 
         public DbInitializer(AppDbContext db, UnitOfWork unitOfWork)
@@ -192,7 +194,9 @@ namespace DataAccess
                 Name = "Weekly",
                 DaysBetween = 7},
                 new RecurringType {
+
                 Name = "Bi-Weekly",
+
                 DaysBetween = 14}
             };
 
@@ -205,31 +209,18 @@ namespace DataAccess
             var Bookings = new List<Booking>
             {
                 new Booking {
-                    Id = 1,
                     WNumber = 01333732,
                     Subject = "Comp Sci",
                     Note = "CBTD Help",
-                    StartTime = DateTime.Now,
+                    //StartTime = "help"
                     Duration = 15,
-                    Attachment = "",
-                    ProviderProfile = _unitOfWork.ProviderProfile.Get(p=> p.ProviderProfileID == 3),
-                    User = _unitOfWork.ApplicationUser.Get(p=> p.Id == "1"),
-
+                    Attatchment = "",
+                    //Meeting with Fry,
+                    providerId = new ProviderProfile(),
+                    User = User
                 }     
-            };
-
-            foreach (var c in Bookings)
-            {
-                _db.Bookings.Add(c);
-            }
-            _db.SaveChanges();
-
-            var Availabilitys = new List<Availability>
-            {
-                new Availability {
-
-                }
             };
         }
     }
 }
+*/
