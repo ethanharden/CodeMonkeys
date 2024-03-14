@@ -1,4 +1,4 @@
-﻿/*
+/*
 using Infrastructure.Interfaces;
 using Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
@@ -14,9 +14,12 @@ namespace DataAccess
     {
         private readonly AppDbContext _db;
 
-        public DbInitializer(AppDbContext db)
+        private readonly UnitOfWork _unitOfWork;
+
+        public DbInitializer(AppDbContext db, UnitOfWork unitOfWork)
         {
             _db = db;
+            _unitOfWork = unitOfWork;
         }
 
         public void Initialize()
@@ -191,7 +194,9 @@ namespace DataAccess
                 Name = "Weekly",
                 DaysBetween = 7},
                 new RecurringType {
-                Name = "bi-weekly",
+
+                Name = "Bi-Weekly",
+
                 DaysBetween = 14}
             };
 

@@ -11,20 +11,15 @@ namespace Infrastructure.Models
 {
     public class AvailabilityGroup
     {
+        [Key]
+        public int Id { get; set; }
+
         [Required]
         public IEnumerable<Availability> AvailabilityList { get; set; }
 
 
         [ForeignKey("RecurringTypeId")]
         public RecurringType RecurringType { get; set; }
-
-        [Required]
-        [DisplayName("Start Time")]
-        public DateTime StartTime { get; set; }
-
-        [Required]
-        [DisplayName("End Time")]
-        public DateTime EndTime { get; set; }
 
         [Required]
 
