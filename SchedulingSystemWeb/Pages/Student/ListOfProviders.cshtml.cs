@@ -1,5 +1,7 @@
 using DataAccess;
 using Infrastructure.Models;
+using Microsoft.AspNet.Identity.EntityFramework;
+
 //using Microsoft.AspNet.Identity;
 
 //using Microsoft.AspNet.Identity;
@@ -14,19 +16,33 @@ namespace SchedulingSystemWeb.Pages.Student
         private readonly UnitOfWork _unitOfWork;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public IEnumerable<ApplicationUser> objApplicationUserList;
-        public ListOfProvidersModel(UnitOfWork unitofWork, UserManager<ApplicationUser> userManager)
+        public List<ApplicationUser> objApplicationUserList;
+        public Dictionary<string, IList<string>> UserRoles; 
+        public ListOfProvidersModel(UnitOfWork unitofWork, UserManager<ApplicationUser> userManager   )
         {
             _unitOfWork = unitofWork;
             objApplicationUserList = new List<ApplicationUser>();
             _userManager = userManager;
+            UserRoles = new Dictionary<string, IList<string>>(); // Initialize user roles dictionary
         }
         public async Task<IActionResult> OnGetAsync()
         {
-            objApplicationUserList = await _userManager.GetUsersInRoleAsync("PROVIDER");
-            //objApplicationUserList = _unitOfWork.ApplicationUser.GetAll(null);
-            return Page();
+            objApplicationUserList.AddRange(await _userManager.GetUsersInRoleAsync("TUTORS"));
 
+            objApplicationUserList.AddRange(await _userManager.GetUsersInRoleAsync("TEACHER"));
+            objApplicationUserList.AddRange(await _userManager.GetUsersInRoleAsync("ADVISOR"));
+            //objApplicationUserList = _unitOfWork.ApplicationUser.GetAll(null);
+            
+            foreach (var user in objApplicationUserList)
+            {
+                UserRoles[user.Id] = await _userManager.GetRolesAsync(user);
+                
+            }
+
+
+
+            
+            return Page();
 
         }
     }

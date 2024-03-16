@@ -93,7 +93,7 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account.Manage
             {
                 WNumber = _unitOfWork.CustomerProfile.Get(u => u.User == user).WNumber;
             }
-            if (role[0] == "PROVIDER")
+            if (role[0] == "TEACHER" || role[0] == "ADVISOR" || role[0] == "TUTOR")
             {
                 IsProvider = true;
                 Department = _unitOfWork.ProviderProfile.Get(u => u.User == user).DepartmentString;
@@ -167,7 +167,7 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account.Manage
                 customerProfile.WNumber = WNumber;
                 _unitOfWork.CustomerProfile.Update(customerProfile);
             }
-            if (role[0] == "PROVIDER")
+            if (role[0] == "TEACHER" || role[0] == "TUTOR" || role[0] == "ADVISOR")
             {
                 ProviderProfile profiderProfile = _unitOfWork.ProviderProfile.Get(u => u.User == user);
                 profiderProfile.BookingPrompt = BookingPrompt;
