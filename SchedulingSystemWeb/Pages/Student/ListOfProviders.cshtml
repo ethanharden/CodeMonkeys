@@ -22,7 +22,7 @@
                 Provider Roles
             </th>
             <th style="width: 33%">
-                Action
+                
             </th>
         </tr>
     </thead>
@@ -35,7 +35,7 @@
                     <ul>
                         @foreach (var role in Model.UserRoles[user.Id])
                         {
-                            <li>@role</li>
+                            @role
                         }
                     </ul>
                 </td>
