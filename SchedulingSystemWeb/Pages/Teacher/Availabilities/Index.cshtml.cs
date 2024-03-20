@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using Microsoft.AspNetCore.Identity;
 
 namespace SchedulingSystemWeb.Pages.Availabilities
 {
@@ -30,42 +31,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             _unitOfWork = unitOfWork;
             Bookings = new List<Booking>();
             Availabilities = new List<Availability>();
-            SeedData();
         }
-        public void SeedData()
-        {
-            // Temporary seeding of Availabilities and Bookings
-            Availabilities = new List<Availability>
-            {
-                new Availability
-                {
-                    Id = 1,
-                    DayOfTheWeek = DayOfWeek.Friday,
-                    StartTime = new DateTime(2024, 3, 15, 9, 0, 0),
-                    EndTime = new DateTime(2024, 3, 15, 12, 0, 0),
-                },
-                new Availability
-                {
-                    Id = 2,
-                    DayOfTheWeek = DayOfWeek.Monday,
-                    StartTime = new DateTime(2024, 4, 1, 9, 0, 0),
-                    EndTime = new DateTime(2024, 4, 1, 12, 0, 0),
-                }
-            };
-
-            Bookings = new List<Booking>
-            {
-                new Booking
-                {
-                    Id = 1,
-                    Subject = "Team Meeting",
-                    Note = "Discuss project milestones",
-                    StartTime = new DateTime(2024, 3, 14, 14, 0, 0),
-                    Duration = 2,
-                }
-            };
-        }
-
 
         public async Task OnGetAsync()
         {
@@ -129,26 +95,22 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             await FetchDataForCurrentViewAsync(); 
             return RedirectToPage();
         }
-
+        public bool IsAvailabilityBooked(Availability availability)
+        {
+            return Bookings.Any(booking => booking.StartTime >= availability.StartTime && booking.StartTime < availability.EndTime);
+        }
         private async Task FetchDataForCurrentViewAsync()
         {
-            // Adjust these lines to match your actual method names and parameters
             DateTime startOfMonth = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
             DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
-            //TEMP
             // Filter bookings within the month.
-            //ViewBookings = await _unitOfWork.Booking.GetAllAsync(
-            //    b => b.StartTime >= startOfMonth && b.StartTime <= endOfMonth);
+            ViewBookings = await _unitOfWork.Booking.GetAllAsync(
+                b => b.StartTime >= startOfMonth && b.StartTime <= endOfMonth);
 
-            //ViewAvailabilities = await _unitOfWork.Availability.GetAllAsync(
-            //    a => a.StartTime >= startOfMonth && a.StartTime <= endOfMonth
-            //    );
-
-
-            //TEMP
-            ViewBookings = Bookings.Where(b => b.StartTime.Date >= startOfMonth && b.StartTime.Date <= endOfMonth);
-            ViewAvailabilities = Availabilities.Where(a => a.StartTime.Date >= startOfMonth && a.StartTime.Date <= endOfMonth);
+            ViewAvailabilities = await _unitOfWork.Availability.GetAllAsync(
+                a => a.StartTime >= startOfMonth && a.StartTime <= endOfMonth
+                );
         }
 
     }

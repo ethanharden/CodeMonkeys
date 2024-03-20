@@ -1,6 +1,7 @@
 ﻿@page
 @model SchedulingSystemWeb.Pages.Availabilities.UpsertModel
 @using System.Globalization
+@using System.Linq
 @{
     ViewData["Title"] = Model.objAvailability.Id == 0 ? "Create Availability" : "Edit Availability";
     var firstDayOfMonth = new DateTime(Model.CurrentDate.Year, Model.CurrentDate.Month, 1);
@@ -13,6 +14,18 @@
 
 <h4>Availability</h4>
 
+@if (TempData["Errors"] is List<string> errors && errors.Count > 0)
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var error in errors)
+            {
+                <li>@error</li>
+            }
+        </ul>
+    </div>
+}
+
 <div class="row">
     <div class="col-md-6">
         <!-- Form goes here -->
@@ -20,18 +33,20 @@
         <form method="post">
             <!-- Hidden field for Id -->
             <input type="hidden" asp-for="objAvailability.Id" />
+            <input type="hidden" asp-for="objAvailability.ProviderProfile.ProviderProfileID" />
+            <input asp-for="objAvailability.ProviderProfile.UserId" type="hidden" />
         
             <!-- Start Time -->
             <div class="form-group">
                 <label asp-for="objAvailability.StartTime" class="control-label"></label>
-                <input asp-for="objAvailability.StartTime" class="form-control" type="datetime-local" />
+                <input asp-for="objAvailability.StartTime" class="form-control" type="datetime-local" value="@Model.objAvailability.StartTime.ToString("yyyy-MM-ddTHH:mm")" />
                 <span asp-validation-for="objAvailability.StartTime" class="text-danger"></span>
             </div>
 
             <!-- End Time -->
             <div class="form-group">
                 <label asp-for="objAvailability.EndTime" class="control-label"></label>
-                <input asp-for="objAvailability.EndTime" class="form-control" type="datetime-local" />
+                <input asp-for="objAvailability.EndTime" class="form-control" type="datetime-local" value="@Model.objAvailability.EndTime.ToString("yyyy-MM-ddTHH:mm")" />
                 <span asp-validation-for="objAvailability.EndTime" class="text-danger"></span>
             </div>
 
@@ -54,11 +69,8 @@
                     foreach (var day in dayOfWeekValues)
                     {
                         <div class="form-check">
-                            <input class="form-check-input"
-                                    type="checkbox"
-                                    name="SelectedDaysOfWeek"
-                                    value="@day" />
-                            <label class="form-check-label">@day</label>
+                            <input class="form-check-input" type="checkbox" name="SelectedDaysOfWeek" value="@day" />
+                            <label class="form-check-label">@day.ToString()</label>
                         </div>
                     }
                 }
@@ -103,12 +115,12 @@
                     <div class="container">
                         <!-- Weekly Calendar -->
                         <br>
-                        <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=NextWeek'">Next Week</button>
-                        <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=PreviousWeek'">Previous Week</button>
+                        <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=NextWeek&id=@Model.objAvailability.Id'">Next Week</button>
+                        <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=PreviousWeek&id=@Model.objAvailability.Id'">Previous Week</button>
                
-                        <button type="button" class="btn btn-secondary" style="float: right;" onclick="location.href='?handler=TodayWeek'">Today</button>
+                        <button type="button" class="btn btn-secondary" style="float: right;" onclick="location.href='?handler=TodayWeek&id=@Model.objAvailability.Id'">Today</button>
                         @if (Model.WeekDays.Any())
-        {
+                        {
                             var firstDay = Model.WeekDays.First();
                             var lastDay = Model.WeekDays.Last();
                             string displayWeek;
@@ -151,18 +163,24 @@
                                     @foreach (var day in Model.WeekDays)
                                     {
                                         <td class="hour-cell @((day.Date == DateTime.Today) ? "today" : "")">
-                                            <!-- Display availabilities for the day and hour -->
-                                            @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour))
+                                            <!-- Display bookings for the day and hour -->
+                                           @*  @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == day.Date && b.StartTime.Hour == hour))
                                             {
-                                                <a asp-page="/Availabilities/Upsert" asp-route-id="@availability.Id" class="availability-link">
-                                                    <div class="card text-white bg-success mb-3">
-                                                        <div class="card-header">Available</div>
-                                                        <div class="card-body">
-                                                            @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
-                                                        </div>
-                                                        <br>
+                                                <div class="booking-event" style="background-color: grey; color: white; cursor: pointer;"
+                                                     onclick="showBookingDetails('@booking.Subject', '@booking.StartTime.ToString("dddd, MMMM dd, yyyy HH:mm")')">
+                                                  @booking.Subject @booking.StartTime.ToString("HH:mm") - @booking.StartTime.AddMinutes(booking.Duration).ToString("HH:mm")
+                                                </div>
+                                            } *@
+                                            <!-- Display availabilities for the day and hour -->
+                                             @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour) /* && !Model.IsAvailabilityBooked(a) */)
+                                            {
+                                                <div class="card text-white bg-success mb-3">
+                                                    <div class="card-header">Available</div>
+                                                    <div class="card-body">
+                                                        @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
                                                     </div>
-                                                </a>
+                                                    <br>
+                                                </div>
                                             }
                                         </td>
                                     }
@@ -181,9 +199,9 @@
                      <div class="container">
                         <!-- Monthly Calendar -->
                         <br />
-                        <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=NextMonth'">Next Month</button>
-                        <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=PreviousMonth'">Previous Month</button>               
-                        <button type="button" class="btn btn-secondary" style="float: right;" onclick="location.href='?handler=TodayMonth'">Today</button>
+                        <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=NextMonth&id=@Model.objAvailability.Id'">Next Month</button>
+                        <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=PreviousMonth&id=@Model.objAvailability.Id'">Previous Month</button>               
+                        <button type="button" class="btn btn-secondary" style="float: right;" onclick="location.href='?handler=TodayMonth&id=@Model.objAvailability.Id'">Today</button>
                         <h3>@Model.CurrentMonthName @Model.CurrentDate.Year</h3>
                         <table id="monthly-calendar" class="calendar">
                             <thead>
@@ -197,7 +215,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                               @for (int i = 0; i < leadingDays + daysInMonth; i++)
+                            @for (int i = 0; i < leadingDays + daysInMonth; i++)
                             {
                                 if (i % 7 == 0)
                                 {
@@ -213,17 +231,30 @@
                                     var currentDay = firstDayOfMonth.AddDays(i - leadingDays);
                                     <td class="month-day @(currentDay.Date == DateTime.Today.Date ? "today" : "")">
                                         @currentDay.Day
-                                        <!-- Display availabilities for the day -->
-                                        @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == currentDay))
+                                        <!--Bookings-->
+                                        @* @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == currentDay))
                                         {
-                                            <a asp-page="/Availabilities/Upsert" asp-route-id="@availability.Id" class="card-link">
-                                                <div class="card-header">Available</div>
-                                                <div class="card-body">
-                                                    @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
+                                            <div class="booking-event" style="background-color: grey; color: white; cursor: pointer;"
+                                                 onclick="showBookingDetails('@booking.Subject', '@booking.StartTime.ToString("dddd, MMMM dd, yyyy HH:mm")')">
+                                              @booking.Subject @booking.StartTime.ToString("HH:mm") - @booking.StartTime.AddMinutes(booking.Duration).ToString("HH:mm")
+                                            </div>
+                                        } *@
+                                        <!-- Display availabilities for the day -->
+                                        @if(Model.ViewAvailabilities != null)
+                                        {
+                                            @foreach(var availability in Model.ViewAvailabilities.Where(a => a.StartTime.Date == currentDay) /* && !Model.IsAvailabilityBooked(a) */)
+                                            {
+                                            @* <a asp-page="/Availabilities/Upsert" asp-route-id="@availability.Id" class="card-link"> *@
+                                                <div class="card text-white bg-success mb-3">
+                                                    <div class="card-header">Available</div>
+                                                    <div class="card-body">
+                                                        @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
+                                                    </div>
+                                                    <br>
                                                 </div>
-                                                <br>
-                                            </a>
-                                        }
+                                            @* </a> *@
+                                            }
+                                        }                          
                                         </td>
                                 }
 
@@ -244,20 +275,31 @@
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
+    <!--Tab switching-->
     <script>
-        // Handle the tab switching and also call the Today handler
-        document.querySelectorAll('.nav-link').forEach(function (navLink) {
-            navLink.addEventListener('click', function (e) {
+    // Handle the tab switching
+        document.querySelectorAll('.nav-link').forEach(function(navLink) {
+            navLink.addEventListener('click', function(e) {
                 let currentTab = new bootstrap.Tab(navLink);
                 currentTab.show();
 
-                // Check the id of the clicked tab and call the respective Today handler
-                if (navLink.id === 'weekly-tab') {
-                    window.location.href = '?handler=Today';
-                } else if (navLink.id === 'monthly-tab') {
-                    window.location.href = '?handler=TodayMonth';
+                let availabilityId = '@Model.objAvailability.Id';
+                let handler = (navLink.id === 'weekly-tab') ? 'TodayWeek' : 'TodayMonth';
+                let urlParams = new URLSearchParams(window.location.search);
+            
+                // Use the URLSearchParams to handle the query string
+                urlParams.set('handler', handler);
+            
+                // Check if there's a valid ID to append
+                if (availabilityId && availabilityId !== '0') {
+                    urlParams.set('id', availabilityId);
+                } else {
+                    urlParams.delete('id'); // Make sure to remove id if it's not valid
                 }
 
+                // Construct the URL with the search parameters
+                let url = `${window.location.pathname}?${urlParams.toString()}`;
+                window.location.href = url;
                 e.preventDefault();
             });
         });
@@ -327,6 +369,30 @@
 
         //initial display
         toggleRecurringEndDate();
+    });
+    </script>
+    <!--Show Booking Details-->
+    <script>
+        function showBookingDetails(subject, startTime) {
+            var modalBody = document.querySelector('#bookingDetailsModal .modal-body');
+            modalBody.innerHTML = `<p><strong>Subject:</strong> ${subject}</p><p><strong>Start Time:</strong> ${startTime}</p>`;
+            var bookingDetailsModal = new bootstrap.Modal(document.getElementById('bookingDetailsModal'));
+            bookingDetailsModal.show();
+        }
+    </script>
+    <!--Sweet Alert-->
+    <script>
+    $(document).ready(function() {
+        var formStatus = '@TempData["FormStatus"]';
+        var errorMessage = '@TempData["ErrorMessage"]';
+
+        if (formStatus === "Failed" && errorMessage) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: errorMessage,
+            });
+        }
     });
     </script>
 }

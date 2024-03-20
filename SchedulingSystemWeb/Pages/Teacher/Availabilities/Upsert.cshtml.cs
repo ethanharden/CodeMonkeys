@@ -4,6 +4,10 @@ using DataAccess;
 using Infrastructure.Models;
 using System.Globalization;
 using Infrastructure.Interfaces;
+using Microsoft.Extensions.Caching.Memory;
+using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace SchedulingSystemWeb.Pages.Availabilities
 {
@@ -12,13 +16,16 @@ namespace SchedulingSystemWeb.Pages.Availabilities
 
         private readonly UnitOfWork _unitOfWork;
         private readonly ICalendarService _calendarService;
+        private readonly IMemoryCache _memoryCache;
+
         public IEnumerable<Availability> Availabilities { get; set; }
         public IEnumerable<Booking> Bookings { get; set; }
         public IEnumerable<Availability> ViewAvailabilities { get; set; }
         public IEnumerable<Booking> ViewBookings { get; set; }
+        public ProviderProfile providerProfileGet { get; set; }
 
+        [BindProperty]
         public Availability objAvailability { get; set; }
-        AvailabilityGroup availabilityGroup = null;
 
         public DateTime CurrentDate { get; private set; }
         public List<DateTime> WeekDays { get; private set; } = new List<DateTime>();
@@ -27,90 +34,41 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         [BindProperty]
         public List<DayOfWeek> SelectedDaysOfWeek { get; set; }
 
-        public UpsertModel(UnitOfWork unitOfWork, ICalendarService calendarService)
+        public UpsertModel(UnitOfWork unitOfWork, ICalendarService calendarService, IMemoryCache memoryCache)
         {
             _calendarService = calendarService;
             _unitOfWork = unitOfWork;
-            Availabilities = new List<Availability>();
-            SeedData();
+            ViewAvailabilities = new List<Availability>();
+            ViewBookings = new List<Booking>();
+            _memoryCache = memoryCache;
+
         }
-        public void SeedData()
-        {
-            // Temporary seeding of Availabilities and Bookings
-            Availabilities = new List<Availability>
-            {
-                new Availability
-                {
-                    Id = 1,
-                    DayOfTheWeek = DayOfWeek.Friday,
-                    StartTime = new DateTime(2024, 3, 15, 9, 0, 0),
-                    EndTime = new DateTime(2024, 3, 15, 12, 0, 0),
-                },
-                new Availability
-                {
-                    Id = 2,
-                    DayOfTheWeek = DayOfWeek.Monday,
-                    StartTime = new DateTime(2024, 4, 1, 9, 0, 0),
-                    EndTime = new DateTime(2024, 4, 1, 12, 0, 0),
-                },
-                new Availability
-                {
-                    Id = 3,
-                    DayOfTheWeek = DayOfWeek.Monday,
-                    StartTime = new DateTime(2024, 4, 10, 13, 0, 0),
-                    EndTime =   new DateTime(2024, 4, 10, 14, 0, 0),
-                },
-                new Availability
-                {
-                    Id = 4,
-                    DayOfTheWeek = DayOfWeek.Monday,
-                    StartTime = new DateTime(2024, 4, 12, 13, 0, 0),
-                    EndTime =   new DateTime(2024, 4, 12, 14, 0, 0),
-                }
-            };
-
-            Bookings = new List<Booking>
-            {
-                new Booking
-                {
-                    Id = 1,
-                    Subject = "Team Meeting",
-                    Note = "Discuss project milestones",
-                    StartTime = new DateTime(2024, 3, 15, 9, 0, 0),
-                    Duration = 3,
-                    objAvailability = Availabilities.FirstOrDefault(a => a.Id == 1)
-                },
-
-                new Booking
-                {
-                    Id = 2,
-                    Subject = "Client Consultation",
-                    Note = "Initial project discussion",
-                    StartTime = new DateTime(2024, 4, 1, 9, 0, 0),
-                    Duration = 1,
-                    objAvailability = Availabilities.FirstOrDefault(a => a.Id == 1),
-                }
-            };
-        }
-
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
+
             CurrentDate = (DateTime?)TempData["CurrentDate"] ?? DateTime.Today;
             TempData.Keep("CurrentDate");
             CurrentMonthName = CurrentDate.ToString("MMMM");
-
             WeekDays = _calendarService.GetWeekDays(CurrentDate);
             MonthDays = _calendarService.GetMonthDays(CurrentDate);
 
-            await FetchDataForCurrentViewAsync();
+            providerProfileGet = _unitOfWork.ProviderProfile.Get(p => p.ProviderProfileID == 5);
 
-            if (id.HasValue)
+            Availabilities = _unitOfWork.Availability.GetAll().Where(p => p.ProviderProfile == providerProfileGet);
+            Bookings = _unitOfWork.Booking.GetAll().Where(p => p.ProviderProfile == providerProfileGet);
+
+
+
+            if (providerProfileGet == null)
             {
-                //TEMP
-                objAvailability = Availabilities.FirstOrDefault(a => a.Id == id.Value);
+                TempData["ErrorMessage"] = "Provider profile not found.";
+                return Page();
+            }
 
-                //objAvailability = _unitOfWork.Availability.GetById(id.Value);
+            if (id.HasValue && id != 0)
+            {
+                objAvailability = _unitOfWork.Availability.GetById(id.Value);
                 if (objAvailability == null)
                 {
                     return NotFound();
@@ -118,75 +76,63 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             }
             else
             {
-                objAvailability = new Availability();
+                objAvailability = new Availability
+                {
+                    Id = 0,
+                    StartTime = DateTime.Today.AddDays(1), // Set to tomorrow's date
+                    EndTime = DateTime.Today.AddDays(1).AddHours(1), // Set to tomorrow's date + 1 hour
+                    ProviderProfile = providerProfileGet
+                };
             }
-            await FetchDataForCurrentViewAsync();
 
+            await FetchDataForCurrentViewAsync();
             return Page();
         }
+
 
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
+                var errorList = ModelState.Values.SelectMany(v => v.Errors.Select(b => b.ErrorMessage)).ToList();
+                TempData["Errors"] = errorList;
+                TempData["FormStatus"] = "Failed";
+                TempData["ErrorMessage"] = "Please ensure all required fields are filled and valid.";
                 return Page();
             }
-
-            AvailabilityGroup availabilityGroup = null;
-            if (Request.Form["Recurring"].FirstOrDefault() == "on") // Check if recurring is checked
+            if (objAvailability == null)
             {
-                // Create an AvailabilityGroup to assign to new Availabilities
-                availabilityGroup = new AvailabilityGroup
-                {
-                    // TODO: Set properties like RecurringEndDate and RecurringType
-                };
+                return Page();
             }
-
-           
-
-            if (objAvailability.Id == 0) 
-            {            
-                if (Request.Form["Recurring"].FirstOrDefault() == "on") // Check if recurring is checked
+            if (objAvailability.Id == 0)
+            {
+                // Creating new availabilities for each selected day
+                foreach (var day in SelectedDaysOfWeek)
                 {
-                    // Create or find an AvailabilityGroup to assign to new Availabilities
-                    availabilityGroup = new AvailabilityGroup
+                    var newAvailability = new Availability
                     {
-                        // Set properties like RecurringEndDate and RecurringType
+                        // Assign values
+                        DayOfTheWeek = day,
+                        StartTime = objAvailability.StartTime,
+                        EndTime = objAvailability.EndTime,
+                        ProviderProfile = objAvailability.ProviderProfile,
+                        LocationId = 1,
                     };
-                }
 
-                foreach (var dateTime in GetRecurringDates(objAvailability.StartTime, Request.Form["RecurringEndDate"]))
-                {
-                    foreach (var day in SelectedDaysOfWeek) // Creating new availabilities for each selected day
-                    {
-                        var newAvailability = new Availability
-                        {
-                            // Assign values
-                            DayOfTheWeek = day,
-                            StartTime = objAvailability.StartTime,
-                            EndTime = objAvailability.EndTime,
-                        };
-
-                        // Save to database
-                        //TEMP
-                        //_unitOfWork.Availability.Add(newAvailability);
-                    }
+                    _unitOfWork.Availability.Add(newAvailability); //Getting an error here
                 }
             }
-            else // Editing an availability
+            else
             {
-                var existingAvailability = Availabilities.FirstOrDefault(a => a.Id == objAvailability.Id);
-                // var existingAvailability = _unitOfWork.Availability.GetById(objAvailability.Id);
+                // Editing an existing availability
+                var existingAvailability = _unitOfWork.Availability.GetById(objAvailability.Id);
                 if (existingAvailability != null)
                 {
-                    // Update properties of `existingAvailability` with values from `objAvailability`
+                    // Update properties of existingAvailability with values from objAvailability
                     existingAvailability.StartTime = objAvailability.StartTime;
                     existingAvailability.EndTime = objAvailability.EndTime;
-
-                    existingAvailability.AvailabilityGroup = objAvailability.AvailabilityGroup;
-
-                    //Temp
-                    //_unitOfWork.Availability.Update(existingAvailability);             
+                    existingAvailability.DayOfTheWeek = objAvailability.DayOfTheWeek;
+                    _unitOfWork.Availability.Update(existingAvailability);
                 }
                 else
                 {
@@ -194,8 +140,9 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                 }
             }
 
-            //Temp
-            //await _unitOfWork.CommitAsync();
+            await _unitOfWork.CommitAsync();
+            TempData["FormStatus"] = "Success";
+            TempData["SuccessMessage"] = "Availability saved successfully.";
             return RedirectToPage("./Index");
         }
 
@@ -206,22 +153,8 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             TempData["ActiveTab"] = "weekly";
             await FetchDataForCurrentViewAsync();
 
-            if (id.HasValue)
-            {
-                objAvailability = Availabilities.FirstOrDefault(a => a.Id == id.Value);
-                if (objAvailability == null)
-                {
-                    return NotFound();
-                }
-            }
-            else
-            {
-                objAvailability = new Availability();
-            }
-
             return RedirectToPage(new { id = objAvailability?.Id });
         }
-      
         public async Task<IActionResult> OnGetNextWeekAsync(int? id)
         {
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(7);
@@ -229,22 +162,8 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             TempData["ActiveTab"] = "weekly";
             await FetchDataForCurrentViewAsync();
 
-            if (id.HasValue)
-            {
-                objAvailability = Availabilities.FirstOrDefault(a => a.Id == id.Value);
-                if (objAvailability == null)
-                {
-                    return NotFound();
-                }
-            }
-            else
-            {
-                objAvailability = new Availability();
-            }
-
             return RedirectToPage(new { id = objAvailability?.Id });
         }
-
         public async Task<IActionResult> OnGetPreviousMonthAsync(int? id)
         {
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(-1);
@@ -254,22 +173,8 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             MonthDays = _calendarService.GetMonthDays(CurrentDate);
             await FetchDataForCurrentViewAsync();
 
-            if (id.HasValue)
-            {
-                objAvailability = Availabilities.FirstOrDefault(a => a.Id == id.Value);
-                if (objAvailability == null)
-                {
-                    return NotFound();
-                }
-            }
-            else
-            {
-                objAvailability = new Availability();
-            }
-
             return RedirectToPage(new { id = objAvailability?.Id });
         }
-
         public async Task<IActionResult> OnGetNextMonthAsync(int? id)
         {
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(1);
@@ -277,22 +182,8 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             TempData["ActiveTab"] = "monthly";
             await FetchDataForCurrentViewAsync();
 
-            if (id.HasValue)
-            {
-                objAvailability = Availabilities.FirstOrDefault(a => a.Id == id.Value);
-                if (objAvailability == null)
-                {
-                    return NotFound();
-                }
-            }
-            else
-            {
-                objAvailability = new Availability();
-            }
-
             return RedirectToPage(new { id = objAvailability?.Id });
         }
-
         public async Task<IActionResult> OnGetTodayWeekAsync(int? id)
         {
             CurrentDate = DateTime.Today;
@@ -300,22 +191,8 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             TempData["ActiveTab"] = "weekly";
             await FetchDataForCurrentViewAsync();
 
-            if (id.HasValue)
-            {
-                objAvailability = Availabilities.FirstOrDefault(a => a.Id == id.Value);
-                if (objAvailability == null)
-                {
-                    return NotFound();
-                }
-            }
-            else
-            {
-                objAvailability = new Availability();
-            }
-
             return RedirectToPage(new { id = objAvailability?.Id });
         }
-
         public async Task<IActionResult> OnGetTodayMonthAsync(int? id)
         {
             CurrentDate = DateTime.Today;
@@ -323,33 +200,11 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             TempData["ActiveTab"] = "monthly";
             await FetchDataForCurrentViewAsync();
 
-            if (id.HasValue)
-            {
-                objAvailability = Availabilities.FirstOrDefault(a => a.Id == id.Value);
-                if (objAvailability == null)
-                {
-                    return NotFound();
-                }
-            }
-            else
-            {
-                objAvailability = new Availability();
-            }
-
             return RedirectToPage(new { id = objAvailability?.Id });
         }
-
         public bool IsAvailabilityBooked(Availability availability)
         {
             return Bookings.Any(booking => booking.StartTime >= availability.StartTime && booking.StartTime < availability.EndTime);
-        }
-        private IEnumerable<DateTime> GetRecurringDates(DateTime startDate, string recurringEndDate)
-        {
-            DateTime end = Convert.ToDateTime(recurringEndDate);
-            List<DateTime> dates = new List<DateTime>();
-            // calculate dates based on the recurring pattern
-
-            return dates;
         }
 
         private async Task FetchDataForCurrentViewAsync()
@@ -358,23 +213,37 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             DateTime startOfMonth = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
             DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
-            //TEMP
-            //These will be used when the database is working, for now ignore them
-            //Later i will want to also filter availabilities based on provider
-            //ViewAvailabilities = await _unitOfWork.Availability.GetAllAsync(
-            //    a => a.StartTime >= startOfMonth && a.StartTime <= endOfMonth
-            //    );
 
-            //I may need to add View bookings?
-            //ViewBookings = await _unitOfWork.Availability.GetAllAsync(
-            //    a => a.StartTime >= startOfMonth && a.StartTime <= endOfMonth
-            //    );
+            // Keys for cache
+            string cacheKeyAvailabilities = "availabilities";
+            string cacheKeyBookings = "bookings";
 
+            //// Try to get data from cache
+            //if (!_memoryCache.TryGetValue(cacheKeyAvailabilities, out IEnumerable<Availability> availabilities))
+            //{
+            //    // If not in cache, fetch from database and cache it
+            //    availabilities = await _unitOfWork.Availability.GetAllAsync(a => true);
+            //    _memoryCache.Set(cacheKeyAvailabilities, availabilities, TimeSpan.FromMinutes(30)); // Adjust expiration as needed
+            //}
 
-            // TEMP
-            ViewAvailabilities = Availabilities.Where(a => a.StartTime.Date >= startOfMonth && a.StartTime.Date <= endOfMonth);
+            //if (!_memoryCache.TryGetValue(cacheKeyBookings, out IEnumerable<Booking> bookings))
+            //{
+            //    bookings = await _unitOfWork.Booking.GetAllAsync(b => true);
+            //    _memoryCache.Set(cacheKeyBookings, bookings, TimeSpan.FromMinutes(30)); // Adjust expiration as needed
+            //}
+
+            //Ensures ViewAvailabilities and ViewBookings are never null
+            if (Bookings == null)
+            {
+                Bookings = Bookings ?? Enumerable.Empty<Booking>();
+            }
+            if (Availabilities == null)
+            {
+                Availabilities = Availabilities ?? Enumerable.Empty<Availability>();
+            }
+
+            ViewAvailabilities = Availabilities?.Where(a => a.StartTime.Date >= startOfMonth && a.StartTime.Date <= endOfMonth);
             ViewBookings = Bookings.Where(a => a.StartTime.Date >= startOfMonth && a.StartTime.Date <= endOfMonth);
         }
-
     }
 }

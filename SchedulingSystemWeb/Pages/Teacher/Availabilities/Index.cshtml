@@ -12,7 +12,6 @@
 }
 
 <h2 class="text-primary">@ViewData["Title"]</h2>
-
 <!-- Tab navigation buttons -->
 <ul class="nav nav-tabs" id="calendarTabs" role="tablist">
     <li class="nav-item" role="presentation">
@@ -88,7 +87,7 @@
                                         <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
                                     }
                                     <!-- Display availabilities for the day and hour -->
-                                    @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour))
+                                    @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour && !Model.IsAvailabilityBooked(a)))
                                     {
                                         <a asp-page="/Teacher/Availabilities/Upsert" asp-route-id="@availability.Id" class="availability-link">
                                             <div class="card text-white bg-success mb-3">
@@ -158,14 +157,16 @@
                                     <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
                                 }
                                 <!-- Display availabilities for the day -->
-                                @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == currentDay))
+                                @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == currentDay && !Model.IsAvailabilityBooked(a)))
                                 {
                                     <a asp-page="/Teacher/Availabilities/Upsert" asp-route-id="@availability.Id" class="availability-link">
-                                        <div class="card-header">Available</div>
-                                        <div class="card-body">
-                                            @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
+                                        <div class="card text-white bg-success mb-3">
+                                            <div class="card-header">Available</div>
+                                            <div class="card-body">
+                                                @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
+                                            </div>
+                                            <br>
                                         </div>
-                                        <br>
                                     </a>
                                 }
                                 </td>
