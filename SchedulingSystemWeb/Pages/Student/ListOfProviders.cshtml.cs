@@ -50,6 +50,7 @@ namespace SchedulingSystemWeb.Pages.Student
                 
             }
 
+
             return Page();
 
         }
