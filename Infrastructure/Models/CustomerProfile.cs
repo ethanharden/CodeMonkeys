@@ -13,9 +13,7 @@ namespace Infrastructure.Models
         [Key]
         public int Id { get; set; }
 
-        [Required]
-        [Display(Name = "User")]
-        public string UserId { get; set; }
+
 
         [ForeignKey("UserId")]
         public ApplicationUser? User { get; set; }

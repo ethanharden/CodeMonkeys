@@ -168,7 +168,7 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
                         {
                             CustomerProfile customerProfile = new CustomerProfile();
                             customerProfile.User = user;
-                            customerProfile.UserId = user.Id;
+                            //customerProfile.UserId = user.Id;
 
                             _unitOfWork.CustomerProfile.Add(customerProfile);
                             _unitOfWork.Commit();
@@ -178,7 +178,7 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
                         {
                             ProviderProfile providerProfile = new ProviderProfile();
                             providerProfile.User = user;
-                            providerProfile.UserId = user.Id;
+                            //providerProfile.UserId = user.Id;
                             _unitOfWork.ProviderProfile.Add(providerProfile);
                             _unitOfWork.Commit();
                             
@@ -191,7 +191,7 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
                         await _userManager.AddToRoleAsync(user, "STUDENT");
                         CustomerProfile customerProfile = new CustomerProfile();
                         customerProfile.User = user;
-                        customerProfile.UserId = user.Id;
+                     //   customerProfile.UserId = user.Id;
 
                         _unitOfWork.CustomerProfile.Add(customerProfile);
                         _unitOfWork.Commit();

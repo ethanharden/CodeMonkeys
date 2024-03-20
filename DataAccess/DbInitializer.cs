@@ -212,135 +212,139 @@ namespace DataAccess
             }
             _db.SaveChanges();
 
-            var Bookings = new List<Booking>
-            {
-                new Booking {
-                    //Id = 1,
-                    WNumber = 01333732,
-                    Subject = "4760",
-                    Note = "CBTD Help",
-                    StartTime = new DateTime(2024, 3, 26, 13, 0, 0),
-                    Duration = 60,
-                    Attachment = "",
-                    ProviderProfile = _unitOfWork.ProviderProfile.Get(p=> p.ProviderProfileID == 3),
-                    User = _unitOfWork.ApplicationUser.Get(p=> p.FirstName == "John"),
+            //var Availabilitys = new List<Availability>
+            //{
+            //    new Availability
+            //    {
+            //        ProviderProfile = _unitOfWork.ProviderProfile.Get(p => p.UserId == "3"),
+            //        LocationId = 1,
+            //        DayOfTheWeek = DayOfWeek.Thursday,
+            //        StartTime = new DateTime(2024, 4, 25, 9, 0, 0), // April 25, 2024, 9:00 AM
+            //        EndTime = new DateTime(2024, 4, 25, 10, 0, 0), // April 25, 2024, 5:00 PM
+            //    },
+            //    new Availability
+            //    {
+            //        ProviderProfile = _unitOfWork.ProviderProfile.Get(p => p.UserId == "3"),
+            //        LocationId = 1,
+            //        DayOfTheWeek = DayOfWeek.Friday,
+            //        StartTime = new DateTime(2024, 4, 26, 9, 0, 0),
+            //        EndTime = new DateTime(2024, 4, 26, 10, 0, 0),
+            //    },
+            //    new Availability
+            //    {
+            //        ProviderProfile = _unitOfWork.ProviderProfile.Get(p => p.UserId == "3"),
+            //        LocationId = 1,
+            //        DayOfTheWeek = DayOfWeek.Saturday,
+            //        StartTime = new DateTime(2024, 4, 27, 2, 0, 0),
+            //        EndTime = new DateTime(2024, 4, 27, 2, 30, 0),
+            //    },
+            //    new Availability
+            //    {
+            //        ProviderProfile = _unitOfWork.ProviderProfile.Get(p => p.UserId == "3"),
+            //        LocationId = 1,
+            //        DayOfTheWeek = DayOfWeek.Saturday,
+            //        StartTime = new DateTime(2024, 4, 27, 3, 0, 0),
+            //        EndTime = new DateTime(2024, 4, 27, 3, 45, 0),
+            //    },
+            //    new Availability
+            //    {
+            //        ProviderProfile = _unitOfWork.ProviderProfile.Get(p => p.UserId == "3"),
+            //        LocationId = 1,
+            //        DayOfTheWeek = DayOfWeek.Sunday,
+            //        StartTime = new DateTime(2024, 4, 28, 7, 0, 0),
+            //        EndTime = new DateTime(2024, 4, 28, 8, 0, 0),
+            //    },
+            //    new Availability
+            //    {
+            //        ProviderProfile = _unitOfWork.ProviderProfile.Get(p => p.UserId == "3"),
+            //        LocationId = 1,
+            //        DayOfTheWeek = DayOfWeek.Monday,
+            //        StartTime = new DateTime(2024, 4, 29, 7, 0, 0),
+            //        EndTime = new DateTime(2024, 4, 29, 8, 0, 0),
+            //    },
+            //    new Availability
+            //    {
+            //        ProviderProfile = _unitOfWork.ProviderProfile.Get(p => p.UserId == "3"),
+            //        LocationId = 1,
+            //        DayOfTheWeek = DayOfWeek.Monday,
+            //        StartTime = new DateTime(2024, 4, 29, 8, 0, 0),
+            //        EndTime = new DateTime(2024, 4, 29, 9, 0, 0),
+            //    },
+            //    new Availability
+            //    {
+            //       ProviderProfile = _unitOfWork.ProviderProfile.Get(p => p.UserId == "3"),
+            //        LocationId = 1,
+            //        DayOfTheWeek = DayOfWeek.Monday,
+            //        StartTime = new DateTime(2024, 4, 29, 9, 0, 0),
+            //        EndTime = new DateTime(2024, 4, 29, 9, 30, 0),
+            //    },
+            //    new Availability
+            //    {
+            //        ProviderProfile = _unitOfWork.ProviderProfile.Get(p => p.UserId == "3"),
+            //        LocationId = 1,
+            //        DayOfTheWeek = DayOfWeek.Monday,
+            //        StartTime = new DateTime(2024, 4, 29, 9, 45, 0),
+            //        EndTime = new DateTime(2024, 4, 29, 10, 30, 0),
+            //    },
+            //    new Availability
+            //    {
+            //       // ProviderProfile = _unitOfWork.ProviderProfile.Get(p => p.UserId == "3"),
+            //        LocationId = 1,
+            //        DayOfTheWeek = DayOfWeek.Tuesday,
+            //        StartTime = new DateTime(2024, 4, 30, 9, 30, 0),
+            //        EndTime = new DateTime(2024, 4, 30, 10, 30, 0),
+            //    },
 
-                }
-            };
+            //};
+            ////foreach (var c in Availabilitys)
+            ////{
+            ////    _db.Availabilities.Add(c);
+            ////}
+            ////_db.SaveChanges();
 
-            foreach (var c in Bookings)
-            {
-                _db.Bookings.Add(c);
-            }
-            _db.SaveChanges();
-
-            var Availabilites = new List<Availability>
-            {
-                new Availability {
-                    //Rich Fry availabile tuesdays 1-2
-                    //Id = 1,
-                    ProviderProfile = _unitOfWork.ProviderProfile.Get(p=> p.ProviderProfileID == 3),
-                    LocationId = 1,
-                    DayOfTheWeek = DayOfWeek.Tuesday,
-                    StartTime = new DateTime(2024, 3, 26, 13, 0, 0),
-                    EndTime = new DateTime(2024, 3, 26, 14, 0, 0),
-                },
-
-                new Availability {
-                    //Rich Fry availabile wednesdays 2-3
-                    //Id = 2,
-                    ProviderProfile = _unitOfWork.ProviderProfile.Get(p=> p.ProviderProfileID == 3),
-                    LocationId = 1,
-                    DayOfTheWeek = DayOfWeek.Wednesday,
-                    StartTime = new DateTime(2024, 3, 27, 14, 0, 0),
-                    EndTime = new DateTime(2024, 3, 27, 15, 0, 0),
-
-                },
-
-                new Availability {
-                    //Rich Fry availabile Fridays 11-4
-                    //Id = 3,
-                    ProviderProfile = _unitOfWork.ProviderProfile.Get(p=> p.ProviderProfileID == 3),
-                    LocationId = 1,
-                    DayOfTheWeek = DayOfWeek.Friday,
-                    StartTime = new DateTime(2024, 3, 29, 11, 0, 0),
-                    EndTime = new DateTime(2024, 3, 29, 16, 0, 0),
-                },
-
-                new Availability {
-                    //Pat available mondays 12-1
-                    //Id = 4,
-                    ProviderProfile = _unitOfWork.ProviderProfile.Get(p=> p.ProviderProfileID == 4),
-                    LocationId = 1,
-                    DayOfTheWeek = DayOfWeek.Monday,
-                    StartTime = new DateTime(2024, 3, 25, 12, 0, 0),
-                    EndTime = new DateTime(2024, 3, 25, 13, 0, 0),
-                },
-
-                new Availability {
-                    //Pat available thursadys 9-1
-                    //Id = 5,
-                    ProviderProfile = _unitOfWork.ProviderProfile.Get(p=> p.ProviderProfileID == 4),
-                    LocationId = 1,
-                    DayOfTheWeek = DayOfWeek.Thursday,
-                    StartTime = new DateTime(2024, 3, 28, 9, 0, 0),
-                    EndTime = new DateTime(2024, 3, 28, 13, 0, 0),
-                },
+            //var bookAvailabilities = _unitOfWork.Availability.GetAll().Take(5).ToList();
+            //for (int i = 0; i < 5; i++)
+            //{
+            //    var user = _unitOfWork.ApplicationUser.Get(u => u.Id == "1");
+            //    var booking = new Booking
+            //    {
+            //        ProviderProfile = bookAvailabilities[i].ProviderProfile,
+            //        User = user,
+            //        WNumber = 00000 + i, // Example WNumber
+            //        Subject = $"Seed Data: {i + 1}",
+            //        Note = $"Testing Note:  {i + 1}",
+            //        StartTime = bookAvailabilities[i].StartTime,
+            //        Duration = (int)(bookAvailabilities[i].EndTime - bookAvailabilities[i].StartTime).TotalMinutes,
+            //        objAvailability = bookAvailabilities[i]
+            //    };
+            //    _db.Bookings.Add(booking);
+            //}
 
 
-                new Availability {
-                    //Julie available thursadys 3-4
-                    //Id = 6,
-                    ProviderProfile = _unitOfWork.ProviderProfile.Get(p=> p.ProviderProfileID == 5),
-                    LocationId = 1,
-                    DayOfTheWeek = DayOfWeek.Thursday,
-                    StartTime = new DateTime(2024, 3, 28, 15, 0, 0),
-                    EndTime = new DateTime(2024, 3, 28, 16, 0, 0),
-                },
+            //var AvailabilityGroups = new List<AvailabilityGroup>
+            //{
+            //    new AvailabilityGroup // weekly
+            //    {
+            //        //Id = 1,
+            //        AvailabilityList = new List<Availability>(),
+            //        RecurringType = _unitOfWork.RecurringType.Get(p=> p.Id == 1),
+            //        RecurringEndDate = new DateTime(2024, 5, 1, 0, 0, 0),
+            //    },
+            //    new AvailabilityGroup //bi weekly
+            //    {
+            //        //Id = 2,
+            //        AvailabilityList = new List<Availability>(),
+            //        RecurringType = _unitOfWork.RecurringType.Get(p=> p.Id == 2),
+            //        RecurringEndDate = new DateTime(2024, 5, 1, 0, 0, 0),
+            //    },
 
+            //};
 
-                new Availability {
-                    //Julie available mondays 9-10
-                    //Id = 6,
-                    ProviderProfile = _unitOfWork.ProviderProfile.Get(p=> p.ProviderProfileID == 5),
-                    LocationId = 1,
-                    DayOfTheWeek = DayOfWeek.Monday,
-                    StartTime = new DateTime(2024, 3, 28, 9, 0, 0),
-                    EndTime = new DateTime(2024, 3, 28, 10, 0, 0),
-                },
-            };
-
-            foreach (var c in Availabilites)
-            {
-                _db.Availabilities.Add(c);
-            }
-            _db.SaveChanges();
-
-
-            var AvailabilityGroups = new List<AvailabilityGroup>
-            {
-                new AvailabilityGroup // weekly
-                {
-                    //Id = 1,
-                    AvailabilityList = new List<Availability>(),
-                    RecurringType = _unitOfWork.RecurringType.Get(p=> p.Id == 1),
-                    RecurringEndDate = new DateTime(2024, 5, 1, 0, 0, 0),
-                },
-                new AvailabilityGroup //bi weekly
-                {
-                    //Id = 2,
-                    AvailabilityList = new List<Availability>(),
-                    RecurringType = _unitOfWork.RecurringType.Get(p=> p.Id == 2),
-                    RecurringEndDate = new DateTime(2024, 5, 1, 0, 0, 0),
-                },
-
-            };
-
-            foreach (var c in AvailabilityGroups)
-            {
-                _db.AvailabilityGroups.Add(c);
-            }
-            _db.SaveChanges();
+            //foreach (var c in AvailabilityGroups)
+            //{
+            //    _db.AvailabilityGroups.Add(c);
+            //}
+            //_db.SaveChanges();
 
 
         }
