@@ -25,23 +25,31 @@ namespace SchedulingSystemWeb.Pages.Student
             _userManager = userManager;
             UserRoles = new Dictionary<string, IList<string>>(); // Initialize user roles dictionary
         }
-        public async Task<IActionResult> OnGetAsync()
+        public async Task<IActionResult> OnGetAsync(string search, string role)
         {
-            objApplicationUserList.AddRange(await _userManager.GetUsersInRoleAsync("TUTORS"));
+            if (!string.IsNullOrEmpty(role))
+            {
+                objApplicationUserList.AddRange(await _userManager.GetUsersInRoleAsync(role));
 
-            objApplicationUserList.AddRange(await _userManager.GetUsersInRoleAsync("TEACHER"));
-            objApplicationUserList.AddRange(await _userManager.GetUsersInRoleAsync("ADVISOR"));
-            //objApplicationUserList = _unitOfWork.ApplicationUser.GetAll(null);
-            
+            }
+            else
+            {
+                objApplicationUserList.AddRange(await _userManager.GetUsersInRoleAsync("TUTOR"));
+                objApplicationUserList.AddRange(await _userManager.GetUsersInRoleAsync("TEACHER"));
+                objApplicationUserList.AddRange(await _userManager.GetUsersInRoleAsync("ADVISOR"));
+            }
+            if (!string.IsNullOrEmpty(search))
+            {
+                objApplicationUserList = objApplicationUserList.Where(u => u.FullName.Contains(search)).ToList();
+
+            }
+
             foreach (var user in objApplicationUserList)
             {
                 UserRoles[user.Id] = await _userManager.GetRolesAsync(user);
                 
             }
 
-
-
-            
             return Page();
 
         }
