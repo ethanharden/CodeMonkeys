@@ -20,26 +20,26 @@
                 <form>
                     <div class="form-group">
                         <label for="meetingName">Meeting Name:</label>
-                        <input type="text" class="form-control" id="meetingName" placeholder="Enter meeting name">
+                        <input  type="text" class="form-control" id="meetingName" placeholder="Enter meeting name" required>
                     </div>
                     <div class="form-group">
                         <label for="professorName">Professor Name:</label>
-                        <input type="text" class="form-control" id="professorName" value="Professor Fry" disabled>
+                        <input type="text" class="form-control" id="professorName" value="@Model.fullName" disabled>
                     </div>
                     <div class="form-group">
                         <label for="location">Location:</label>
-                        <input type="text" class="form-control" id="location" value="Virtual" disabled>
+                        <input type="text" class="form-control" id="location" value="@Model.location.LocationName" disabled>
                     </div>
                     <div class="form-group">
                         <label for="course">Course:</label>
-                        <input type="text" class="form-control" id="course" placeholder="Enter course">
+                        <input type="text" asp-for = "course" class="form-control" id="course" placeholder="Enter course" required>
                     </div>
                     <div class="form-group">
-                        <label for="course">Description: (Optional)</label>
-                        <textarea class="form-control" id="description" placeholder="Enter description"></textarea>
+                        <label for="description">Description: (Optional)</label>
+                        <textarea class="form-control" asp-for="description" id="description" placeholder="Enter description"></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="fileUpload">File Upload:</label>
+                        <label for="fileUpload">File Upload: (Optional)</label>
                         <input type="file" class="form-control-file" id="fileUpload">
                     </div>
                     <div class="form-group">
@@ -50,11 +50,11 @@
             <div class="col-md-5">
                 <div class="form-group">
                     <label for="meetingTime">Time:</label>
-                    <input type="text" class="form-control" id="meetingTime" value="3:30 P.M. - 4:00 P.M." disabled>
+                    <input type="text" class="form-control" id="meetingTime" value="@Model.startEndTime" disabled>
                 </div>
                 <div class="form-group">
                     <label for="meetingDate">Date:</label>
-                    <input type="text" class="form-control" id="meetingDate" value="2/14/2024" disabled>
+                    <input type="text" class="form-control" id="meetingDate" value="@Model.availability." disabled>
                 </div>
             </div>
         </div>

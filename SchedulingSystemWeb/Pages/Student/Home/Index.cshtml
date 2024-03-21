@@ -88,7 +88,7 @@
                                     <!-- Display availabilities for the day and hour -->
                                     @foreach(var availability in Model.ViewAvailabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour))
                                     {
-                                        <a asp-page="/Student/Bookings/Upsert" asp-route-id="@availability.Id" class="availability-link">
+                                        <a asp-page="/Student/Bookings/Upsert" asp-route-id="@availability.Id"  class="availability-link">
                                             <div class="card text-white bg-success mb-3">
                                                 <div class="card-header">Available</div>
                                                 <div class="card-body">
