@@ -2,13 +2,15 @@
 @model SchedulingSystemWeb.Pages.Student.Bookings.IndexModel
 @using System.Globalization
 @{
-    ViewData["Title"] = "Availability Calendar";
+    ViewData["Title"] = @Model._ProfUser.FirstName + " "+  @Model._ProfUser.LastName +"'s Calendar";
     var firstDayOfMonth = new DateTime(Model.CurrentDate.Year, Model.CurrentDate.Month, 1);
     var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
     int daysInMonth = DateTime.DaysInMonth(Model.CurrentDate.Year, Model.CurrentDate.Month);
     int firstDayOfWeek = (int)CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek;
     int currentDayOfWeek = (int)firstDayOfMonth.DayOfWeek;
     int leadingDays = (currentDayOfWeek - firstDayOfWeek + 7) % 7;
+    var user = Model._ProfUser;
+    var profProv = Model.provider;
 }
 
 <h2 class="text-primary">@ViewData["Title"]</h2>
