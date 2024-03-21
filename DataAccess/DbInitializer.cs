@@ -36,35 +36,35 @@ namespace DataAccess
 
             }
 
-            //if (_db.Availabilities.Any())
-            //{
-            //    return; //DB has been seeded
-            //}
+            if (_db.Availabilities.Any())
+            {
+                return; //DB has been seeded
+            }
 
-            //if (_db.Bookings.Any())
-            //{
-            //    return; //DB has been seeded
-            //}
+            if (_db.Bookings.Any())
+            {
+                return; //DB has been seeded
+            }
 
-            //if (_db.Locations.Any())
-            //{
-            //    return; //DB has been seeded
-            //}
+            if (_db.Locations.Any())
+            {
+                return; //DB has been seeded
+            }
 
-            //if (_db.ProviderProfiles.Any())
-            //{
-            //    return; //DB has been seeded
-            //}
+            if (_db.ProviderProfiles.Any())
+            {
+                return; //DB has been seeded
+            }
 
-            //if (_db.CustomerProfiles.Any())
-            //{
-            //    return; //DB has been seeded
-            //}
+            if (_db.CustomerProfiles.Any())
+            {
+                return; //DB has been seeded
+            }
 
-            //if (_db.RecurringTypes.Any())
-            //{
-            //    return; //DB has been seeded
-            //}
+            if (_db.RecurringTypes.Any())
+            {
+                return; //DB has been seeded
+            }
 
 
 

@@ -1,10 +1,5 @@
 using DataAccess;
 using Infrastructure.Models;
-using Microsoft.AspNet.Identity.EntityFramework;
-
-//using Microsoft.AspNet.Identity;
-
-//using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -46,13 +41,12 @@ namespace SchedulingSystemWeb.Pages.Student
 
             foreach (var user in objApplicationUserList)
             {
-                UserRoles[user.Id] = await _userManager.GetRolesAsync(user);
-                
+                UserRoles[user.Id] = await _userManager.GetRolesAsync(user); 
             }
-
 
             return Page();
 
         }
+        
     }
 }
