@@ -18,8 +18,8 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer
 //builder.Services.AddSingleton<IEmailSender, EmailSender>();
 
 //builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-//  .AddDefaultTokenProviders()
-//    .AddEntityFrameworkStores<AppDbContext>();
+  //.AddDefaultTokenProviders()
+   // .AddEntityFrameworkStores<AppDbContext>();
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>() // ApplicationUser should extend IdentityUser
     .AddEntityFrameworkStores<AppDbContext>()
@@ -35,7 +35,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddScoped<UnitOfWork>();
 builder.Services.AddScoped<ICalendarService, CalendarService>();
-//builder.Services.AddScoped<DbInitializer>();
+builder.Services.AddScoped<DbInitializer>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -50,7 +50,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-//SeedDatabase();
+SeedDatabase();
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -60,5 +60,11 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{area=Customer}/{controller=Home}/{action=Index}/{id?}");
 
-app.Run(); 
+app.Run();
 
+void SeedDatabase()
+{
+    using var scope = app.Services.CreateScope();
+    var dbInitializer = scope.ServiceProvider.GetRequiredService<DbInitializer>();
+    dbInitializer.Initialize();
+}
