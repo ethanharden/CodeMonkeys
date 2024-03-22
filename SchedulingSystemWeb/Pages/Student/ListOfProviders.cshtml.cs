@@ -36,7 +36,7 @@ namespace SchedulingSystemWeb.Pages.Student
             }
             if (!string.IsNullOrEmpty(search))
             {
-                objApplicationUserList = objApplicationUserList.Where(u => u.FullName.Contains(search)).ToList();
+                objApplicationUserList = objApplicationUserList.Where(u => u.FullName.ToLower().Contains(search.ToLower())).ToList();
 
             }
 
