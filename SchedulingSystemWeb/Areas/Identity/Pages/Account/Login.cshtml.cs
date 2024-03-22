@@ -122,7 +122,7 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
                     }
                     else
                     {
-                        return LocalRedirect("/Teacher/Home");
+                        return LocalRedirect("/Teacher/Availabilities");
                     }
                 }
                 

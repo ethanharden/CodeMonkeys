@@ -3,6 +3,7 @@ using Infrastructure.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Http;
 
 namespace SchedulingSystemWeb.Pages.Student
 {
@@ -47,6 +48,11 @@ namespace SchedulingSystemWeb.Pages.Student
             return Page();
 
         }
-        
+        public IActionResult OnGetSetProvId(string userId)
+        {
+            HttpContext.Session.SetString("ProvId", userId);
+            return RedirectToPage("/Student/Bookings/Index");
+        }
+
     }
 }

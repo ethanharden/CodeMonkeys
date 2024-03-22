@@ -16,7 +16,6 @@ namespace SchedulingSystemWeb.Pages.Availabilities
 
         private readonly UnitOfWork _unitOfWork;
         private readonly ICalendarService _calendarService;
-        private readonly IMemoryCache _memoryCache;
 
         public IEnumerable<Availability> Availabilities { get; set; }
         public IEnumerable<Booking> Bookings { get; set; }
@@ -34,13 +33,12 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         [BindProperty]
         public List<DayOfWeek> SelectedDaysOfWeek { get; set; }
 
-        public UpsertModel(UnitOfWork unitOfWork, ICalendarService calendarService, IMemoryCache memoryCache)
+        public UpsertModel(UnitOfWork unitOfWork, ICalendarService calendarService)
         {
             _calendarService = calendarService;
             _unitOfWork = unitOfWork;
             ViewAvailabilities = new List<Availability>();
             ViewBookings = new List<Booking>();
-            _memoryCache = memoryCache;
 
         }
 
@@ -53,10 +51,10 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             WeekDays = _calendarService.GetWeekDays(CurrentDate);
             MonthDays = _calendarService.GetMonthDays(CurrentDate);
 
-           // providerProfileGet = _unitOfWork.ProviderProfile.Get(p => p.ProviderProfileID == 5);
+            providerProfileGet = _unitOfWork.ProviderProfile.Get(p => p.Id == id);
 
-            //Availabilities = _unitOfWork.Availability.GetAll().Where(p => p.ProviderProfile == providerProfileGet);
-            //Bookings = _unitOfWork.Booking.GetAll().Where(p => p.ProviderProfile == providerProfileGet);
+            Availabilities = _unitOfWork.Availability.GetAll().Where(p => p.ProviderProfileID == providerProfileGet.Id);
+            Bookings = _unitOfWork.Booking.GetAll().Where(p => p.ProviderProfileID == providerProfileGet.Id);
 
 
 
@@ -81,7 +79,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                     Id = 0,
                     StartTime = DateTime.Today.AddDays(1), // Set to tomorrow's date
                     EndTime = DateTime.Today.AddDays(1).AddHours(1), // Set to tomorrow's date + 1 hour
-               //     ProviderProfile = providerProfileGet
+                    ProviderProfileID = providerProfileGet.Id
                 };
             }
 
@@ -115,7 +113,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                         DayOfTheWeek = day,
                         StartTime = objAvailability.StartTime,
                         EndTime = objAvailability.EndTime,
-                      //  ProviderProfile = objAvailability.ProviderProfile,
+                        ProviderProfileID = objAvailability.ProviderProfileID,
                         LocationId = 1,
                     };
 
@@ -212,35 +210,6 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             // Adjust these lines to match your actual method names and parameters
             DateTime startOfMonth = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
             DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
-
-
-            // Keys for cache
-            string cacheKeyAvailabilities = "availabilities";
-            string cacheKeyBookings = "bookings";
-
-            //// Try to get data from cache
-            //if (!_memoryCache.TryGetValue(cacheKeyAvailabilities, out IEnumerable<Availability> availabilities))
-            //{
-            //    // If not in cache, fetch from database and cache it
-            //    availabilities = await _unitOfWork.Availability.GetAllAsync(a => true);
-            //    _memoryCache.Set(cacheKeyAvailabilities, availabilities, TimeSpan.FromMinutes(30)); // Adjust expiration as needed
-            //}
-
-            //if (!_memoryCache.TryGetValue(cacheKeyBookings, out IEnumerable<Booking> bookings))
-            //{
-            //    bookings = await _unitOfWork.Booking.GetAllAsync(b => true);
-            //    _memoryCache.Set(cacheKeyBookings, bookings, TimeSpan.FromMinutes(30)); // Adjust expiration as needed
-            //}
-
-            //Ensures ViewAvailabilities and ViewBookings are never null
-            if (Bookings == null)
-            {
-                Bookings = Bookings ?? Enumerable.Empty<Booking>();
-            }
-            if (Availabilities == null)
-            {
-                Availabilities = Availabilities ?? Enumerable.Empty<Availability>();
-            }
 
             ViewAvailabilities = Availabilities?.Where(a => a.StartTime.Date >= startOfMonth && a.StartTime.Date <= endOfMonth);
             ViewBookings = Bookings.Where(a => a.StartTime.Date >= startOfMonth && a.StartTime.Date <= endOfMonth);

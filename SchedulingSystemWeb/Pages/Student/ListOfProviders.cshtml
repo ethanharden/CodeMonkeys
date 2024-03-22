@@ -40,9 +40,30 @@
                     </ul>
                 </td>
                 <td style="width: 33%">
-                    <a asp-page="/Student/Bookings/Index" asp-route-UserId="@user.Id" class="btn btn-primary">Schedule Appointment</a>
+                    <a asp-page-handler="SetProvId" asp-route-userId="@user.Id" class="btn btn-primary">Schedule Appointment</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+@section Scripts {
+    <script>
+        function scheduleAppointment(userId) {
+            // Send an AJAX request to update the ProvId in the session
+            $.ajax({
+                type: "GET",
+                url: '/Student/Bookings/Index',
+                data: { userId: userId },
+                success: function (response) {
+                    // Optionally, handle success response if needed
+                    console.log(response);
+                },
+                error: function (xhr, status, error) {
+                    // Optionally, handle error response if needed
+                    console.error(xhr.responseText);
+                }
+            });
+        }
+    </script>
+}

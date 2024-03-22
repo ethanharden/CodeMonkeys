@@ -182,7 +182,7 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
                             _unitOfWork.ProviderProfile.Add(providerProfile);
                             _unitOfWork.Commit();
                             
-                            ReturnUrl = "/Teacher/Home";
+                            ReturnUrl = "/Teacher/Availabilities";
                             
                         }
                     }

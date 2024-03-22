@@ -1,9 +1,12 @@
 using DataAccess;
 using Infrastructure.Interfaces;
 using Infrastructure.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.DotNet.Scaffolding.Shared;
 using System.Globalization;
+using System.Security.Claims;
 
 namespace SchedulingSystemWeb.Pages.Student.Home
 {
@@ -11,6 +14,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
     {
         private readonly UnitOfWork _unitOfWork;
         private readonly ICalendarService _calendarService;
+        private readonly UserManager<ApplicationUser> _userManager;
         public IEnumerable<Booking> Bookings { get; set; }
         public IEnumerable<Availability> Availabilities { get; set; }
 
@@ -22,47 +26,47 @@ namespace SchedulingSystemWeb.Pages.Student.Home
         public List<DateTime> MonthDays { get; private set; }
         public string CurrentMonthName { get; private set; }
 
-        public IndexModel(UnitOfWork unitOfWork, ICalendarService calendarService)
+        public IndexModel(UserManager<ApplicationUser> userManager, UnitOfWork unitOfWork, ICalendarService calendarService)
         {
             _unitOfWork = unitOfWork;
             _calendarService = calendarService;
             Bookings = new List<Booking>();
             Availabilities = new List<Availability>();
-            SeedData();
+            //SeedData();
         }
-        public void SeedData()
-        {
-            // Temporary test data of Availabilities and book list
-            Availabilities = new List<Availability>
-            {
-                new Availability
-                {
-                    Id = 1,
-                    DayOfTheWeek = DayOfWeek.Friday,
-                    StartTime = new DateTime(2024, 3, 15, 9, 0, 0),
-                    EndTime = new DateTime(2024, 3, 15, 12, 0, 0),
-                },
-                new Availability
-                {
-                    Id = 2,
-                    DayOfTheWeek = DayOfWeek.Monday,
-                    StartTime = new DateTime(2024, 4, 1, 9, 0, 0),
-                    EndTime = new DateTime(2024, 4, 1, 12, 0, 0),
-                }
-            };
+        //public void SeedData()
+        //{
+        //    // Temporary test data of Availabilities and book list
+        //    Availabilities = new List<Availability>
+        //    {
+        //        new Availability
+        //        {
+        //            Id = 1,
+        //            DayOfTheWeek = DayOfWeek.Friday,
+        //            StartTime = new DateTime(2024, 3, 15, 9, 0, 0),
+        //            EndTime = new DateTime(2024, 3, 15, 12, 0, 0),
+        //        },
+        //        new Availability
+        //        {
+        //            Id = 2,
+        //            DayOfTheWeek = DayOfWeek.Monday,
+        //            StartTime = new DateTime(2024, 4, 1, 9, 0, 0),
+        //            EndTime = new DateTime(2024, 4, 1, 12, 0, 0),
+        //        }
+        //    };
 
-            Bookings = new List<Booking>
-            {
-                new Booking
-                {
-                    Id = 1,
-                    Subject = "Team Meeting",
-                    Note = "Discuss project milestones",
-                    StartTime = new DateTime(2024, 3, 14, 14, 0, 0),
-                    Duration = 2,
-                }
-            };
-        }
+        //    Bookings = new List<Booking>
+        //    {
+        //        new Booking
+        //        {
+        //            Id = 1,
+        //            Subject = "Team Meeting",
+        //            Note = "Discuss project milestones",
+        //            StartTime = new DateTime(2024, 3, 14, 14, 0, 0),
+        //            Duration = 2,
+        //        }
+        //    };
+        //}
 
 
         public async Task OnGetAsync()
@@ -73,6 +77,9 @@ namespace SchedulingSystemWeb.Pages.Student.Home
 
             WeekDays = _calendarService.GetWeekDays(CurrentDate);
             MonthDays = _calendarService.GetMonthDays(CurrentDate);
+
+            var currentUser = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            Bookings = _unitOfWork.Booking.GetAll().Where(u=>u.User == currentUser);
 
             await FetchDataForCurrentViewAsync();
         }
@@ -140,18 +147,9 @@ namespace SchedulingSystemWeb.Pages.Student.Home
             DateTime startOfMonth = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
             DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
+            ViewBookings = await _unitOfWork.Booking.GetAllAsync(
+                b => b.StartTime >= startOfMonth && b.StartTime <= endOfMonth);
 
-            //TEMP
-            //ViewBookings = await _unitOfWork.Booking.GetAllAsync(
-            //    b => b.StartTime >= startOfMonth && b.StartTime <= endOfMonth);
-            //ViewAvailabilities = await _unitOfWork.Availability.GetAllAsync(
-            //    a => a.StartTime >= startOfMonth && a.StartTime <= endOfMonth
-            //    );
-
-            // Filter bookings within the month.
-            ViewBookings = Bookings.Where(b => b.StartTime.Date >= startOfMonth && b.StartTime.Date <= endOfMonth);
-            // Filter availabilities within the month. Adjust this logic if your availabilities work differently.
-            ViewAvailabilities = Availabilities.Where(a => a.StartTime.Date >= startOfMonth && a.StartTime.Date <= endOfMonth);
         }
     }
 }

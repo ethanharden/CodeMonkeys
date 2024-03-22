@@ -17,13 +17,18 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer
 
 //builder.Services.AddSingleton<IEmailSender, EmailSender>();
 
-//builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-  //.AddDefaultTokenProviders()
-   // .AddEntityFrameworkStores<AppDbContext>();
-
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>() // ApplicationUser should extend IdentityUser
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); //set for 30 minutes
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -49,6 +54,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+app.UseSession();
 app.UseRouting();
 
 SeedDatabase();

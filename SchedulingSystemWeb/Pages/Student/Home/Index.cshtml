@@ -85,19 +85,6 @@
                                     {
                                         <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
                                     }
-                                    <!-- Display availabilities for the day and hour -->
-                                    @foreach(var availability in Model.ViewAvailabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour))
-                                    {
-                                        <a asp-page="/Student/Bookings/Upsert" asp-route-id="@availability.Id"  class="availability-link">
-                                            <div class="card text-white bg-success mb-3">
-                                                <div class="card-header">Available</div>
-                                                <div class="card-body">
-                                                    @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
-                                                </div>
-                                            </div>
-                                        </a>
-                                        <br>
-                                    }
                                 </td>
                             }
                         </tr>
@@ -151,19 +138,6 @@
                                 @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == currentDay))
                                 {
                                     <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
-                                }
-                                <!-- Display availabilities for the day -->
-                                @foreach(var availability in Model.ViewAvailabilities.Where(a => a.StartTime.Date == currentDay))
-                                {
-                                    <a asp-page="/Student/Bookings/Upsert" asp-route-id="@availability.Id" class="availability-link">
-                                        <div class="card text-white bg-success mb-3">
-                                            <div class="card-header">Available</div>
-                                            <div class="card-body">
-                                                @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
-                                            </div>
-                                        </div>
-                                    </a>
-                                    <br>
                                 }
                             </td>
                         }
