@@ -13,12 +13,12 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         private readonly UnitOfWork _unitOfWork;
         private readonly ICalendarService _calendarService;
 
-        [BindProperty]
-        public string ProfId { get; set; }
+        //[BindProperty]
+        //public string ProfId { get; set; }
         [BindProperty]
         public ApplicationUser _ProfUser { get; set; }
         [BindProperty]
-        public  string profFullName { get; set; }
+        public  string profFullName { get;set; }
         public IEnumerable<Booking> Bookings { get; set; }
         public IEnumerable<Availability> Availabilities { get; set; }
         [BindProperty]
@@ -79,8 +79,10 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         {
             if(UserId != null)
             {
-                ProfId = UserId;         
+                TempData["ProfId"] = UserId;        
             }
+
+            string ProfId = TempData["ProfId"] as string;
             _ProfUser = _unitOfWork.ApplicationUser.Get(u => u.Id == ProfId);
             profFullName = _ProfUser.FirstName + " " + _ProfUser.LastName;
             provider = _unitOfWork.ProviderProfile.Get(p => p.User == _ProfUser.Id);
@@ -100,9 +102,9 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         }
 
 
-        public async Task<IActionResult> OnGetPreviousWeekAsync(string UserId)
+        public async Task<IActionResult> OnGetPreviousWeekAsync()
         {
-            ProfId = UserId;
+            string ProfId = TempData["ProfId"] as string;
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(-7);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
@@ -110,9 +112,9 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnGetNextWeekAsync(string UserId)
+        public async Task<IActionResult> OnGetNextWeekAsync()
         {
-            ProfId = UserId;
+            string ProfId = TempData["ProfId"] as string;
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(7);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
@@ -120,9 +122,9 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnGetPreviousMonthAsync(string UserId)
+        public async Task<IActionResult> OnGetPreviousMonthAsync()
         {
-            ProfId = UserId;
+            string ProfId = TempData["ProfId"] as string;
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(-1);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
@@ -132,9 +134,9 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             return Page();
         }
 
-        public async Task<IActionResult> OnGetNextMonthAsync(string UserId)
+        public async Task<IActionResult> OnGetNextMonthAsync()
         {
-            ProfId = UserId;
+            string ProfId = TempData["ProfId"] as string;
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(1);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
@@ -142,9 +144,9 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnGetTodayWeekAsync(string UserId)
+        public async Task<IActionResult> OnGetTodayWeekAsync()
         {
-            ProfId = UserId;
+            string ProfId = TempData["ProfId"] as string;
             CurrentDate = DateTime.Today;
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
@@ -152,9 +154,9 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnGetTodayMonthAsync(string UserId)
+        public async Task<IActionResult> OnGetTodayMonthAsync()
         {
-            ProfId = UserId;
+            string ProfId = TempData["ProfId"] as string;
             CurrentDate = DateTime.Today;
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
