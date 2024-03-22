@@ -153,7 +153,7 @@
                                     <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
                                 }
                                 <!-- Display availabilities for the day -->
-                                @foreach(var availability in Model.ViewAvailabilities.Where(a => a.StartTime.Date == currentDay))
+                                @foreach(var availability in Model.ViewAvailabilities.Where(a => a.StartTime.Date == currentDay && !Model.IsAvailabilityBooked(a)))
                                 {
                                     <a asp-page="/Student/Bookings/Upsert" asp-route-id="@availability.Id" class="availability-link">
                                         <div class="card text-white bg-success mb-3">
