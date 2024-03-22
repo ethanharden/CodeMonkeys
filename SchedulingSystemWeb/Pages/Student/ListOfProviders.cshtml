@@ -56,11 +56,9 @@
                 url: '/Student/Bookings/Index',
                 data: { userId: userId },
                 success: function (response) {
-                    // Optionally, handle success response if needed
                     console.log(response);
                 },
                 error: function (xhr, status, error) {
-                    // Optionally, handle error response if needed
                     console.error(xhr.responseText);
                 }
             });

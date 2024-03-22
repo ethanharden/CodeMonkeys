@@ -14,9 +14,6 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         private readonly UnitOfWork _unitOfWork;
         private readonly ICalendarService _calendarService;
         private readonly IHttpContextAccessor _httpContextAccessor;
-
-        //[BindProperty]
-        //public string ProfId { get; set; }
         [BindProperty]
         public ApplicationUser _ProfUser { get; set; }
         [BindProperty]
@@ -41,42 +38,8 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             _calendarService = calendarService;
             Bookings = new List<Booking>();
             Availabilities = new List<Availability>();
-            //SeedData();
         }
-        //public void SeedData()
-        //{
-        //    // Temporary test data of Availabilities and book list
-        //    Availabilities = new List<Availability>
-        //    {
-        //        new Availability
-        //        {
-        //            Id = 1,
-        //            DayOfTheWeek = DayOfWeek.Friday,
-        //            StartTime = new DateTime(2024, 3, 15, 9, 0, 0),
-        //            EndTime = new DateTime(2024, 3, 15, 12, 0, 0),
-        //        },
-        //        new Availability
-        //        {
-        //            Id = 2,
-        //            DayOfTheWeek = DayOfWeek.Monday,
-        //            StartTime = new DateTime(2024, 4, 1, 9, 0, 0),
-        //            EndTime = new DateTime(2024, 4, 1, 12, 0, 0),
-        //        }
-        //    };
-
-        //    Bookings = new List<Booking>
-        //    {
-        //        new Booking
-        //        {
-        //            Id = 1,
-        //            Subject = "Team Meeting",
-        //            Note = "Discuss project milestones",
-        //            StartTime = new DateTime(2024, 3, 14, 14, 0, 0),
-        //            Duration = 2,
-        //        }
-        //    };
-        //}
-
+        
 
         public async Task OnGetAsync()
         {

@@ -163,13 +163,13 @@
                                     {
                                         <td class="hour-cell @((day.Date == DateTime.Today) ? "today" : "")">
                                             <!-- Display bookings for the day and hour -->
-                                           @*  @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == day.Date && b.StartTime.Hour == hour))
+                                            @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == day.Date && b.StartTime.Hour == hour))
                                             {
                                                 <div class="booking-event" style="background-color: grey; color: white; cursor: pointer;"
                                                      onclick="showBookingDetails('@booking.Subject', '@booking.StartTime.ToString("dddd, MMMM dd, yyyy HH:mm")')">
                                                   @booking.Subject @booking.StartTime.ToString("HH:mm") - @booking.StartTime.AddMinutes(booking.Duration).ToString("HH:mm")
                                                 </div>
-                                            } *@
+                                            }
                                             <!-- Display availabilities for the day and hour -->
                                              @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour) /* && !Model.IsAvailabilityBooked(a) */)
                                             {
@@ -231,13 +231,13 @@
                                     <td class="month-day @(currentDay.Date == DateTime.Today.Date ? "today" : "")">
                                         @currentDay.Day
                                         <!--Bookings-->
-                                        @* @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == currentDay))
+                                        @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == currentDay))
                                         {
                                             <div class="booking-event" style="background-color: grey; color: white; cursor: pointer;"
                                                  onclick="showBookingDetails('@booking.Subject', '@booking.StartTime.ToString("dddd, MMMM dd, yyyy HH:mm")')">
                                               @booking.Subject @booking.StartTime.ToString("HH:mm") - @booking.StartTime.AddMinutes(booking.Duration).ToString("HH:mm")
                                             </div>
-                                        } *@
+                                        }
                                         <!-- Display availabilities for the day -->
                                         @if(Model.ViewAvailabilities != null)
                                         {
@@ -286,17 +286,16 @@
                 let handler = (navLink.id === 'weekly-tab') ? 'TodayWeek' : 'TodayMonth';
                 let urlParams = new URLSearchParams(window.location.search);
             
-                // Use the URLSearchParams to handle the query string
                 urlParams.set('handler', handler);
             
-                // Check if there's a valid ID to append
+                // Check if valid ID
                 if (availabilityId && availabilityId !== '0') {
                     urlParams.set('id', availabilityId);
                 } else {
                     urlParams.delete('id'); // Make sure to remove id if it's not valid
                 }
 
-                // Construct the URL with the search parameters
+                // Construct the URL
                 let url = `${window.location.pathname}?${urlParams.toString()}`;
                 window.location.href = url;
                 e.preventDefault();

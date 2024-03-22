@@ -207,7 +207,6 @@ namespace SchedulingSystemWeb.Pages.Availabilities
 
         private async Task FetchDataForCurrentViewAsync()
         {
-            // Adjust these lines to match your actual method names and parameters
             DateTime startOfMonth = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
             DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
