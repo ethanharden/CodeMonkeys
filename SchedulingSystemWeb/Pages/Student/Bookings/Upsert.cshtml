@@ -17,7 +17,7 @@
                 <a class="nav-link text-dark" asp-area="" asp-page="/Student/Bookings/Index"><button class="btn btn-secondary">Back</button></a>
             </div>
             <div class="col-md-5">
-                <form>
+                <form method="post" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="meetingName">Meeting Name:</label>
                         <input  type="text" class="form-control" id="meetingName" placeholder="Enter meeting name" required>
@@ -43,7 +43,7 @@
                         <input type="file" class="form-control-file" id="fileUpload">
                     </div>
                     <div class="form-group">
-                        <input class="btn btn-success" asp-page="/Student/Home/Index" type="submit"/>
+                        <input class="btn btn-success" type="submit"/>
                     </div>
                 </form>
             </div>

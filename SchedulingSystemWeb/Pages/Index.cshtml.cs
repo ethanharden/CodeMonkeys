@@ -12,9 +12,16 @@ namespace SchedulingSystemWeb.Pages
             _logger = logger;
         }
 
-        public void OnGet()
+        public async Task OnGet()
         {
-
+            if (User.IsInRole("STUDENT"))
+            {
+                RedirectToPage("/student/home/index");
+            }
+            else
+            {
+                RedirectToPage("/Teacher/Availabilities");
+            }
         }
     }
 }

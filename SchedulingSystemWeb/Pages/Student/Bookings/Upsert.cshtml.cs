@@ -14,11 +14,13 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         private readonly UserManager<ApplicationUser> _userManager;
         public Availability availability = new Availability();
         public String startEndTime;
-        public String fullName;
-        public Location location;
+        public string fullName { get; set; }
+        public Location location { get; set; }
         public string course;
         public Booking newBooking = new Booking();
-        public string description;
+        
+        public static int? AId;
+        public string description { get; set; }
         ApplicationUser user = new ApplicationUser();
         private IWebHostEnvironment _webhostenvironment;
         public UpsertModel(UnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, IWebHostEnvironment webhostenvironment)
@@ -30,24 +32,27 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
         public async Task<IActionResult> OnGetAsync(int? Id)
         {
+            AId = Id;
             availability = _unitOfWork.Availability.Get(a=> a.Id == Id);
             startEndTime = availability.StartTime + "-" + availability.EndTime;
-             user = availability.ProviderProfile.User;
-            fullName = user.FullName;
+             //user = availability.ProviderProfile.User;
+            fullName = user.FirstName + " " + user.LastName;
             var locationID = availability.LocationId;
-            Location location = _unitOfWork.Location.Get(l => l.LocationId == locationID);
+            location = _unitOfWork.Location.Get(l => l.LocationId == locationID);
             
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPost()
         {
-          
-          
-                newBooking.Subject = course;
-                newBooking.ProviderProfile.User = user;
-                //newBooking.User =
-                newBooking.Note = description;
+            availability = _unitOfWork.Availability.Get(a => a.Id == AId);
+            newBooking.StartTime = availability.StartTime;
+            newBooking.Duration = (int)(availability.EndTime - availability.StartTime).TotalMinutes;
+
+            newBooking.Subject = course;
+            newBooking.ProviderProfileID = availability.ProviderProfileID;
+            newBooking.User = await _userManager.GetUserAsync(User);
+            newBooking.Note = description;
                 newBooking.objAvailability = availability;
                 string webRootPath = _webhostenvironment.WebRootPath;
                 var files = HttpContext.Request.Form.Files;
@@ -67,8 +72,21 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                 //associate real URL and save to DB
                 newBooking.Attachment = @"\bookingFiles\" + fileName + extension;
             }
-            //_unitOfWork.Booking.Add(newBooking); Reactivate when ready.
-            return RedirectToPage("././Home/Index");
+            else
+            {
+                newBooking.Attachment = "";
+            }
+            if (description == null)
+            {
+                newBooking.Note = "";
+            }
+            if (course == null)
+            {
+                newBooking.Subject = "";
+            }
+            _unitOfWork.Booking.Add(newBooking); //Reactivate when ready.
+            _unitOfWork.Commit();   
+            return RedirectToPage("/Student/Home/Index");
         }
     }
 }

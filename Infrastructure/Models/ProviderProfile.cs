@@ -12,7 +12,7 @@ namespace Infrastructure.Models
     {
 
         [Key]
-        public int ProviderProfileID { get; set; }
+        public int Id { get; set; }
 
 
         [ForeignKey("UserId")]

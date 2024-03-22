@@ -110,7 +110,7 @@ namespace DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AvailabilityGroupId")
+                    b.Property<int?>("AvailabilityGroupID")
                         .HasColumnType("int");
 
                     b.Property<int>("DayOfTheWeek")
@@ -122,7 +122,7 @@ namespace DataAccess.Migrations
                     b.Property<int>("LocationId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProviderId")
+                    b.Property<int>("ProviderProfileID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartTime")
@@ -130,9 +130,7 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AvailabilityGroupId");
-
-                    b.HasIndex("ProviderId");
+                    b.HasIndex("AvailabilityGroupID");
 
                     b.ToTable("Availabilities");
                 });
@@ -181,7 +179,7 @@ namespace DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ProviderId")
+                    b.Property<int>("ProviderProfileID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartTime")
@@ -200,8 +198,6 @@ namespace DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AvailabilityId");
-
-                    b.HasIndex("ProviderId");
 
                     b.HasIndex("UserId");
 
@@ -267,11 +263,11 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("Infrastructure.Models.ProviderProfile", b =>
                 {
-                    b.Property<int>("ProviderProfileID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProviderProfileID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("BookingPrompt")
                         .HasColumnType("nvarchar(max)");
@@ -285,7 +281,7 @@ namespace DataAccess.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("ProviderProfileID");
+                    b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
@@ -447,19 +443,9 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("Infrastructure.Models.Availability", b =>
                 {
-                    b.HasOne("Infrastructure.Models.AvailabilityGroup", "AvailabilityGroup")
+                    b.HasOne("Infrastructure.Models.AvailabilityGroup", null)
                         .WithMany("AvailabilityList")
-                        .HasForeignKey("AvailabilityGroupId");
-
-                    b.HasOne("Infrastructure.Models.ProviderProfile", "ProviderProfile")
-                        .WithMany()
-                        .HasForeignKey("ProviderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AvailabilityGroup");
-
-                    b.Navigation("ProviderProfile");
+                        .HasForeignKey("AvailabilityGroupID");
                 });
 
             modelBuilder.Entity("Infrastructure.Models.AvailabilityGroup", b =>
@@ -481,15 +467,9 @@ namespace DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Infrastructure.Models.ProviderProfile", "ProviderProfile")
-                        .WithMany()
-                        .HasForeignKey("ProviderId");
-
                     b.HasOne("Infrastructure.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
-
-                    b.Navigation("ProviderProfile");
 
                     b.Navigation("User");
 

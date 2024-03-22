@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,10 +30,9 @@ namespace DataAccess.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Discriminator = table.Column<string>(type: "nvarchar(21)", maxLength: 21, nullable: false),
-                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNum = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNum = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ProfilePicture = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -56,19 +55,6 @@ namespace DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CustomerProfiles",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    WNumber = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CustomerProfiles", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Locations",
                 columns: table => new
                 {
@@ -84,22 +70,6 @@ namespace DataAccess.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Locations", x => x.LocationId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ProviderProfiles",
-                columns: table => new
-                {
-                    ProviderProfileID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    User = table.Column<int>(type: "int", nullable: false),
-                    RemoteLink = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BookingPrompt = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DepartmentString = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProviderProfiles", x => x.ProviderProfileID);
                 });
 
             migrationBuilder.CreateTable(
@@ -223,6 +193,89 @@ namespace DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CustomerProfiles",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    WNumber = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomerProfiles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CustomerProfiles_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProviderProfiles",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    RemoteLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BookingPrompt = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DepartmentString = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProviderProfiles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProviderProfiles_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AvailabilityGroups",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RecurringTypeId = table.Column<int>(type: "int", nullable: false),
+                    RecurringEndDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AvailabilityGroups", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AvailabilityGroups_RecurringTypes_RecurringTypeId",
+                        column: x => x.RecurringTypeId,
+                        principalTable: "RecurringTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Availabilities",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProviderProfileID = table.Column<int>(type: "int", nullable: false),
+                    AvailabilityGroupID = table.Column<int>(type: "int", nullable: true),
+                    LocationId = table.Column<int>(type: "int", nullable: false),
+                    DayOfTheWeek = table.Column<int>(type: "int", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Availabilities", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Availabilities_AvailabilityGroups_AvailabilityGroupID",
+                        column: x => x.AvailabilityGroupID,
+                        principalTable: "AvailabilityGroups",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Bookings",
                 columns: table => new
                 {
@@ -233,9 +286,10 @@ namespace DataAccess.Migrations
                     Note = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Duration = table.Column<int>(type: "int", nullable: false),
-                    Attatchment = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProviderId = table.Column<int>(type: "int", nullable: true),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    Attachment = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProviderProfileID = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    AvailabilityId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -246,40 +300,9 @@ namespace DataAccess.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Bookings_ProviderProfiles_ProviderId",
-                        column: x => x.ProviderId,
-                        principalTable: "ProviderProfiles",
-                        principalColumn: "ProviderProfileID");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Availabilities",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ProviderId = table.Column<int>(type: "int", nullable: false),
-                    RecurringTypeId = table.Column<int>(type: "int", nullable: false),
-                    LocationId = table.Column<int>(type: "int", nullable: false),
-                    DayOfTheWeek = table.Column<int>(type: "int", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Recurring = table.Column<bool>(type: "bit", nullable: false),
-                    RecurringEndDate = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Availabilities", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Availabilities_ProviderProfiles_ProviderId",
-                        column: x => x.ProviderId,
-                        principalTable: "ProviderProfiles",
-                        principalColumn: "ProviderProfileID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Availabilities_RecurringTypes_RecurringTypeId",
-                        column: x => x.RecurringTypeId,
-                        principalTable: "RecurringTypes",
+                        name: "FK_Bookings_Availabilities_AvailabilityId",
+                        column: x => x.AvailabilityId,
+                        principalTable: "Availabilities",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -324,23 +347,33 @@ namespace DataAccess.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Availabilities_ProviderId",
+                name: "IX_Availabilities_AvailabilityGroupID",
                 table: "Availabilities",
-                column: "ProviderId");
+                column: "AvailabilityGroupID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Availabilities_RecurringTypeId",
-                table: "Availabilities",
+                name: "IX_AvailabilityGroups_RecurringTypeId",
+                table: "AvailabilityGroups",
                 column: "RecurringTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Bookings_ProviderId",
+                name: "IX_Bookings_AvailabilityId",
                 table: "Bookings",
-                column: "ProviderId");
+                column: "AvailabilityId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Bookings_UserId",
                 table: "Bookings",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CustomerProfiles_UserId",
+                table: "CustomerProfiles",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProviderProfiles_UserId",
+                table: "ProviderProfiles",
                 column: "UserId");
         }
 
@@ -363,9 +396,6 @@ namespace DataAccess.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Availabilities");
-
-            migrationBuilder.DropTable(
                 name: "Bookings");
 
             migrationBuilder.DropTable(
@@ -375,16 +405,22 @@ namespace DataAccess.Migrations
                 name: "Locations");
 
             migrationBuilder.DropTable(
+                name: "ProviderProfiles");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "RecurringTypes");
+                name: "Availabilities");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "ProviderProfiles");
+                name: "AvailabilityGroups");
+
+            migrationBuilder.DropTable(
+                name: "RecurringTypes");
         }
     }
 }

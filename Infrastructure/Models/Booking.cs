@@ -25,7 +25,7 @@ namespace Infrastructure.Models
         public string Attachment {  get; set; }
 
         [ForeignKey("ProviderId")]
-        public ProviderProfile? ProviderProfile { get; set; }
+        public int ProviderProfileID { get; set; }
         [ForeignKey("UserId")]
         public ApplicationUser? User { get; set; }
 

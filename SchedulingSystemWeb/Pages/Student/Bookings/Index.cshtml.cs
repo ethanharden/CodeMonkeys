@@ -84,8 +84,8 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             WeekDays = _calendarService.GetWeekDays(CurrentDate);
             MonthDays = _calendarService.GetMonthDays(CurrentDate);
 
-            Availabilities = _unitOfWork.Availability.GetAll().Where(p => p.ProviderProfile == provider);
-            Bookings = _unitOfWork.Booking.GetAll().Where(p => p.ProviderProfile == provider);
+            Availabilities = _unitOfWork.Availability.GetAll().Where(p => p.ProviderProfileID == provider.Id);
+            Bookings = _unitOfWork.Booking.GetAll().Where(p => p.ProviderProfileID == provider.Id);
 
             await FetchDataForCurrentViewAsync();
         }

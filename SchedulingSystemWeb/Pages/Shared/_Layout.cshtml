@@ -27,7 +27,7 @@
                             @if (User.IsInRole("TEACHER") || User.IsInRole("ADVISOR") || User.IsInRole("TUTOR"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
+                                    <a class="nav-link text-dark" asp-area="" asp-page="/Teacher/Availabilities">Home</a>
                                 </li>
 
 
@@ -57,7 +57,7 @@
                             else
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
+                                    <a class="nav-link text-dark" asp-area="" asp-page="/Student/Home/index">Home</a>
                                 </li>
 
 

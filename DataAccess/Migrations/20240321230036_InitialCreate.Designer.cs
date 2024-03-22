@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240303020644_CustomerAndProviderFixing")]
-    partial class CustomerAndProviderFixing
+    [Migration("20240321230036_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.2")
+                .HasAnnotation("ProductVersion", "8.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -113,6 +113,9 @@ namespace DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("AvailabilityGroupID")
+                        .HasColumnType("int");
+
                     b.Property<int>("DayOfTheWeek")
                         .HasColumnType("int");
 
@@ -122,16 +125,7 @@ namespace DataAccess.Migrations
                     b.Property<int>("LocationId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProviderId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("Recurring")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("RecurringEndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("RecurringTypeId")
+                    b.Property<int>("ProviderProfileID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartTime")
@@ -139,11 +133,31 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProviderId");
+                    b.HasIndex("AvailabilityGroupID");
+
+                    b.ToTable("Availabilities");
+                });
+
+            modelBuilder.Entity("Infrastructure.Models.AvailabilityGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("RecurringEndDate")
+                        .IsRequired()
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RecurringTypeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("RecurringTypeId");
 
-                    b.ToTable("Availabilities");
+                    b.ToTable("AvailabilityGroups");
                 });
 
             modelBuilder.Entity("Infrastructure.Models.Booking", b =>
@@ -154,9 +168,12 @@ namespace DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Attatchment")
+                    b.Property<string>("Attachment")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("AvailabilityId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Duration")
                         .HasColumnType("int");
@@ -165,7 +182,7 @@ namespace DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ProviderId")
+                    b.Property<int>("ProviderProfileID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartTime")
@@ -183,7 +200,7 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProviderId");
+                    b.HasIndex("AvailabilityId");
 
                     b.HasIndex("UserId");
 
@@ -199,10 +216,9 @@ namespace DataAccess.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("WNumber")
+                    b.Property<int?>("WNumber")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -250,29 +266,25 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("Infrastructure.Models.ProviderProfile", b =>
                 {
-                    b.Property<int>("ProviderProfileID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProviderProfileID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("BookingPrompt")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DepartmentString")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RemoteLink")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("ProviderProfileID");
+                    b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
@@ -434,45 +446,44 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("Infrastructure.Models.Availability", b =>
                 {
-                    b.HasOne("Infrastructure.Models.ProviderProfile", "ProviderProfile")
-                        .WithMany()
-                        .HasForeignKey("ProviderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("Infrastructure.Models.AvailabilityGroup", null)
+                        .WithMany("AvailabilityList")
+                        .HasForeignKey("AvailabilityGroupID");
+                });
 
+            modelBuilder.Entity("Infrastructure.Models.AvailabilityGroup", b =>
+                {
                     b.HasOne("Infrastructure.Models.RecurringType", "RecurringType")
                         .WithMany()
                         .HasForeignKey("RecurringTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ProviderProfile");
-
                     b.Navigation("RecurringType");
                 });
 
             modelBuilder.Entity("Infrastructure.Models.Booking", b =>
                 {
-                    b.HasOne("Infrastructure.Models.ProviderProfile", "ProviderProfile")
+                    b.HasOne("Infrastructure.Models.Availability", "objAvailability")
                         .WithMany()
-                        .HasForeignKey("ProviderId");
+                        .HasForeignKey("AvailabilityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Infrastructure.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
 
-                    b.Navigation("ProviderProfile");
-
                     b.Navigation("User");
+
+                    b.Navigation("objAvailability");
                 });
 
             modelBuilder.Entity("Infrastructure.Models.CustomerProfile", b =>
                 {
                     b.HasOne("Infrastructure.Models.ApplicationUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
@@ -481,9 +492,7 @@ namespace DataAccess.Migrations
                 {
                     b.HasOne("Infrastructure.Models.ApplicationUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
@@ -537,6 +546,11 @@ namespace DataAccess.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Infrastructure.Models.AvailabilityGroup", b =>
+                {
+                    b.Navigation("AvailabilityList");
                 });
 #pragma warning restore 612, 618
         }

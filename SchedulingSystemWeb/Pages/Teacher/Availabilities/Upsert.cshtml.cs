@@ -53,10 +53,10 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             WeekDays = _calendarService.GetWeekDays(CurrentDate);
             MonthDays = _calendarService.GetMonthDays(CurrentDate);
 
-            providerProfileGet = _unitOfWork.ProviderProfile.Get(p => p.ProviderProfileID == 5);
+           // providerProfileGet = _unitOfWork.ProviderProfile.Get(p => p.ProviderProfileID == 5);
 
-            Availabilities = _unitOfWork.Availability.GetAll().Where(p => p.ProviderProfile == providerProfileGet);
-            Bookings = _unitOfWork.Booking.GetAll().Where(p => p.ProviderProfile == providerProfileGet);
+            //Availabilities = _unitOfWork.Availability.GetAll().Where(p => p.ProviderProfile == providerProfileGet);
+            //Bookings = _unitOfWork.Booking.GetAll().Where(p => p.ProviderProfile == providerProfileGet);
 
 
 
@@ -81,7 +81,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                     Id = 0,
                     StartTime = DateTime.Today.AddDays(1), // Set to tomorrow's date
                     EndTime = DateTime.Today.AddDays(1).AddHours(1), // Set to tomorrow's date + 1 hour
-                    ProviderProfile = providerProfileGet
+               //     ProviderProfile = providerProfileGet
                 };
             }
 
@@ -115,7 +115,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                         DayOfTheWeek = day,
                         StartTime = objAvailability.StartTime,
                         EndTime = objAvailability.EndTime,
-                        ProviderProfile = objAvailability.ProviderProfile,
+                      //  ProviderProfile = objAvailability.ProviderProfile,
                         LocationId = 1,
                     };
 

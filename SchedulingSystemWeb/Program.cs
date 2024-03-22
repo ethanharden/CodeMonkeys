@@ -35,7 +35,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddScoped<UnitOfWork>();
 builder.Services.AddScoped<ICalendarService, CalendarService>();
-builder.Services.AddScoped<DbInitializer>();
+//builder.Services.AddScoped<DbInitializer>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -50,7 +50,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-SeedDatabase();
+/*SeedDatabase*/
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -62,9 +62,9 @@ app.MapControllerRoute(
 
 app.Run();
 
-void SeedDatabase()
-{
-    using var scope = app.Services.CreateScope();
-    var dbInitializer = scope.ServiceProvider.GetRequiredService<DbInitializer>();
-    dbInitializer.Initialize();
-}
+//void SeedDatabase()
+//{
+//    using var scope = app.Services.CreateScope();
+//    var dbInitializer = scope.ServiceProvider.GetRequiredService<DbInitializer>();
+//    dbInitializer.Initialize();
+//}
