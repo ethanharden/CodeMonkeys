@@ -129,6 +129,11 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             return RedirectToPage();
         }
 
+        public bool IsAvailabilityBooked(Availability availability)
+        {
+            return Bookings.Any(booking => booking.StartTime >= availability.StartTime && booking.StartTime < availability.EndTime);
+        }
+
         private async Task FetchDataForCurrentViewAsync()
         {
             DateTime startOfMonth = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
