@@ -91,14 +91,14 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account.Manage
             var role = await _userManager.GetRolesAsync(user);
             if (role[0] == "STUDENT")
             {
-                WNumber = _unitOfWork.CustomerProfile.Get(u => u.User == user).WNumber;
+                WNumber = _unitOfWork.CustomerProfile.Get(u => u.User == user.Id).WNumber;
             }
             if (role[0] == "TEACHER" || role[0] == "ADVISOR" || role[0] == "TUTOR")
             {
                 IsProvider = true;
-                Department = _unitOfWork.ProviderProfile.Get(u => u.User == user).DepartmentString;
-                BookingPrompt = _unitOfWork.ProviderProfile.Get(u => u.User == user).BookingPrompt;
-                RemoteLink = _unitOfWork.ProviderProfile.Get(u => u.User == user).RemoteLink;
+                Department = _unitOfWork.ProviderProfile.Get(u => u.User == user.Id).DepartmentString;
+                BookingPrompt = _unitOfWork.ProviderProfile.Get(u => u.User == user.Id).BookingPrompt;
+                RemoteLink = _unitOfWork.ProviderProfile.Get(u => u.User == user.Id).RemoteLink;
             }
         }
 
@@ -163,13 +163,13 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account.Manage
             var role = await _userManager.GetRolesAsync(user);
             if (role[0] == "STUDENT")
             {
-                CustomerProfile customerProfile = _unitOfWork.CustomerProfile.Get(u => u.User == user);
+                CustomerProfile customerProfile = _unitOfWork.CustomerProfile.Get(u => u.User == user.Id);
                 customerProfile.WNumber = WNumber;
                 _unitOfWork.CustomerProfile.Update(customerProfile);
             }
             if (role[0] == "TEACHER" || role[0] == "TUTOR" || role[0] == "ADVISOR")
             {
-                ProviderProfile profiderProfile = _unitOfWork.ProviderProfile.Get(u => u.User == user);
+                ProviderProfile profiderProfile = _unitOfWork.ProviderProfile.Get(u => u.User == user.Id);
                 profiderProfile.BookingPrompt = BookingPrompt;
                 profiderProfile.DepartmentString = Department;
                 profiderProfile.RemoteLink = RemoteLink;

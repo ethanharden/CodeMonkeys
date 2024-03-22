@@ -15,14 +15,14 @@ namespace Infrastructure.Models
 
         [Required]
         public string LocationName { get; set; }
-
-        public string Address1 { get; set; }
-        public string Address2 { get; set; }
+        
+        public string? Address1 { get; set; }
+        public string? Address2 { get; set; }
         [DisplayName("City")]
-        public string AddressCity { get; set; }
+        public string? AddressCity { get; set; }
 
-        public string BuildingName { get; set; }
+        public string? BuildingName { get; set; }
         [DisplayName("Room Number")]
-        public int RoomNumber { get; set; }
+        public string? RoomNumber { get; set; }
     }
 }

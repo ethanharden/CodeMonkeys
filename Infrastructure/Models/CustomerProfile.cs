@@ -16,7 +16,7 @@ namespace Infrastructure.Models
 
 
         [ForeignKey("UserId")]
-        public ApplicationUser? User { get; set; }
+        public string User { get; set; }
 
         public int? WNumber {  get; set; }
         

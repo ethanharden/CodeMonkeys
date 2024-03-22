@@ -12,9 +12,13 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
     {
         private readonly UnitOfWork _unitOfWork;
         private readonly ICalendarService _calendarService;
+
+        [BindProperty]
+        public string ProfId { get; set; }
         [BindProperty]
         public ApplicationUser _ProfUser { get; set; }
-
+        [BindProperty]
+        public  string profFullName { get; set; }
         public IEnumerable<Booking> Bookings { get; set; }
         public IEnumerable<Availability> Availabilities { get; set; }
         [BindProperty]
@@ -26,6 +30,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         public List<DateTime> WeekDays { get; private set; } = new List<DateTime>();
         public List<DateTime> MonthDays { get; private set; }
         public string CurrentMonthName { get; private set; }
+        
 
         public IndexModel(UnitOfWork unitOfWork, ICalendarService calendarService)
         {
@@ -72,10 +77,16 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
         public async Task OnGetAsync(string UserId)
         {
-            var user = _unitOfWork.ApplicationUser.Get(u => u.Id == UserId);
-            _ProfUser = user;
-            provider = _unitOfWork.ProviderProfile.Get(p=>p.User == user);
- 
+            if(UserId != null)
+            {
+                ProfId = UserId;         
+            }
+            _ProfUser = _unitOfWork.ApplicationUser.Get(u => u.Id == ProfId);
+            profFullName = _ProfUser.FirstName + " " + _ProfUser.LastName;
+            provider = _unitOfWork.ProviderProfile.Get(p => p.User == _ProfUser.Id);
+            Availabilities = _unitOfWork.Availability.GetAll().Where(p => p.ProviderProfileID == provider.Id);
+            Bookings = _unitOfWork.Booking.GetAll().Where(p => p.ProviderProfileID == provider.Id);
+
 
             CurrentDate = (DateTime?)TempData["CurrentDate"] ?? DateTime.Today;
             TempData.Keep("CurrentDate");
@@ -84,15 +95,14 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             WeekDays = _calendarService.GetWeekDays(CurrentDate);
             MonthDays = _calendarService.GetMonthDays(CurrentDate);
 
-            Availabilities = _unitOfWork.Availability.GetAll().Where(p => p.ProviderProfileID == provider.Id);
-            Bookings = _unitOfWork.Booking.GetAll().Where(p => p.ProviderProfileID == provider.Id);
-
+           
             await FetchDataForCurrentViewAsync();
         }
 
 
-        public async Task<IActionResult> OnGetPreviousWeekAsync()
+        public async Task<IActionResult> OnGetPreviousWeekAsync(string UserId)
         {
+            ProfId = UserId;
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(-7);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
@@ -100,8 +110,9 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnGetNextWeekAsync()
+        public async Task<IActionResult> OnGetNextWeekAsync(string UserId)
         {
+            ProfId = UserId;
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(7);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
@@ -109,8 +120,9 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnGetPreviousMonthAsync()
+        public async Task<IActionResult> OnGetPreviousMonthAsync(string UserId)
         {
+            ProfId = UserId;
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(-1);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
@@ -120,8 +132,9 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             return Page();
         }
 
-        public async Task<IActionResult> OnGetNextMonthAsync()
+        public async Task<IActionResult> OnGetNextMonthAsync(string UserId)
         {
+            ProfId = UserId;
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(1);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
@@ -129,8 +142,9 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnGetTodayWeekAsync()
+        public async Task<IActionResult> OnGetTodayWeekAsync(string UserId)
         {
+            ProfId = UserId;
             CurrentDate = DateTime.Today;
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
@@ -138,8 +152,9 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnGetTodayMonthAsync()
+        public async Task<IActionResult> OnGetTodayMonthAsync(string UserId)
         {
+            ProfId = UserId;
             CurrentDate = DateTime.Today;
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";

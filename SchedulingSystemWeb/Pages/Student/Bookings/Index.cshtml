@@ -2,15 +2,14 @@
 @model SchedulingSystemWeb.Pages.Student.Bookings.IndexModel
 @using System.Globalization
 @{
-    ViewData["Title"] = @Model._ProfUser.FirstName + " "+  @Model._ProfUser.LastName +"'s Calendar";
+    ViewData["Title"] = @Model.profFullName +"'s Calendar";
     var firstDayOfMonth = new DateTime(Model.CurrentDate.Year, Model.CurrentDate.Month, 1);
     var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
     int daysInMonth = DateTime.DaysInMonth(Model.CurrentDate.Year, Model.CurrentDate.Month);
     int firstDayOfWeek = (int)CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek;
     int currentDayOfWeek = (int)firstDayOfMonth.DayOfWeek;
     int leadingDays = (currentDayOfWeek - firstDayOfWeek + 7) % 7;
-    var user = Model._ProfUser;
-    var profProv = Model.provider;
+    var user = @Model.profFullName;
 }
 
 <h2 class="text-primary">@ViewData["Title"]</h2>
@@ -18,10 +17,10 @@
 <!-- Tab navigation buttons -->
 <ul class="nav nav-tabs" id="calendarTabs" role="tablist">
     <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="weekly-tab" data-bs-toggle="tab" data-bs-target="#weekly" type="button" role="tab" aria-controls="weekly" aria-selected="true">Weekly</button>
+        <button class="nav-link active" id="weekly-tab" data-bs-toggle="tab" data-bs-target="#weekly" type="button" role="tab" aria-controls="weekly" aria-selected="true" onclick="location.href='?handler=Weekly&UserId=@Model.ProfId'"">Weekly</button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="monthly-tab" data-bs-toggle="tab" data-bs-target="#monthly" type="button" role="tab" aria-controls="monthly" aria-selected="false">Monthly</button>
+        <button class="nav-link" id="monthly-tab" data-bs-toggle="tab" data-bs-target="#monthly" type="button" role="tab" aria-controls="monthly" aria-selected="false" onclick="location.href='?handler=Monthly&UserId=@Model.ProfId'">Monthly</button>
     </li>
 
 </ul>

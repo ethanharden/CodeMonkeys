@@ -15,11 +15,11 @@ namespace Infrastructure.Models
         public int Id { get; set; }
 
         [Required]
-        public IEnumerable<Availability> AvailabilityList { get; set; }
+        public IEnumerable<int> AvailabilityIDList { get; set; }
 
 
         [ForeignKey("RecurringTypeId")]
-        public RecurringType RecurringType { get; set; }
+        public int RecurringType { get; set; }
 
         [Required]
 

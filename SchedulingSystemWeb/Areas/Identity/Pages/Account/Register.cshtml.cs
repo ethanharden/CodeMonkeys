@@ -167,7 +167,7 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
                         if(Input.Role == "STUDENT")
                         {
                             CustomerProfile customerProfile = new CustomerProfile();
-                            customerProfile.User = user;
+                            customerProfile.User = user.Id;
                             //customerProfile.UserId = user.Id;
 
                             _unitOfWork.CustomerProfile.Add(customerProfile);
@@ -177,7 +177,7 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
                         else if(Input.Role =="TEACHER" || Input.Role == "TUTOR" || Input.Role == "ADVISOR")
                         {
                             ProviderProfile providerProfile = new ProviderProfile();
-                            providerProfile.User = user;
+                            providerProfile.User = user.Id;
                             //providerProfile.UserId = user.Id;
                             _unitOfWork.ProviderProfile.Add(providerProfile);
                             _unitOfWork.Commit();
@@ -190,7 +190,7 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
                     {
                         await _userManager.AddToRoleAsync(user, "STUDENT");
                         CustomerProfile customerProfile = new CustomerProfile();
-                        customerProfile.User = user;
+                        customerProfile.User = user.Id;
                      //   customerProfile.UserId = user.Id;
 
                         _unitOfWork.CustomerProfile.Add(customerProfile);
