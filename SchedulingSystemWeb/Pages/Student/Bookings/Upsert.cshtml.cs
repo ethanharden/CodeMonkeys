@@ -16,12 +16,13 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         public string startEndTime;
         public string fullName { get; set; }
         public Location location { get; set; }
-        [BindProperty]
+        [BindProperty(SupportsGet = true)]
         public string course { get;set; }
         public Booking newBooking = new Booking();
-        
+        [BindProperty(SupportsGet = true)]
+        public string title { get; set; }
         public static int? AId;
-        [BindProperty]
+        [BindProperty(SupportsGet = true)]
         public string description { get; set; }
         ApplicationUser user = new ApplicationUser();
         private IWebHostEnvironment _webhostenvironment;
@@ -51,11 +52,12 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             availability = _unitOfWork.Availability.Get(a => a.Id == AId);
             newBooking.StartTime = availability.StartTime;
             newBooking.Duration = (int)(availability.EndTime - availability.StartTime).TotalMinutes;
-
             newBooking.Subject = course;
             newBooking.ProviderProfileID = availability.ProviderProfileID;
-           // newBooking.User = await _userManager.GetUserAsync(User);
+            //newBooking.User = await _userManager.GetUserAsync(User);
             newBooking.Note = description;
+            newBooking.MeetingTitle = title;
+            newBooking.User = _userManager.GetUserId(User);
                // newBooking.objAvailability = availability;
                 string webRootPath = _webhostenvironment.WebRootPath;
                 var files = HttpContext.Request.Form.Files;
