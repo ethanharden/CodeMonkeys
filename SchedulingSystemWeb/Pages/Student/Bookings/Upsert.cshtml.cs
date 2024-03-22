@@ -13,7 +13,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
        private readonly UnitOfWork _unitOfWork;
         private readonly UserManager<ApplicationUser> _userManager;
         public Availability availability = new Availability();
-        public String startEndTime;
+        public string startEndTime;
         public string fullName { get; set; }
         public Location location { get; set; }
         [BindProperty]
@@ -36,8 +36,9 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         {
             AId = Id;
             availability = _unitOfWork.Availability.Get(a=> a.Id == Id);
-            startEndTime = availability.StartTime + "-" + availability.EndTime;
-            // user = availability.ProviderProfile.User;
+            startEndTime = availability.StartTime.TimeOfDay+ "-" + availability.EndTime.TimeOfDay;
+            ProviderProfile prov = _unitOfWork.ProviderProfile.Get(u => u.Id == availability.ProviderProfileID);
+            user = _unitOfWork.ApplicationUser.Get(u => u.Id == prov.User);
             fullName = user.FirstName + " " + user.LastName;
             var locationID = availability.LocationId;
             location = _unitOfWork.Location.Get(l => l.LocationId == locationID);
