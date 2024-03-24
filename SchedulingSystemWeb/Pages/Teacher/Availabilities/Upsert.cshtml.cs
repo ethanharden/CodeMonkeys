@@ -7,7 +7,7 @@ using Infrastructure.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations.Schema;
-
+using Microsoft.AspNetCore.Identity;
 
 namespace SchedulingSystemWeb.Pages.Availabilities
 {
@@ -16,7 +16,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
 
         private readonly UnitOfWork _unitOfWork;
         private readonly ICalendarService _calendarService;
-
+        private readonly UserManager<ApplicationUser> _userManager;
         public IEnumerable<Availability> Availabilities { get; set; }
         public IEnumerable<Booking> Bookings { get; set; }
         public IEnumerable<Availability> ViewAvailabilities { get; set; }
@@ -33,12 +33,13 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         [BindProperty]
         public List<DayOfWeek> SelectedDaysOfWeek { get; set; }
 
-        public UpsertModel(UnitOfWork unitOfWork, ICalendarService calendarService)
+        public UpsertModel(UnitOfWork unitOfWork, ICalendarService calendarService, UserManager<ApplicationUser> userManager)
         {
             _calendarService = calendarService;
             _unitOfWork = unitOfWork;
             ViewAvailabilities = new List<Availability>();
             ViewBookings = new List<Booking>();
+            _userManager = userManager;
 
         }
 
@@ -50,19 +51,6 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             CurrentMonthName = CurrentDate.ToString("MMMM");
             WeekDays = _calendarService.GetWeekDays(CurrentDate);
             MonthDays = _calendarService.GetMonthDays(CurrentDate);
-
-            providerProfileGet = _unitOfWork.ProviderProfile.Get(p => p.Id == id);
-
-            Availabilities = _unitOfWork.Availability.GetAll().Where(p => p.ProviderProfileID == providerProfileGet.Id);
-            Bookings = _unitOfWork.Booking.GetAll().Where(p => p.ProviderProfileID == providerProfileGet.Id);
-
-
-
-            if (providerProfileGet == null)
-            {
-                TempData["ErrorMessage"] = "Provider profile not found.";
-                return Page();
-            }
 
             if (id.HasValue && id != 0)
             {
@@ -79,9 +67,12 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                     Id = 0,
                     StartTime = DateTime.Today.AddDays(1), // Set to tomorrow's date
                     EndTime = DateTime.Today.AddDays(1).AddHours(1), // Set to tomorrow's date + 1 hour
-                    ProviderProfileID = providerProfileGet.Id
+                    ProviderProfileID = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id,
                 };
             }
+
+            Availabilities = _unitOfWork.Availability.GetAll().Where(p => p.ProviderProfileID == objAvailability.ProviderProfileID);
+            Bookings = _unitOfWork.Booking.GetAll().Where(p => p.ProviderProfileID == objAvailability.ProviderProfileID);
 
             await FetchDataForCurrentViewAsync();
             return Page();
@@ -211,7 +202,8 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
             ViewAvailabilities = Availabilities?.Where(a => a.StartTime.Date >= startOfMonth && a.StartTime.Date <= endOfMonth);
-            ViewBookings = Bookings.Where(a => a.StartTime.Date >= startOfMonth && a.StartTime.Date <= endOfMonth);
+            ViewBookings = Bookings?.Where(a => a.StartTime.Date >= startOfMonth && a.StartTime.Date <= endOfMonth).ToList() ?? new List<Booking>();
+
         }
     }
 }

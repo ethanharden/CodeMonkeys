@@ -14,6 +14,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
     {
         private readonly UnitOfWork _unitOfWork;
         private readonly ICalendarService _calendarService;
+        private readonly UserManager<ApplicationUser> _userManager;
         public IEnumerable<Booking> Bookings { get; set; }
         public IEnumerable<Availability> Availabilities { get; set; }
 
@@ -25,12 +26,13 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         public List<DateTime> MonthDays { get; private set; }
         public string CurrentMonthName { get; private set; }
 
-        public IndexModel(UnitOfWork unitOfWork, ICalendarService calendarService)
+        public IndexModel(UnitOfWork unitOfWork, ICalendarService calendarService, UserManager<ApplicationUser> userManager)
         {
             _calendarService = calendarService;
             _unitOfWork = unitOfWork;
             Bookings = new List<Booking>();
             Availabilities = new List<Availability>();
+            _userManager = userManager;
         }
 
         public async Task OnGetAsync()
@@ -41,6 +43,10 @@ namespace SchedulingSystemWeb.Pages.Availabilities
 
             WeekDays = _calendarService.GetWeekDays(CurrentDate);
             MonthDays = _calendarService.GetMonthDays(CurrentDate);
+
+            int provId = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id;
+            Availabilities = _unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == provId);
+            Bookings = _unitOfWork.Booking.GetAll().Where(p => p.ProviderProfileID == provId);
 
             await FetchDataForCurrentViewAsync();
         }
