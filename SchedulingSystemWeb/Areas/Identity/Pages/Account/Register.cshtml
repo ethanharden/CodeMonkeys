@@ -3,12 +3,36 @@
 @{
     ViewData["Title"] = "Register";
 }
+<head>
+    <script>
+        function toggleInput() {
+            var checkbox = document.getElementById("showWNumber");
+            var wNumberField = document.getElementById("wNumberField");
 
+            if (checkbox.checked) {
+                wNumberField.style.display = "block";
+            } else {
+                wNumberField.style.display = "none";
+            }
+        }
+        function validateForm() {
+            var wNumberInput = document.getElementById("wNumber");
+            var wNumberValue = wNumberInput.value.trim();
+
+            if (wNumberValue !== "" && !/^\d+$/.test(wNumberValue)) {
+                alert("WNumber must contain only numbers.");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</head>
 <h1>@ViewData["Title"]</h1>
 
 <div class="row">
     <div class="col-md-4">
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" onsubmit="return validateForm()">
             <h2>Create a new account.</h2>
             <hr />
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
@@ -42,6 +66,13 @@
                 <label asp-for="Input.ConfirmPassword">Confirm Password</label>
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
+            <label for="showWNumber">Are you a current WSU student?</label>
+            <input type="checkbox" id="showWNumber" onchange="toggleInput()">
+
+            <div id="wNumberField" style="display: none;">
+                <label for="wNumber">WNumber (Only Numbers):</label>
+                <input class="form-control" id="wNumber" asp-for="Input.WNumber">
+            </div>
             <div class="form-group row pt-4">
                 <div class="mb-3 col-6">
                     <select asp-for="Input.Role" asp-items="@Model.Input.RoleList" class="form-select">
@@ -51,37 +82,7 @@
             <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
         </form>
     </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to register.</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
-                        </p>
-                    </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
-                        </div>
-                    </form>
-                }
-            }
-        </section>
-    </div>
-</div>
+    
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

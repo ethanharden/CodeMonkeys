@@ -1,5 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
+﻿
 #nullable disable
 
 using System;
@@ -82,10 +81,8 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
         /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
+            
+            public string WNumber { get; set; }
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
@@ -101,34 +98,28 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
             [Phone]
             [Display(Name = "Phone Number")]
             public string PhoneNum { get; set; }
-            [Required]
+            
             public string Role { get; set; }
             public IEnumerable<SelectListItem> RoleList { get; set; }
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
+
             [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
             public string Password { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [DataType(DataType.Password)]
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+            
         }
 
 
         public async Task OnGetAsync(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
             Input = new InputModel()
             {
                 RoleList = _roleManager.Roles.Select(x => x.Name).Select(r => new SelectListItem
@@ -142,7 +133,7 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnPostAsync()
         {
             
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+       
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
@@ -156,20 +147,20 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
                 string returnURL = "";
                 if (result.Succeeded)
                 {
+                    
                     _logger.LogInformation("User created a new account with password.");
                     if (Input.Role != null)
                     {
-                        //if(Input.RoleList.ToString() ==null)
-                        /// {
-                        //    await _userManager.AddToRoleAsync(user, Input.RoleList.ToString());
-                        //}
+                        
                         await _userManager.AddToRoleAsync(user, Input.Role); //added that so role is set
                         if(Input.Role == "STUDENT")
                         {
                             CustomerProfile customerProfile = new CustomerProfile();
                             customerProfile.User = user.Id;
-                            //customerProfile.UserId = user.Id;
-
+                            if (Input.WNumber.ToString() != null)
+                            {
+                                customerProfile.WNumber = Int32.Parse(Input.WNumber);
+                            }
                             _unitOfWork.CustomerProfile.Add(customerProfile);
                             _unitOfWork.Commit();
                             ReturnUrl = "/Student/Home";
@@ -190,34 +181,42 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
                     {
                         await _userManager.AddToRoleAsync(user, "STUDENT");
                         CustomerProfile customerProfile = new CustomerProfile();
-                        customerProfile.User = user.Id;
-                     //   customerProfile.UserId = user.Id;
-
+                        customerProfile.User = user.Id ;
+                        if(Input.WNumber.ToString()!=null)
+                        {
+                            customerProfile.WNumber = Int32.Parse(Input.WNumber);
+                        }
+               
                         _unitOfWork.CustomerProfile.Add(customerProfile);
                         _unitOfWork.Commit();
                         ReturnUrl = "/Student/Home";
 
                     }
                     
+                    }
+                
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                  
 
-                   // await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                   //     $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
-                    
-                    
                         await _signInManager.SignInAsync(user, isPersistent: false);
+                if(ReturnUrl == null)
+                {
+                    ReturnUrl = "/Student/Home";
+                }
                         return LocalRedirect(ReturnUrl);
                     
                 }
-                foreach (var error in result.Errors)
+            Input = new InputModel()
+            {
+                RoleList = _roleManager.Roles.Select(x => x.Name).Select(r => new SelectListItem
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-            }
+                    Text = char.ToUpper(r[0]) + r.Substring(1).ToLower(),
+                    Value = r
+                })
+            };
+
+
 
             // If we got this far, something failed, redisplay form
             return Page();

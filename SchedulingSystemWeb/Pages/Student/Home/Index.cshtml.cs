@@ -20,7 +20,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
 
         public IEnumerable<Booking> ViewBookings { get; set; }
         public IEnumerable<Availability> ViewAvailabilities { get; set; }
-
+        public List<ApplicationUser> Teachers{get; set;}
         public DateTime CurrentDate { get; private set; }
         public List<DateTime> WeekDays { get; private set; } = new List<DateTime>();
         public List<DateTime> MonthDays { get; private set; }
@@ -45,7 +45,16 @@ namespace SchedulingSystemWeb.Pages.Student.Home
 
             var currentUser = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             Bookings = _unitOfWork.Booking.GetAll().Where(u=>u.User == currentUser);
-
+            Bookings = Bookings.ToList().OrderBy(obj => obj.StartTime); // Order bookings by date
+            List<ProviderProfile> Providers = new List<ProviderProfile>();
+            Teachers = new List<ApplicationUser>();
+            int i = 0;
+            foreach (var booking in Bookings) // Adds Teachers to List for names
+            {
+                Providers.Add(_unitOfWork.ProviderProfile.Get(b => b.Id == booking.ProviderProfileID));
+                Teachers.Add(_unitOfWork.ApplicationUser.Get(u => u.Id == Providers[i].User));
+                i++;
+            }
             await FetchDataForCurrentViewAsync();
         }
 

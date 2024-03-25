@@ -11,9 +11,40 @@
     int leadingDays = (currentDayOfWeek - firstDayOfWeek + 7) % 7;
 }
 
-<h2 class="text-primary">@ViewData["Title"]</h2>
-<a class="btn btn-danger" style="float:right; margin-left:10px;" asp-page="/Student/ListOfProviders">Book an Appointment</a>
+@{
+    if (Model.Bookings.Count()>=1)
+    {
+        <h1>
+            Your Upcoming appointments
+        </h1>
+        <div class="container">
+            <div class="row">
+                @{
+                    int p = 0;
+                    foreach (var booking in Model.Bookings)
+                    {
 
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Meeting with @Model.Teachers[p].FullName</h5>
+                                    <hr />
+                                    <p class="card-text">@booking.StartTime.ToShortDateString()</p>
+                                    <p class="card-text">@booking.StartTime.ToShortTimeString() - @booking.StartTime.AddMinutes(booking.Duration).ToShortTimeString()</p>
+                                    <a href="#" class="btn btn-danger">Cancel Booking</a>
+                                </div>
+                            </div>
+                        </div>
+                        p++;
+                    }
+                }
+            </div>
+        </div>
+    }
+}
+  <br />
+  <h2 class="text-primary">@ViewData["Title"]</h2>
+<a class="btn btn-danger" style="float:right; margin-left:10px;" asp-page="/Student/ListOfProviders">Book an Appointment</a>
 <!-- Tab navigation buttons -->
 <ul class="nav nav-tabs" id="calendarTabs" role="tablist">
     <li class="nav-item" role="presentation">
