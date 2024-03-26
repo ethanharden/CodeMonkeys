@@ -5,7 +5,14 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
-
+using Microsoft.Identity.Client;
+using static System.Formats.Asn1.AsnWriter;
+using System.Globalization;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Calendar.v3;
+using Google.Apis.Calendar.v3.Data;
+using Google.Apis.Services;
+using Google.Apis.Util.Store;
 namespace SchedulingSystemWeb.Pages.Student.Bookings
 {
     public class UpsertModel : PageModel
@@ -49,6 +56,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
         public async Task<IActionResult> OnPost()
         {
+            TimeZoneInfo localTimeZone = TimeZoneInfo.Local;
             availability = _unitOfWork.Availability.Get(a => a.Id == AId);
             newBooking.StartTime = availability.StartTime;
             newBooking.Duration = (int)(availability.EndTime - availability.StartTime).TotalMinutes;
@@ -90,8 +98,71 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                 newBooking.Subject = "";
             }
             _unitOfWork.Booking.Add(newBooking); //Reactivate when ready.
-            _unitOfWork.Commit();   
-            return RedirectToPage("/Student/Home/Index");
+            _unitOfWork.Commit();
+            var selectedCalendar = Request.Form["calendar"];
+            if (selectedCalendar.Count > 0)
+            {
+                var calendarType = selectedCalendar[0];
+                if (calendarType == "outlook")
+                {
+                    
+                }
+                else if (calendarType == "google")
+                {
+                    UserCredential credential;
+                    string[] Scopes = { Google.Apis.Calendar.v3.CalendarService.Scope.CalendarEvents };
+                    string ApplicationName = "Code Monkeys";
+                    string CalendarId = "primary";
+
+                    using (var stream = new FileStream(@"wwwroot/secret/client_secret_328091863377-8nbrlurrfk4f51on47vvosc341ajlgk1.apps.googleusercontent.com (1).json", FileMode.Open, FileAccess.Read))
+                    {
+                        string credPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+                        credPath = Path.Combine(credPath, ".credentials/calendar-dotnet-quickstart.json");
+
+                        credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
+                            GoogleClientSecrets.Load(stream).Secrets,
+                            Scopes,
+                            "user",
+                            CancellationToken.None,
+                            new FileDataStore(credPath, true)).Result;
+                        Console.WriteLine("Credential file saved to: " + credPath);
+                    }
+
+                    // Create Google Calendar API service.
+                    var service = new Google.Apis.Calendar.v3.CalendarService(new BaseClientService.Initializer()
+                    {
+                        HttpClientInitializer = credential,
+                        ApplicationName = "CodeMonkeys"
+                    });
+
+                    //Availability availability = _unitOfWork.Availability.Get(a => a.Id == newBooking.objAvailability);
+                    // Define event
+                    Event newEvent = new Event()
+                    {
+                        Summary = newBooking.Subject,
+                        Location = _unitOfWork.Location.Get(l => l.LocationId == availability.LocationId).LocationName,
+                        Description = newBooking.Note,
+                        Start = new EventDateTime()
+                        {
+                            DateTime = newBooking.StartTime,
+                            TimeZone = localTimeZone.DisplayName,
+                        },
+                        End = new EventDateTime()
+                        {
+                            DateTime = newBooking.StartTime.AddMinutes(newBooking.Duration),
+                            TimeZone = localTimeZone.DisplayName,
+                        },
+                    };
+
+                    // Add event
+                    EventsResource.InsertRequest request = service.Events.Insert(newEvent, CalendarId);
+                    Event createdEvent = request.Execute();
+                    Console.WriteLine("Event created: {0}", createdEvent.HtmlLink);
+                }
+
+            }
+            
+            return Redirect("/student/home/index");
         }
     }
 }
