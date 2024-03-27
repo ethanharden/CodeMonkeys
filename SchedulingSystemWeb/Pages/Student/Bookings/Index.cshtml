@@ -2,7 +2,7 @@
 @model SchedulingSystemWeb.Pages.Student.Bookings.IndexModel
 @using System.Globalization
 @{
-    ViewData["Title"] = @Model.profFullName +"'s Calendar";
+    ViewData["Title"] = "Booking Calendar";
     var firstDayOfMonth = new DateTime(Model.CurrentDate.Year, Model.CurrentDate.Month, 1);
     var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
     int daysInMonth = DateTime.DaysInMonth(Model.CurrentDate.Year, Model.CurrentDate.Month);

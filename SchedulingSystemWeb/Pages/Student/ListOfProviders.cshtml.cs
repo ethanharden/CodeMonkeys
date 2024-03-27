@@ -13,46 +13,48 @@ namespace SchedulingSystemWeb.Pages.Student
         private readonly UserManager<ApplicationUser> _userManager;
 
         public List<ApplicationUser> objApplicationUserList;
-        public Dictionary<string, IList<string>> UserRoles; 
-        public ListOfProvidersModel(UnitOfWork unitofWork, UserManager<ApplicationUser> userManager   )
+        public Dictionary<string, IList<string>> UserRoles;
+        public ListOfProvidersModel(UnitOfWork unitofWork, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitofWork;
             objApplicationUserList = new List<ApplicationUser>();
             _userManager = userManager;
             UserRoles = new Dictionary<string, IList<string>>(); // Initialize user roles dictionary
         }
-        public async Task<IActionResult> OnGetAsync(string search, string role)
+        //public async Task<IActionResult> OnGetAsync(string search, string role)
+        //{
+        //    if (!string.IsNullOrEmpty(role))
+        //    {
+        //        objApplicationUserList.AddRange(await _userManager.GetUsersInRoleAsync(role));
+
+        //    }
+        //    else
+        //    {
+        //        objApplicationUserList.AddRange(await _userManager.GetUsersInRoleAsync("TUTOR"));
+        //        objApplicationUserList.AddRange(await _userManager.GetUsersInRoleAsync("TEACHER"));
+        //        objApplicationUserList.AddRange(await _userManager.GetUsersInRoleAsync("ADVISOR"));
+        //    }
+        //    if (!string.IsNullOrEmpty(search))
+        //    {
+        //        objApplicationUserList = objApplicationUserList.Where(u => u.FullName.ToLower().Contains(search.ToLower())).ToList();
+
+        //    }
+
+        //    foreach (var user in objApplicationUserList)
+        //    {
+        //        UserRoles[user.Id] = await _userManager.GetRolesAsync(user);
+        //    }
+
+        //    return Page();
+
+        //}
+
+        public async Task<IActionResult> OnPostAsync(string role, int department)
         {
-            if (!string.IsNullOrEmpty(role))
-            {
-                objApplicationUserList.AddRange(await _userManager.GetUsersInRoleAsync(role));
 
-            }
-            else
-            {
-                objApplicationUserList.AddRange(await _userManager.GetUsersInRoleAsync("TUTOR"));
-                objApplicationUserList.AddRange(await _userManager.GetUsersInRoleAsync("TEACHER"));
-                objApplicationUserList.AddRange(await _userManager.GetUsersInRoleAsync("ADVISOR"));
-            }
-            if (!string.IsNullOrEmpty(search))
-            {
-                objApplicationUserList = objApplicationUserList.Where(u => u.FullName.ToLower().Contains(search.ToLower())).ToList();
-
-            }
-
-            foreach (var user in objApplicationUserList)
-            {
-                UserRoles[user.Id] = await _userManager.GetRolesAsync(user); 
-            }
-
-            return Page();
-
+            return RedirectToPage("/Student/Bookings/Index", new { role = role, department = department});
         }
-        public IActionResult OnGetSetProvId(string userId)
-        {
-            HttpContext.Session.SetString("ProvId", userId);
-            return RedirectToPage("/Student/Bookings/Index");
-        }
+        
 
     }
 }
