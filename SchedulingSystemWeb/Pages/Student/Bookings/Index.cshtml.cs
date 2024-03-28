@@ -7,6 +7,7 @@ using System.Data.Entity.Infrastructure;
 using System.Globalization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 
 namespace SchedulingSystemWeb.Pages.Student.Bookings
 {
@@ -51,30 +52,28 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         }
 
 
-        public async Task OnGetAsync(string role, int? department)
+        public async Task OnGetAsync(string role, int? department, string? providerUserId)
         {
-            string searchRole = _httpContextAccessor.HttpContext.Session.GetString("SearchRole");
-            int? searchDepartment = _httpContextAccessor.HttpContext.Session.GetInt32("SearchDepartment");
+            string searchRole = HttpContext.Session.GetString("SearchRole");
+            int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
 
-            //_ProfUser = await _unitOfWork.ApplicationUser.GetAsync(u => u.Id == provId);
-
-            //if (_ProfUser != null)
-            //{
-            //    profFullName = $"{_ProfUser.FirstName} {_ProfUser.LastName}";
-            //    provider = await _unitOfWork.ProviderProfile.GetAsync(p => p.User == _ProfUser.Id);
-            //    Availabilities = _unitOfWork.Availability.GetAll()/*.Where(p => p.ProviderProfileID == provider.Id)*/;
-            //    Bookings = _unitOfWork.Booking.GetAll()/*.Where(p => p.ProviderProfileID == provider.Id)*/;
-            //}
 
             if (string.IsNullOrEmpty(searchRole)) {
-                //HttpContext.Session.SetString("searchRole", role);
+                HttpContext.Session.SetString("SearchRole", role);
+                searchRole = HttpContext.Session.GetString("SearchRole");
             }
-            if(!searchDepartment.HasValue && department.HasValue)
+            if (!role.IsNullOrEmpty() && !string.IsNullOrEmpty(searchRole))
             {
-               //HttpContext.Session.SetInt32("SearchDepartment", department.Value);
+                HttpContext.Session.SetString("SearchRole", role);
+                searchRole = HttpContext.Session.GetString("SearchRole");
+            }
+            if (!searchDepartment.HasValue && department.HasValue)
+            {
+               HttpContext.Session.SetInt32("SearchDepartment", department.Value);
+                searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
             }
 
-            objApplicationUserList.AddRange(await _userManager.GetUsersInRoleAsync(role));
+            objApplicationUserList.AddRange(await _userManager.GetUsersInRoleAsync(searchRole));
 
             if (objApplicationUserList.Count > 0)
             {
@@ -86,19 +85,28 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             Availabilities = new List<Availability>();
             Bookings = new List<Booking>();
 
-            foreach (var p in objProviderList )
+            if (!providerUserId.IsNullOrEmpty())
             {
-                var providerAvailabilities = _unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == p);
-                Availabilities = Availabilities.Concat(providerAvailabilities);
-
-                var providerBookings = _unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == p);
-                Bookings = Bookings.Concat(providerBookings);
+                var provider = _unitOfWork.ProviderProfile.Get(p => p.User == providerUserId).Id;
+                Availabilities = _unitOfWork.Availability.GetAll()
+                                    .Where(a => a.ProviderProfileID == provider);
+                Bookings = _unitOfWork.Booking.GetAll()
+                                    .Where(a => a.ProviderProfileID == provider);
             }
-           
+            else
+            {
+                foreach (var p in objProviderList)
+                {
+                    var providerAvailabilities = _unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == p);
+                    Availabilities = Availabilities.Concat(providerAvailabilities);
 
+                    var providerBookings = _unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == p);
+                    Bookings = Bookings.Concat(providerBookings);
+                }
+            }
+            
            // Availabilities = _unitOfWork.Availability.GetAll() /*.Where(p => p.ProviderProfileID == provider.Id)*/
             //Bookings = _unitOfWork.Booking.GetAll()/*.Where(p => p.ProviderProfileID == provider.Id)*/;
-
 
             CurrentDate = (DateTime?)TempData["CurrentDate"] ?? DateTime.Today;
             TempData.Keep("CurrentDate");
@@ -114,7 +122,8 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
         public async Task<IActionResult> OnGetPreviousWeekAsync()
         {
-            var provId = HttpContext.Session.GetString("ProvId"); 
+            string searchRole = HttpContext.Session.GetString("SearchRole");
+            int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(-7);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
@@ -124,7 +133,8 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
         public async Task<IActionResult> OnGetNextWeekAsync()
         {
-            var provId = HttpContext.Session.GetString("ProvId");
+            string searchRole = HttpContext.Session.GetString("SearchRole");
+            int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
 
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(7);
             TempData["CurrentDate"] = CurrentDate;
@@ -135,7 +145,8 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
         public async Task<IActionResult> OnGetPreviousMonthAsync()
         {
-            var provId = HttpContext.Session.GetString("ProvId");
+            string searchRole = HttpContext.Session.GetString("SearchRole");
+            int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(-1);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
@@ -147,7 +158,8 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
         public async Task<IActionResult> OnGetNextMonthAsync()
         {
-            var provId = HttpContext.Session.GetString("ProvId");
+            string searchRole = HttpContext.Session.GetString("SearchRole");
+            int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(1);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
@@ -157,7 +169,8 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
         public async Task<IActionResult> OnGetTodayWeekAsync()
         {
-            var provId = HttpContext.Session.GetString("ProvId");
+            string searchRole = HttpContext.Session.GetString("SearchRole");
+            int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
             CurrentDate = DateTime.Today;
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
@@ -167,7 +180,8 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
         public async Task<IActionResult> OnGetTodayMonthAsync()
         {
-            var provId = HttpContext.Session.GetString("ProvId");
+            string searchRole = HttpContext.Session.GetString("SearchRole");
+            int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
             CurrentDate = DateTime.Today;
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
@@ -180,12 +194,6 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             return Bookings.Any(booking => booking.StartTime >= availability.StartTime && booking.StartTime < availability.EndTime);
         }
 
-
-        //public IActionResult OnGetSetProvId(string userId)
-        //{
-        //    HttpContext.Session.SetString("ProvId", userId);
-        //    return RedirectToPage("/Student/Bookings/Index");
-        //}
         private async Task FetchDataForCurrentViewAsync()
         {
             DateTime startOfMonth = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);

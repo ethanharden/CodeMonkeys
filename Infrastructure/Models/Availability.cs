@@ -17,6 +17,8 @@ namespace Infrastructure.Models
         [ForeignKey("ProviderId")]
         public int ProviderProfileID { get; set; }
 
+        //providers full name
+
         [ForeignKey("AvailabilityGroupId")]
         public int? AvailabilityGroupID { get; set; }
 
@@ -32,7 +34,6 @@ namespace Infrastructure.Models
         [Required]
         [DisplayName("End Time")]
         public DateTime EndTime { get; set; }
-
         
     }
 }
