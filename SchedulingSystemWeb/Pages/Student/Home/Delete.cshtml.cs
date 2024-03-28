@@ -30,8 +30,8 @@ namespace SchedulingSystemWeb.Pages.Student.Home
         {
             
             bookings = _unitOfWork.Booking.Get(b => b.Id == id);
-            //_unitOfWork.Booking.Delete(bookings);
-            //_unitOfWork.Commit();
+            _unitOfWork.Booking.Delete(bookings);
+            _unitOfWork.Commit();
             await SendEmail(id);
             return RedirectToPage("./Index");
         }
