@@ -71,7 +71,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             }
             if(!searchDepartment.HasValue && department.HasValue)
             {
-               // HttpContext.Session.SetInt32("SearchDepartment", department.Value);
+               //HttpContext.Session.SetInt32("SearchDepartment", department.Value);
             }
 
             objApplicationUserList.AddRange(await _userManager.GetUsersInRoleAsync(role));
@@ -83,9 +83,21 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                     objProviderList.Add(_unitOfWork.ProviderProfile.Get(p => p.User == user.Id).Id);
                 }
             }
+            Availabilities = new List<Availability>();
+            Bookings = new List<Booking>();
 
-            Availabilities = _unitOfWork.Availability.GetAll()/*.Where(p => p.ProviderProfileID == provider.Id)*/;
-            Bookings = _unitOfWork.Booking.GetAll()/*.Where(p => p.ProviderProfileID == provider.Id)*/;
+            foreach (var p in objProviderList )
+            {
+                var providerAvailabilities = _unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == p);
+                Availabilities = Availabilities.Concat(providerAvailabilities);
+
+                var providerBookings = _unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == p);
+                Bookings = Bookings.Concat(providerBookings);
+            }
+           
+
+           // Availabilities = _unitOfWork.Availability.GetAll() /*.Where(p => p.ProviderProfileID == provider.Id)*/
+            //Bookings = _unitOfWork.Booking.GetAll()/*.Where(p => p.ProviderProfileID == provider.Id)*/;
 
 
             CurrentDate = (DateTime?)TempData["CurrentDate"] ?? DateTime.Today;
