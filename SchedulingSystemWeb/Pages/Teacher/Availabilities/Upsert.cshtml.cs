@@ -8,6 +8,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace SchedulingSystemWeb.Pages.Availabilities
 {
@@ -122,6 +123,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             }
             DateTime startTime = MeetingDate.Add(MeetingStartTime);
             DateTime endTime = MeetingDate.Add(MeetingEndTime);
+            DayOfWeek firstDay = MeetingDate.DayOfWeek;
 
             // Ensure the end time is after the start time
             if (endTime <= startTime)
@@ -138,21 +140,28 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                     var recurringType = _unitOfWork.RecurringType.GetById(SelectedRecurringTypeId);
                     var daysBetween = recurringType.DaysBetween;
                     var avIds = new List<int>();
-                    var datesForAvailabilities = CalculateDatesForRecurring(startTime, RecurringEndDate.Value, daysBetween); //needs to return a list of dates
+                    var datesForAvailabilities = CalculateWeeksForRecurring(startTime, RecurringEndDate.Value, daysBetween);
                     
                     //for each week or biweekly
                     foreach (var date in datesForAvailabilities)
                     {
-
                         // Creating new availabilities for each selected day
                         foreach (var day in SelectedDaysOfWeek)
                         {
+                            int diffInDay = (int)day + (int)firstDay;
+                            if (diffInDay <6 )
+                            {
+                                diffInDay -= 7;
+                            }
+                            DateTime weekStart = startTime.AddDays(diffInDay);
+                            DateTime weekEnd = endTime.AddDays(diffInDay);
+
                             var newAvailability = new Availability
                             {
                                 // Assign values
                                 DayOfTheWeek = day,
-                                StartTime = startTime,
-                                EndTime = endTime,
+                                StartTime = weekStart,
+                                EndTime = weekEnd,
                                 ProviderProfileID = objAvailability.ProviderProfileID,
                                 LocationId = 1,
                             };
@@ -161,6 +170,9 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                             await _unitOfWork.CommitAsync();
                             avIds.Add(newAvailability.Id);
                         }
+                        startTime = startTime.AddDays(daysBetween);
+                        endTime = endTime.AddDays(daysBetween);
+
                     }
                     var availabilityGroup = new AvailabilityGroup
                     {
@@ -187,13 +199,19 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                 {
                     foreach (var day in SelectedDaysOfWeek)
                     {
-
+                        int diffInDay = (int)day + (int)firstDay;
+                        if (diffInDay < 6)
+                        {
+                            diffInDay -= 7;
+                        }
+                        DateTime weekStart = startTime.AddDays(diffInDay);
+                        DateTime weekEnd = endTime.AddDays(diffInDay);
                         var newAvailability = new Availability
                         {
                             // Assign values
                             DayOfTheWeek = day,
-                            StartTime = startTime,
-                            EndTime = endTime,
+                            StartTime = weekStart,
+                            EndTime = weekEnd,
                             ProviderProfileID = objAvailability.ProviderProfileID,
                             LocationId = 1,
                         };
@@ -287,7 +305,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             return Bookings.Any(booking => booking.StartTime >= availability.StartTime && booking.StartTime < availability.EndTime);
         }
 
-        private List<DateTime> CalculateDatesForRecurring(DateTime start, DateTime end, int daysBetween)
+        private List<DateTime> CalculateWeeksForRecurring(DateTime start, DateTime end, int daysBetween)
         {
             var dates = new List<DateTime>();
             int multiplier = 1;
