@@ -128,22 +128,16 @@ namespace DataAccess
                 //Pat Dejong
                 new ProviderProfile {
                     User =  _unitOfWork.ApplicationUser.Get(u => u.Email == "PatDeJong@PatDeJong.com").Id,
-                    RemoteLink = "",
-                    BookingPrompt = "", 
-                    DepartmentString = ""},
+                    },
                 //Rich Fry
                 new ProviderProfile {
                     //UserId = "3",
                     User =  _unitOfWork.ApplicationUser.Get(u => u.Email == "RichardFry@RichardFry.com").Id,
-                    RemoteLink = "",
-                    BookingPrompt = "",
-                    DepartmentString = ""},
+                    },
                 //Julie Christenson
                 new ProviderProfile {
                     User =  _unitOfWork.ApplicationUser.Get(u => u.Email == "JulieChristensen@JulieChristensen.com").Id,
-                    RemoteLink = "",
-                    BookingPrompt = "",
-                    DepartmentString = ""}
+                    }
             };
 
 

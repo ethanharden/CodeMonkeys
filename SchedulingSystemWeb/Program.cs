@@ -41,6 +41,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddScoped<UnitOfWork>();
 builder.Services.AddScoped<ICalendarService, CalendarService>();
 builder.Services.AddScoped<DbInitializer>();
+builder.Services.AddHttpClient();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
