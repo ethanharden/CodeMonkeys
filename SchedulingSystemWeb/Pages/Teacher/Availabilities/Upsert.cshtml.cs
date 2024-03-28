@@ -26,12 +26,31 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         [BindProperty]
         public Availability objAvailability { get; set; }
 
+        [BindProperty]
+        public DateTime MeetingDate { get; set; }
+
+        [BindProperty]
+        public TimeSpan MeetingStartTime { get; set; }
+
+        [BindProperty]
+        public TimeSpan MeetingEndTime { get; set; }
+
         public DateTime CurrentDate { get; private set; }
         public List<DateTime> WeekDays { get; private set; } = new List<DateTime>();
         public List<DateTime> MonthDays { get; private set; }
         public string CurrentMonthName { get; private set; }
         [BindProperty]
         public List<DayOfWeek> SelectedDaysOfWeek { get; set; }
+        public List<RecurringType> RecurringTypes { get; set; }
+
+        [BindProperty]
+        public bool recurringCheckbox { get; set; }
+
+        [BindProperty]
+        public DateTime? RecurringEndDate { get; set; }
+        [BindProperty]
+        public int SelectedRecurringTypeId { get; set; }
+
 
         public UpsertModel(UnitOfWork unitOfWork, ICalendarService calendarService, UserManager<ApplicationUser> userManager)
         {
@@ -51,6 +70,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             CurrentMonthName = CurrentDate.ToString("MMMM");
             WeekDays = _calendarService.GetWeekDays(CurrentDate);
             MonthDays = _calendarService.GetMonthDays(CurrentDate);
+            RecurringTypes = _unitOfWork.RecurringType.GetAll().ToList();
 
             if (id.HasValue && id != 0)
             {
@@ -81,6 +101,13 @@ namespace SchedulingSystemWeb.Pages.Availabilities
 
         public async Task<IActionResult> OnPostAsync()
         {
+            if (SelectedDaysOfWeek == null || !SelectedDaysOfWeek.Any())
+            {
+                ModelState.AddModelError("SelectedDaysOfWeek", "Please select at least one day of the week.");
+                return Page();
+            }
+
+            ModelState.Remove("SelectedRecurringTypeId");
             if (!ModelState.IsValid)
             {
                 var errorList = ModelState.Values.SelectMany(v => v.Errors.Select(b => b.ErrorMessage)).ToList();
@@ -93,22 +120,86 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             {
                 return Page();
             }
+            DateTime startTime = MeetingDate.Add(MeetingStartTime);
+            DateTime endTime = MeetingDate.Add(MeetingEndTime);
+
+            // Ensure the end time is after the start time
+            if (endTime <= startTime)
+            {
+                ModelState.AddModelError("", "End time must be after start time.");
+                return Page(); // Return with error
+            }
+
             if (objAvailability.Id == 0)
             {
-                // Creating new availabilities for each selected day
-                foreach (var day in SelectedDaysOfWeek)
-                {
-                    var newAvailability = new Availability
-                    {
-                        // Assign values
-                        DayOfTheWeek = day,
-                        StartTime = objAvailability.StartTime,
-                        EndTime = objAvailability.EndTime,
-                        ProviderProfileID = objAvailability.ProviderProfileID,
-                        LocationId = 1,
-                    };
 
-                    _unitOfWork.Availability.Add(newAvailability); //Getting an error here
+                if (recurringCheckbox && RecurringEndDate != null)//recurring checkbox is checked
+                {
+                    var recurringType = _unitOfWork.RecurringType.GetById(SelectedRecurringTypeId);
+                    var daysBetween = recurringType.DaysBetween;
+                    var avIds = new List<int>();
+                    var datesForAvailabilities = CalculateDatesForRecurring(startTime, RecurringEndDate.Value, daysBetween); //needs to return a list of dates
+                    
+                    //for each week or biweekly
+                    foreach (var date in datesForAvailabilities)
+                    {
+
+                        // Creating new availabilities for each selected day
+                        foreach (var day in SelectedDaysOfWeek)
+                        {
+                            var newAvailability = new Availability
+                            {
+                                // Assign values
+                                DayOfTheWeek = day,
+                                StartTime = startTime,
+                                EndTime = endTime,
+                                ProviderProfileID = objAvailability.ProviderProfileID,
+                                LocationId = 1,
+                            };
+
+                            _unitOfWork.Availability.Add(newAvailability);
+                            await _unitOfWork.CommitAsync();
+                            avIds.Add(newAvailability.Id);
+                        }
+                    }
+                    var availabilityGroup = new AvailabilityGroup
+                    {
+                        RecurringType = SelectedRecurringTypeId,
+                        RecurringEndDate = RecurringEndDate,
+                        AvailabilityIDList = avIds,
+                    };
+                    
+                    _unitOfWork.AvailabilityGroup.Add(availabilityGroup);
+                    await _unitOfWork.CommitAsync();
+
+                    foreach (var availabilityId in avIds)
+                    {
+                        var availabilityToUpdate = _unitOfWork.Availability.GetById(availabilityId);
+                        if (availabilityToUpdate != null)
+                        {
+                            availabilityToUpdate.AvailabilityGroupID = availabilityGroup.Id;
+                            _unitOfWork.Availability.Update(availabilityToUpdate);
+                        }
+                    }
+                    await _unitOfWork.CommitAsync();
+                }
+                else 
+                {
+                    foreach (var day in SelectedDaysOfWeek)
+                    {
+
+                        var newAvailability = new Availability
+                        {
+                            // Assign values
+                            DayOfTheWeek = day,
+                            StartTime = startTime,
+                            EndTime = endTime,
+                            ProviderProfileID = objAvailability.ProviderProfileID,
+                            LocationId = 1,
+                        };
+                        _unitOfWork.Availability.Add(newAvailability);
+                    }                 
+                    await _unitOfWork.CommitAsync();
                 }
             }
             else
@@ -118,9 +209,9 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                 if (existingAvailability != null)
                 {
                     // Update properties of existingAvailability with values from objAvailability
-                    existingAvailability.StartTime = objAvailability.StartTime;
-                    existingAvailability.EndTime = objAvailability.EndTime;
-                    existingAvailability.DayOfTheWeek = objAvailability.DayOfTheWeek;
+                    existingAvailability.StartTime = startTime;
+                    existingAvailability.EndTime = endTime;
+                    existingAvailability.DayOfTheWeek = startTime.DayOfWeek;
                     _unitOfWork.Availability.Update(existingAvailability);
                 }
                 else
@@ -194,6 +285,18 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         public bool IsAvailabilityBooked(Availability availability)
         {
             return Bookings.Any(booking => booking.StartTime >= availability.StartTime && booking.StartTime < availability.EndTime);
+        }
+
+        private List<DateTime> CalculateDatesForRecurring(DateTime start, DateTime end, int daysBetween)
+        {
+            var dates = new List<DateTime>();
+            int multiplier = 1;
+            for (var dt = start; dt <= end; dt = dt.AddDays(daysBetween))
+            {   
+                dates.Add(dt.AddDays(daysBetween));
+                multiplier *= daysBetween;
+            }
+            return dates;
         }
 
         private async Task FetchDataForCurrentViewAsync()
