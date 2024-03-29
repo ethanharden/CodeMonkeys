@@ -56,8 +56,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         {
             string searchRole = HttpContext.Session.GetString("SearchRole");
             int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
-
-
+            
             if (string.IsNullOrEmpty(searchRole)) {
                 HttpContext.Session.SetString("SearchRole", role);
                 searchRole = HttpContext.Session.GetString("SearchRole");
@@ -87,6 +86,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
             if (!providerUserId.IsNullOrEmpty())
             {
+                HttpContext.Session.SetString("userProv", providerUserId);
                 var provider = _unitOfWork.ProviderProfile.Get(p => p.User == providerUserId).Id;
                 Availabilities = _unitOfWork.Availability.GetAll()
                                     .Where(a => a.ProviderProfileID == provider);
@@ -124,6 +124,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         {
             string searchRole = HttpContext.Session.GetString("SearchRole");
             int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
+            string? searchProv = HttpContext.Session.GetString("userProv");
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(-7);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
@@ -135,7 +136,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         {
             string searchRole = HttpContext.Session.GetString("SearchRole");
             int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
-
+            string? searchProv = HttpContext.Session.GetString("userProv");
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(7);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
@@ -147,6 +148,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         {
             string searchRole = HttpContext.Session.GetString("SearchRole");
             int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
+            string? searchProv = HttpContext.Session.GetString("userProv");
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(-1);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
@@ -160,6 +162,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         {
             string searchRole = HttpContext.Session.GetString("SearchRole");
             int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
+            string? searchProv = HttpContext.Session.GetString("userProv");
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(1);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
@@ -171,6 +174,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         {
             string searchRole = HttpContext.Session.GetString("SearchRole");
             int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
+            string? searchProv = HttpContext.Session.GetString("userProv");
             CurrentDate = DateTime.Today;
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
@@ -182,6 +186,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         {
             string searchRole = HttpContext.Session.GetString("SearchRole");
             int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
+            string? searchProv = HttpContext.Session.GetString("userProv");
             CurrentDate = DateTime.Today;
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
