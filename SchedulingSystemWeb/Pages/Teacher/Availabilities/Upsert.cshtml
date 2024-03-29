@@ -35,19 +35,27 @@
             <input type="hidden" asp-for="objAvailability.Id" />
             <input type="hidden" asp-for="objAvailability.ProviderProfileID" />
         
+            <!-- Date -->
+            <div class="form-group">
+                <label for="meetingDate" class="control-label">Date</label>
+                <input id="meetingDate" name="MeetingDate" type="date" class="form-control" value="@Model.objAvailability.StartTime.ToString("yyyy-MM-dd")" />
+            <span asp-validation-for="MeetingDate" class="text-danger"></span>
+            </div>
+
             <!-- Start Time -->
             <div class="form-group">
-                <label asp-for="objAvailability.StartTime" class="control-label"></label>
-                <input asp-for="objAvailability.StartTime" class="form-control" type="datetime-local" value="@Model.objAvailability.StartTime.ToString("yyyy-MM-ddTHH:mm")" />
-                <span asp-validation-for="objAvailability.StartTime" class="text-danger"></span>
+                <label asp-for="MeetingStartTime" class="control-label">Start Time</label>
+                <input asp-for="MeetingStartTime" class="form-control" type="time" />
+                <span asp-validation-for="MeetingStartTime" class="text-danger"></span>
             </div>
 
             <!-- End Time -->
             <div class="form-group">
-                <label asp-for="objAvailability.EndTime" class="control-label"></label>
-                <input asp-for="objAvailability.EndTime" class="form-control" type="datetime-local" value="@Model.objAvailability.EndTime.ToString("yyyy-MM-ddTHH:mm")" />
-                <span asp-validation-for="objAvailability.EndTime" class="text-danger"></span>
+                <label asp-for="MeetingEndTime" class="control-label">End Time</label>
+                <input asp-for="MeetingEndTime" class="form-control" type="time" />
+                <span asp-validation-for="MeetingEndTime" class="text-danger"></span>
             </div>
+
 
             <!-- Duration -->
             <div class="form-group">
@@ -78,12 +86,24 @@
             <!--Recurring section-->
             <div class="form-group">
                 <label  class="control-label">Recurring</label>
-                <input  class="form-check-input" type="checkbox" id="recurringCheckbox" />
+                <input  asp-for="recurringCheckbox" class="form-check-input" type="checkbox" id="recurringCheckbox" name="recurringCheckbox"/>
+            </div>
+            <div>
+                <div class="form-group" style="display:none;" id="recurringTypeGroup">
+                    <label for="SelectedRecurringTypeId" class="control-label">Recurring Type</label>
+                    <select id="SelectedRecurringTypeId" name="SelectedRecurringTypeId" class="form-control">
+                        <option value="">Select Recurring Type</option>
+                        @foreach (var type in Model.RecurringTypes)
+                        {
+                            <option value="@type.Id">@type.Name</option>
+                        }
+                    </select>
+                </div>
             </div>
 
             <div class="form-group" id="recurringEndDateGroup" style="display:none;">
                 <label  class="control-label">Recurring End Date</label>
-                <input  class="form-control" type="date" />
+                <input  asp-for="recurringCheckbox" class="form-control" type="date" name="RecurringEndDate" />
                 <span @* asp-validation-for="objAvailability.RecurringEndDate" *@ class="text-danger"></span>
             </div>
 
@@ -318,12 +338,14 @@
             function toggleRecurringEndDate() {
                 var recurringCheckbox = document.getElementById('recurringCheckbox');
                 var recurringEndDateGroup = document.getElementById('recurringEndDateGroup');
-                var recurringEndDateInput = document.getElementById('objAvailability_RecurringEndDate');
+                var recurringTypeGroup = document.getElementById('recurringTypeGroup');
 
                 if (recurringCheckbox.checked) {
                     recurringEndDateGroup.style.display = 'block';
+                    recurringTypeGroup.style.display = 'block';
                 } else {
                     recurringEndDateGroup.style.display = 'none';
+                    recurringTypeGroup.style.display = 'none';
                     // Clear the value of the recurring end date when the checkbox is unchecked
                     recurringEndDateInput.value = '';
                 }
@@ -354,19 +376,6 @@
         document.getElementById('duration').addEventListener('change', updateEndTime);
 
         updateEndTime();
-
-        // Toggle RecurringEndDate
-        var recurringCheckbox = document.getElementById('recurring');
-        var recurringEndDateGroup = document.getElementById('recurringEndDateGroup');
-
-        function toggleRecurringEndDate() {
-            recurringEndDateGroup.style.display = recurringCheckbox.checked ? 'block' : 'none';
-        }
-
-        recurringCheckbox.addEventListener('change', toggleRecurringEndDate);
-
-        //initial display
-        toggleRecurringEndDate();
     });
     </script>
     <!--Show Booking Details-->
@@ -377,6 +386,16 @@
             var bookingDetailsModal = new bootstrap.Modal(document.getElementById('bookingDetailsModal'));
             bookingDetailsModal.show();
         }
+    </script>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', function (e) {
+            let checkboxes = document.querySelectorAll('input[name="SelectedDaysOfWeek"]:checked');
+            if (checkboxes.length === 0) {
+                alert('Please select at least one day of the week.');
+                e.preventDefault();
+            }
+        });
     </script>
     <!--Sweet Alert-->
     <script>
