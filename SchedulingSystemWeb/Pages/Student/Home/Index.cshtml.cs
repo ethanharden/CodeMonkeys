@@ -16,7 +16,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
         private readonly ICalendarService _calendarService;
         private readonly UserManager<ApplicationUser> _userManager;
         public IEnumerable<Booking> Bookings { get; set; }
-        public IEnumerable<Availability> Availabilities { get; set; }
+        public List<Availability> Availabilities { get; set; }
 
         public IEnumerable<Booking> ViewBookings { get; set; }
         public IEnumerable<Availability> ViewAvailabilities { get; set; }
@@ -25,6 +25,8 @@ namespace SchedulingSystemWeb.Pages.Student.Home
         public List<DateTime> WeekDays { get; private set; } = new List<DateTime>();
         public List<DateTime> MonthDays { get; private set; }
         public string CurrentMonthName { get; private set; }
+        public List<Location> Locations { get; set; }
+        public List<ProviderProfile> Providers { get; set; }
 
         public IndexModel(UserManager<ApplicationUser> userManager, UnitOfWork unitOfWork, ICalendarService calendarService)
         {
@@ -46,11 +48,14 @@ namespace SchedulingSystemWeb.Pages.Student.Home
             var currentUser = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             Bookings = _unitOfWork.Booking.GetAll().Where(u=>u.User == currentUser);
             Bookings = Bookings.ToList().OrderBy(obj => obj.StartTime); // Order bookings by date
-            List<ProviderProfile> Providers = new List<ProviderProfile>();
+            Providers = new List<ProviderProfile>();
+            Locations = new List<Location>();
             Teachers = new List<ApplicationUser>();
             int i = 0;
             foreach (var booking in Bookings) // Adds Teachers to List for names
             {
+                Availability aval = _unitOfWork.Availability.Get(a=> a.Id == booking.objAvailability);
+                Locations.Add(_unitOfWork.Location.Get(l => l.LocationId == aval.LocationId));
                 Providers.Add(_unitOfWork.ProviderProfile.Get(b => b.Id == booking.ProviderProfileID));
                 Teachers.Add(_unitOfWork.ApplicationUser.Get(u => u.Id == Providers[i].User));
                 i++;

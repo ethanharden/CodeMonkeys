@@ -1,27 +1,54 @@
+using Microsoft.Identity.Client;
+using Microsoft.Graph;
+using Microsoft.Graph.Auth;
+using Microsoft.Extensions.Configuration;
+//using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
+//using Microsoft.Identity.Web;
+//using Microsoft.Identity.Web.UI;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Linq;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
+//using Microsoft.Graph.Extensions;
+using Microsoft.Identity.Client.Extensions.Msal;
+using System;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Graph.Models;
+using Google.Apis.Auth.OAuth2;
 
 namespace SchedulingSystemWeb.Pages
 {
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
-
-        public IndexModel(ILogger<IndexModel> logger)
+        private readonly IHttpClientFactory _httpClientFactory;
+        public IndexModel(ILogger<IndexModel> logger, IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
+            _httpClientFactory = httpClientFactory;
         }
 
-        public async Task OnGet()
+        public async Task<IActionResult> OnGet(string code, string state)
         {
-            if (User.IsInRole("STUDENT"))
+            //var Code = Request.Query["code"].ToString();
+
+            if (string.IsNullOrEmpty(code))
             {
-                RedirectToPage("/student/home/index");
+                // No code parameter, return the page without processing
+                return Page();
             }
-            else
-            {
-                RedirectToPage("/Teacher/Availabilities");
+
+            
+            return RedirectToPage("/Index");
             }
-        }
+        
+
+
     }
 }
+

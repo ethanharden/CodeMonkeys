@@ -1,0 +1,23 @@
+﻿@page
+@model DeleteModel
+@{
+}
+<h1 class="text-center">Delete Booking</h1>
+
+<form method="post" class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <p class="card-text text-center font-weight-bold">
+                    Meeting with @Model.Teacherinfo.FirstName @Model.Teacherinfo.LastName on @Model.bookings.StartTime.ToShortDateString() at @Model.bookings.StartTime.ToShortTimeString()
+                </p>
+                <hr />
+                <form method="post">
+                    <button type="submit" class="btn btn-danger form-control">Delete</button>
+                </form>
+                <a asp-page="./Index" class="btn btn-outline-primary border  form-control">Back</a>
+            </div>
+        </div>
+    </div>
+</form>
+
