@@ -1,0 +1,63 @@
+﻿@page
+@model SchedulingSystemWeb.Pages.Tutor.Bookings.UpsertModel
+@{
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Form</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-2">
+                <a class="nav-link text-dark" asp-area="" asp-page="/Student/Bookings/Index"><button class="btn btn-secondary">Back</button></a>
+            </div>
+            <div class="col-md-5">
+                <form method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="meetingName">Meeting Name:</label>
+                        <input  type="text" class="form-control" id="meetingName" asp-for="title" placeholder="Enter meeting name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="professorName">Professor Name:</label>
+                        <input type="text" class="form-control" id="professorName" value="@Model.fullName" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Location:</label>
+                        <input type="text" class="form-control" id="location" value="@Model.location.LocationName" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="course">Course:</label>
+                        <input type="text" asp-for = "course" class="form-control" id="course" placeholder="Enter course" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description: (Optional)</label>
+                        <textarea class="form-control" asp-for="description" id="description" placeholder="Enter description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="fileUpload">File Upload: (Optional)</label>
+                        <input type="file" class="form-control-file" id="fileUpload">
+                    </div>
+                    <div class="form-group">
+                        <input class="btn btn-success" type="submit"/>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-5">
+                <div class="form-group">
+                    <label for="meetingTime">Time:</label>
+                    <input type="text" class="form-control" id="meetingTime" value="@Model.startEndTime" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="meetingDate">Date:</label>
+                    <input type="text" class="form-control" id="meetingDate" value="@Model.availability.StartTime.Date" disabled>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
