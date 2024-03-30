@@ -1,0 +1,67 @@
+﻿@page
+@model SchedulingSystemWeb.Pages.Tutor.ListOfProvidersModel
+
+<form method="get">
+    <input type="text" name="search" placeholder="Search by name...">
+    <select name="role" onchange="this.form.submit()">
+        <option value="">All Roles</option>
+        @foreach (var role in Model.UserRoles.Values.SelectMany(x => x).Distinct())
+        {
+            <option value="@role">@role</option>
+        }
+    </select>
+    <button type="submit">Search</button>
+</form>
+<table>
+    <thead>
+        <tr>
+            <th style="width: 33%">
+                Provider Name
+            </th>
+            <th style="width: 33%">
+                Provider Roles
+            </th>
+            <th style="width: 33%">
+                
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model.objApplicationUserList)
+        {
+            <tr>
+                <td style="width: 33%">@user.FullName</td>
+                <td style="width: 33%">
+                    <ul>
+                        @foreach (var role in Model.UserRoles[user.Id])
+                        {
+                            @role
+                        }
+                    </ul>
+                </td>
+                <td style="width: 33%">
+                    <a asp-page-handler="SetProvId" asp-route-userId="@user.Id" class="btn btn-primary">Schedule Appointment</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        function scheduleAppointment(userId) {
+            // Send an AJAX request to update the ProvId in the session
+            $.ajax({
+                type: "GET",
+                url: '/Student/Bookings/Index',
+                data: { userId: userId },
+                success: function (response) {
+                    console.log(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr.responseText);
+                }
+            });
+        }
+    </script>
+}
