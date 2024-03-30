@@ -25,10 +25,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Graph" Version="5.45.0" />
+    <PackageReference Include="Microsoft.Graph" Version="5.46.0" />
     <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.3" />
-    <PackageReference Include="Microsoft.Identity.Client" Version="4.59.0" />
-    <PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" Version="4.59.0" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.60.0" />
+    <PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" Version="4.60.0" />
     <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.3.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.2" />
     <PackageReference Include="SendGrid" Version="9.29.2" />
@@ -47,6 +47,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\images\profile\" />
+    <Folder Include="wwwroot\bookingFiles\" />
   </ItemGroup>
 
 </Project>

@@ -23,6 +23,7 @@ namespace DataAccess
         public DbSet <CustomerProfile> CustomerProfiles { get; set; }
         public DbSet <RecurringType> RecurringTypes { get; set; }
         public DbSet<AvailabilityGroup> AvailabilityGroups { get; set; }
+        public DbSet<Department> Department { get; set; }
 
     }
 }

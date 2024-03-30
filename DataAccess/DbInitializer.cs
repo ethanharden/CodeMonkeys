@@ -1,6 +1,7 @@
 using Infrastructure.Interfaces;
 using Infrastructure.Models;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -14,11 +15,13 @@ namespace DataAccess
     {
         private readonly AppDbContext _db;
         private readonly UnitOfWork _unitOfWork;
-
-        public DbInitializer(AppDbContext db, UnitOfWork unitOfWork)
+        private readonly RoleManager<IdentityRole> _roleManager;
+        
+        public DbInitializer(AppDbContext db, UnitOfWork unitOfWork, RoleManager<IdentityRole> roleManager)
         {
             _db = db;
             _unitOfWork = unitOfWork;
+            _roleManager = roleManager;
         }
 
         public void Initialize()
@@ -75,10 +78,12 @@ namespace DataAccess
 
 
 
-            //_roleManager.CreateAsync(new IdentityRole(SD.AdminRole)).GetAwaiter().GetResult();
-            //_roleManager.CreateAsync(new IdentityRole(SD.CustomerRole)).GetAwaiter().GetResult();
-            //_roleManager.CreateAsync(new IdentityRole(SD.ShipperRole)).GetAwaiter().GetResult();
 
+            _roleManager.CreateAsync(new IdentityRole("STUDENT")).GetAwaiter().GetResult();
+            _roleManager.CreateAsync(new IdentityRole("TEACHER")).GetAwaiter().GetResult();
+            _roleManager.CreateAsync(new IdentityRole("TUTOR")).GetAwaiter().GetResult();
+            _roleManager.CreateAsync(new IdentityRole("ADMIN")).GetAwaiter().GetResult();
+            _roleManager.CreateAsync(new IdentityRole("ADVISOR")).GetAwaiter().GetResult();
 
 
             var ApplicationUsers = new List<ApplicationUser>
@@ -123,20 +128,56 @@ namespace DataAccess
             }
             _db.SaveChanges();
 
+            var Departments = new List<Department>
+            {
+                new Department
+                {
+                    Name = "Computer Science"
+                },
+                new Department
+                {
+                    Name = "General Studies"
+                },
+                new Department
+                {
+                    Name = "Networking"
+                },
+                new Department
+                {
+                    Name = "Web Development"
+                },
+                new Department
+                {
+                    Name = "Cybersecurity"
+                }
+            };
+
+            foreach (var d in Departments)
+            {
+                _db.Department.Add(d);
+            }
+
+
             var ProviderProfiles = new List<ProviderProfile>
             {
                 //Pat Dejong
                 new ProviderProfile {
                     User =  _unitOfWork.ApplicationUser.Get(u => u.Email == "PatDeJong@PatDeJong.com").Id,
+                    DeparmentId = _unitOfWork.Department.Get(d => d.Name == "Computer Science").Id,
+                    userFullName = _unitOfWork.ApplicationUser.Get(u => u.Email == "PatDeJong@PatDeJong.com").FullName
                     },
                 //Rich Fry
                 new ProviderProfile {
                     //UserId = "3",
                     User =  _unitOfWork.ApplicationUser.Get(u => u.Email == "RichardFry@RichardFry.com").Id,
+                    DeparmentId = _unitOfWork.Department.Get(d => d.Name == "Computer Science").Id,
+                    userFullName = _unitOfWork.ApplicationUser.Get(u=> u.Id == "RichardFry@RichardFry.com").FullName
                     },
                 //Julie Christenson
                 new ProviderProfile {
                     User =  _unitOfWork.ApplicationUser.Get(u => u.Email == "JulieChristensen@JulieChristensen.com").Id,
+                    DeparmentId = _unitOfWork.Department.Get(d => d.Name == "Computer Science").Id,
+                    userFullName = _unitOfWork.ApplicationUser.Get(u => u.Email == "JulieChristensen@JulieChristensen.com").FullName,
                     }
             };
 

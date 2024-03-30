@@ -24,7 +24,19 @@ namespace DataAccess
         public IGenericRepository<CustomerProfile> _CustomerProfile;
         public IGenericRepository<ApplicationUser> _ApplicationUser;
         public IGenericRepository<AvailabilityGroup> _AvailabilityGroup;
+        public IGenericRepository<Department> _Department;
 
+        public IGenericRepository<Department> Department
+        {
+            get
+            {
+                if (_Department == null)
+                {
+                    _Department = new GenericRepository<Department>(_DbContext);
+                }
+                return _Department;
+            }
+        }
         public IGenericRepository<Availability> Availability
         {
             get

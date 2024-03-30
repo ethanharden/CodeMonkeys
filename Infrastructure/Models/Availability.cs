@@ -17,7 +17,7 @@ namespace Infrastructure.Models
         [ForeignKey("ProviderId")]
         public int ProviderProfileID { get; set; }
 
-        //providers full name
+        public string ProviderFullName { get; set; }
 
         [ForeignKey("AvailabilityGroupId")]
         public int? AvailabilityGroupID { get; set; }

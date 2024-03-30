@@ -16,9 +16,12 @@ namespace Infrastructure.Models
 
         [ForeignKey("UserId")]
         public string User { get; set; }
-        //User full name
+
+        public int DeparmentId { get; set; }
+
+        public string userFullName { get; set; }
         public string? RemoteLink {  get; set; }
         public string? BookingPrompt { get; set; }
-        public string? DepartmentString {  get; set; } //  int DepartmentId 
+
     }
 }

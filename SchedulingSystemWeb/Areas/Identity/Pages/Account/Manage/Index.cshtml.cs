@@ -96,7 +96,7 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account.Manage
             if (role[0] == "TEACHER" || role[0] == "ADVISOR" || role[0] == "TUTOR")
             {
                 IsProvider = true;
-                Department = _unitOfWork.ProviderProfile.Get(u => u.User == user.Id).DepartmentString;
+                //Department = _unitOfWork.Department.Get(d => d.Name == DepartmentString).Id; 
                 BookingPrompt = _unitOfWork.ProviderProfile.Get(u => u.User == user.Id).BookingPrompt;
                 RemoteLink = _unitOfWork.ProviderProfile.Get(u => u.User == user.Id).RemoteLink;
             }
@@ -171,7 +171,7 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account.Manage
             {
                 ProviderProfile profiderProfile = _unitOfWork.ProviderProfile.Get(u => u.User == user.Id);
                 profiderProfile.BookingPrompt = BookingPrompt;
-                profiderProfile.DepartmentString = Department;
+                //profiderProfile.DepartmentString = Department;
                 profiderProfile.RemoteLink = RemoteLink;
                 _unitOfWork.ProviderProfile.Update(profiderProfile);
             }
