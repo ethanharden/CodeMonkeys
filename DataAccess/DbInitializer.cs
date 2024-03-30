@@ -15,13 +15,13 @@ namespace DataAccess
     {
         private readonly AppDbContext _db;
         private readonly UnitOfWork _unitOfWork;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        //private readonly RoleManager<IdentityRole> _roleManager;
         
-        public DbInitializer(AppDbContext db, UnitOfWork unitOfWork, RoleManager<IdentityRole> roleManager)
+        public DbInitializer(AppDbContext db, UnitOfWork unitOfWork)
         {
             _db = db;
             _unitOfWork = unitOfWork;
-            _roleManager = roleManager;
+            //_roleManager = roleManager;
         }
 
         public void Initialize()
@@ -79,11 +79,11 @@ namespace DataAccess
 
 
 
-            _roleManager.CreateAsync(new IdentityRole("STUDENT")).GetAwaiter().GetResult();
-            _roleManager.CreateAsync(new IdentityRole("TEACHER")).GetAwaiter().GetResult();
-            _roleManager.CreateAsync(new IdentityRole("TUTOR")).GetAwaiter().GetResult();
-            _roleManager.CreateAsync(new IdentityRole("ADMIN")).GetAwaiter().GetResult();
-            _roleManager.CreateAsync(new IdentityRole("ADVISOR")).GetAwaiter().GetResult();
+            //_roleManager.CreateAsync(new IdentityRole("STUDENT")).GetAwaiter().GetResult();
+            //_roleManager.CreateAsync(new IdentityRole("TEACHER")).GetAwaiter().GetResult();
+            //_roleManager.CreateAsync(new IdentityRole("TUTOR")).GetAwaiter().GetResult();
+            //_roleManager.CreateAsync(new IdentityRole("ADMIN")).GetAwaiter().GetResult();
+            //_roleManager.CreateAsync(new IdentityRole("ADVISOR")).GetAwaiter().GetResult();
 
 
             var ApplicationUsers = new List<ApplicationUser>
@@ -128,6 +128,7 @@ namespace DataAccess
             }
             _db.SaveChanges();
 
+
             var Departments = new List<Department>
             {
                 new Department
@@ -156,7 +157,7 @@ namespace DataAccess
             {
                 _db.Department.Add(d);
             }
-
+            _db.SaveChanges();
 
             var ProviderProfiles = new List<ProviderProfile>
             {
