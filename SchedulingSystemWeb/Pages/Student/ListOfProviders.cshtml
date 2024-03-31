@@ -2,8 +2,8 @@
 @model SchedulingSystemWeb.Pages.Student.ListOfProvidersModel
 
 <form id="searchForm" method="post">
-    <select name="role">
-        <option value="">All Roles</option>
+    <select name="role" required>
+        <option value="">Select Role</option>
 @*         @foreach (var role in Model.UserRoles.Values.SelectMany(x => x).Distinct())
         { *@
             <option value="TUTOR">TUTOR</option>
@@ -11,14 +11,27 @@
             <option value="ADVISOR">ADVISOR</option>
        @*  } *@
     </select>
+
     <!-- Deparment dropdown-->
-    <select name="department">
+    <select name="department" required>
         <option value="">Department</option>
-            @* <option value ="@user.Id">@user.FirstName @user.LastName</option> *@
-            <option value="1">Computer Science</option>
-            <option value="2">Math</option>
-            <option value="3">Science</option>
+        @foreach(var d in Model.departmentList)
+        {
+            <option value ="@d.Id">@d.Name</option>
+        }
     </select>
     <button type="submit">Search</button>
 </form>
 <button>New Student</button> <!--call General deaprment-->
+
+<script>
+    document.getElementById("searchForm").addEventListener("submit", function (event) {
+        var role = document.getElementsByName("role")[0].value;
+        var department = document.getElementsByName("department")[0].value;
+
+        if (role === "" || department === "") {
+            event.preventDefault(); // Prevent form submission
+            alert("Please select both a role and a department.");
+        }
+    });
+</script>
