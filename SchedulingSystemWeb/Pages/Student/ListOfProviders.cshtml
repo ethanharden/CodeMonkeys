@@ -4,12 +4,13 @@
 <form id="searchForm" method="post">
     <select name="role" required>
         <option value="">Select Role</option>
-@*         @foreach (var role in Model.UserRoles.Values.SelectMany(x => x).Distinct())
-        { *@
-            <option value="TUTOR">TUTOR</option>
-            <option value="TEACHER">TEACHER</option>
-            <option value="ADVISOR">ADVISOR</option>
-       @*  } *@
+        @foreach (var role in Model.Roles)
+        {
+            if (role.Name != "STUDENT") @* this makes sure that student schedules can't be searched' *@
+            {
+              <option value="@role.Id">@role.Name</option>  
+            }          
+        }
     </select>
 
     <!-- Deparment dropdown-->
@@ -20,6 +21,15 @@
             <option value ="@d.Id">@d.Name</option>
         }
     </select>
+
+    <div id="providerProfilesDropdown">
+        <select>
+            @foreach (var d in Model.departmentList)
+            {
+                <option value="@d.Id">@d.Name</option>
+            }
+        </select>
+    </div>
     <button type="submit">Search</button>
 </form>
 <button>New Student</button> <!--call General deaprment-->
@@ -34,4 +44,28 @@
             alert("Please select both a role and a department.");
         }
     });
+</script>
+<script>
+    document.getElementsByName("role")[0].addEventListener("change", updateProviderProfilesDropdown);
+    document.getElementsByName("department")[0].addEventListener("change", updateProviderProfilesDropdown);
+
+    function updateProviderProfilesDropdown() {
+        var role = document.getElementsByName("role")[0].value;
+        var department = document.getElementsByName("department")[0].value;
+
+        if (role !== "" && department !== "") {
+            fetch(`/Student/ListProviders?role=${role}&department=${department}`)
+                .then(response => response.json())
+                .then(data => {
+                    var dropdownHTML = `<select name="providerProfile" required><option value="">Select Provider</option>`;
+                    data.forEach(profile => {
+                        dropdownHTML += `<option value="${profile.Id}">${profile.userFullName}</option>`;
+                    });
+                    dropdownHTML += `</select>`;
+                    document.getElementById("providerProfilesDropdownPlaceholder").innerHTML = dropdownHTML;
+                })
+                .catch(error => console.error('Unable to get provider profiles:', error));
+        }
+    }
+
 </script>
