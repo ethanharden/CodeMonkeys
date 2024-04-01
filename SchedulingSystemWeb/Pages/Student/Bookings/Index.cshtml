@@ -14,19 +14,25 @@
 
 <h2 class="text-primary">@ViewData["Title"]</h2>
 <form method="get" id="filter">
-<select name="role" id = "roleDropdown">
-        <option value="">All Roles</option>
-            <option value="TUTOR">TUTOR</option>
-            <option value="TEACHER">TEACHER</option>
-            <option value="ADVISOR">ADVISOR</option>
-</select>
- <select name="department" id = "departmentDropdown">
+<select name="role" required>
+        <option value="">Select Role</option>
+        @foreach (var role in Model.Roles)
+        {
+            if (role.Name != "STUDENT") @* this makes sure that student schedules can't be searched' *@
+            {
+              <option value="@role.Id">@role.Name</option>  
+            }          
+        }
+    </select>
+
+    <!-- Deparment dropdown-->
+    <select name="department" required>
         <option value="">Department</option>
-            @* <option value ="@user.Id">@user.FirstName @user.LastName</option> *@
-            <option value="1">Computer Science</option>
-            <option value="2">Math</option>
-            <option value="3">Science</option>
-</select>
+        @foreach(var d in Model.departmentList)
+        {
+            <option value ="@d.Id">@d.Name</option>
+        }
+    </select>
 <select name="providers" id="providerFilter">
     <option value=""> ---- </option>
     @foreach(var prov in Model.objApplicationUserList)

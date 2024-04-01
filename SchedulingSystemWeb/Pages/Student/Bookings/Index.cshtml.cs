@@ -8,6 +8,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
 
 namespace SchedulingSystemWeb.Pages.Student.Bookings
 {
@@ -15,7 +16,11 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
     {
         private readonly UnitOfWork _unitOfWork;
         private readonly ICalendarService _calendarService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+
         private readonly IHttpContextAccessor _httpContextAccessor;
+        
         [BindProperty]
         public ApplicationUser _ProfUser { get; set; }
         [BindProperty]
@@ -32,20 +37,25 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         public List<DateTime> MonthDays { get; private set; }
         public string CurrentMonthName { get; private set; }
         public Dictionary<string, IList<string>> SearchRoles;
-        private readonly UserManager<ApplicationUser> _userManager;
+        
         public List<ApplicationUser> objApplicationUserList;
         public new List<int> objProviderList;
+        public IEnumerable<Department> departmentList;
+        public IList<IdentityRole> Roles;
 
 
-        public IndexModel(IHttpContextAccessor httpContextAccessor, UnitOfWork unitOfWork, ICalendarService calendarService, UserManager<ApplicationUser> userManager)
+        public IndexModel(IHttpContextAccessor httpContextAccessor, UnitOfWork unitOfWork, ICalendarService calendarService, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _httpContextAccessor = httpContextAccessor;
             _unitOfWork = unitOfWork;
             _calendarService = calendarService;
+            _userManager = userManager;
+            _roleManager = roleManager;
+
             Bookings = new List<Booking>();
             Availabilities = new List<Availability>();
             SearchRoles = new Dictionary<string, IList<string>>(); // Initialize user roles dictionary
-            _userManager = userManager;
+            
             objApplicationUserList = new List<ApplicationUser>();
             objProviderList = new List<int>();
 
@@ -54,6 +64,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
         public async Task OnGetAsync(string role, int? department, string? providerUserId)
         {
+            Load();
             string searchRole = HttpContext.Session.GetString("SearchRole");
             int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
             
@@ -122,6 +133,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
         public async Task<IActionResult> OnGetPreviousWeekAsync()
         {
+            Load();
             string searchRole = HttpContext.Session.GetString("SearchRole");
             int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
             string? searchProv = HttpContext.Session.GetString("userProv");
@@ -134,6 +146,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
         public async Task<IActionResult> OnGetNextWeekAsync()
         {
+            Load();
             string searchRole = HttpContext.Session.GetString("SearchRole");
             int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
             string? searchProv = HttpContext.Session.GetString("userProv");
@@ -146,6 +159,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
         public async Task<IActionResult> OnGetPreviousMonthAsync()
         {
+            Load();
             string searchRole = HttpContext.Session.GetString("SearchRole");
             int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
             string? searchProv = HttpContext.Session.GetString("userProv");
@@ -172,6 +186,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
         public async Task<IActionResult> OnGetTodayWeekAsync()
         {
+            Load();
             string searchRole = HttpContext.Session.GetString("SearchRole");
             int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
             string? searchProv = HttpContext.Session.GetString("userProv");
@@ -184,6 +199,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
         public async Task<IActionResult> OnGetTodayMonthAsync()
         {
+            Load();
             string searchRole = HttpContext.Session.GetString("SearchRole");
             int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
             string? searchProv = HttpContext.Session.GetString("userProv");
@@ -199,6 +215,11 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             return Bookings.Any(booking => booking.StartTime >= availability.StartTime && booking.StartTime < availability.EndTime);
         }
 
+        public async Task Load()
+        {
+            departmentList = _unitOfWork.Department.GetAll();
+            Roles = await _roleManager.Roles.ToListAsync();
+        }
         private async Task FetchDataForCurrentViewAsync()
         {
             DateTime startOfMonth = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
