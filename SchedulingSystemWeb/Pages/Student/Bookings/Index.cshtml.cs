@@ -83,7 +83,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                 searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
             }
 
-            objApplicationUserList.AddRange(await _userManager.GetUsersInRoleAsync(searchRole));
+            //objApplicationUserList.AddRange(await _userManager.GetUsersInRoleAsync(searchRole));
 
             if (objApplicationUserList.Count > 0)
             {

@@ -169,6 +169,7 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
                         {
                             ProviderProfile providerProfile = new ProviderProfile();
                             providerProfile.User = user.Id;
+                            providerProfile.userFullName = user.FullName;
                             //providerProfile.UserId = user.Id;
                             _unitOfWork.ProviderProfile.Add(providerProfile);
                             _unitOfWork.Commit();
