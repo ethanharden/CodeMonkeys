@@ -16,6 +16,7 @@ namespace SchedulingSystemWeb.Pages.Student
         public Dictionary<string, IList<string>> UserRoles;
         public IEnumerable<Department> departmentList;
         public IList<IdentityRole> Roles;
+        public IList<ProviderProfile> Providers;
 
         public ListOfProvidersModel(UnitOfWork unitofWork, RoleManager<IdentityRole> roleManager)
         {
@@ -44,6 +45,9 @@ namespace SchedulingSystemWeb.Pages.Student
 
         public async Task<IActionResult> OnPostAsync(string role, int department)
         {
+            TempData["SelectedRole"] = role;
+            TempData["SelectedDepartment"] = department.ToString();
+
             return RedirectToPage("/Student/Bookings/Index", new { role = role, department = department});
         }
         

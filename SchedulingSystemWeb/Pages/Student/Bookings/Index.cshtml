@@ -15,32 +15,48 @@
 <h2 class="text-primary">@ViewData["Title"]</h2>
 <form method="get" id="filter">
 <select name="role" required>
-        <option value="">Select Role</option>
-        @foreach (var role in Model.Roles)
-        {
+    <option value="">Select Role</option>
+    @foreach (var role in Model.Roles)
+    {
+
             if (role.Name != "STUDENT") @* this makes sure that student schedules can't be searched' *@
             {
-              <option value="@role.Id">@role.Name</option>  
-            }          
-        }
+                if(role.Name == HttpContext.Session.GetString("SearchRole"))
+                {
+                    <option value="@role.Id" selected>@role.Name</option>
+                }
+                else
+                {
+                    <option value="@role.Id">role.Name</option>
+                }        
+        }     
+    }
     </select>
 
     <!-- Deparment dropdown-->
     <select name="department" required>
-        <option value="">Department</option>
+    <option value=""> ---Department--- </option>
         @foreach(var d in Model.departmentList)
         {
-            <option value ="@d.Id">@d.Name</option>
+            if(d.Id == HttpContext.Session.GetInt32("SearchDepartment"))
+            {
+                <option value ="@d.Id" selected>@d.Name</option>
+            }
+            else
+            {
+                <option value ="@d.Id">@d.Name</option>
+            }
+            
         }
     </select>
-<select name="providers" id="providerFilter">
-    <option value=""> ---- </option>
-    @foreach(var prov in Model.objApplicationUserList)
-    {
-        <option value="prov.id">@prov.FullName</option>
-    }
-</select>
-@* <button type="submit" >Filter by</button> *@
+    <select name="providers" id="providerFilter">
+        <option value=""> ---- </option>
+        @foreach(var prov in Model.ApplicationUserList)
+        {
+            <option value="prov.id">@prov.FullName</option>
+        }
+    </select>
+    <button type="submit" > Filter </button>
 </form>
 
 
@@ -226,7 +242,7 @@
             }
         });
     </script>
-    <script>
+    @* <script>
         document.getElementById("roleDropdown").addEventListener('change', function(){
             document.getElementById('filter').submit();
         });
@@ -234,6 +250,16 @@
     <script>
         document.getElementById("providerFilter").addEventListener('change', function(){
             document.getElementById('filter').submit();
+        });
+    </script> *@
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            let activeTab = '@TempData["ActiveTab"]';
+            if (activeTab === "monthly") {
+                new bootstrap.Tab(document.querySelector('#monthly-tab')).show();
+            } else {
+                new bootstrap.Tab(document.querySelector('#weekly-tab')).show();
+            }
         });
     </script>
 }

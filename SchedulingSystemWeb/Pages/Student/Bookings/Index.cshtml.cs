@@ -18,9 +18,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         private readonly ICalendarService _calendarService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        
+      
         [BindProperty]
         public ApplicationUser _ProfUser { get; set; }
         [BindProperty]
@@ -38,176 +36,187 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         public string CurrentMonthName { get; private set; }
         public Dictionary<string, IList<string>> SearchRoles;
         
-        public List<ApplicationUser> objApplicationUserList;
-        public new List<int> objProviderList;
+        public List<ApplicationUser> ApplicationUserList;
+
+        public new List<int> ProviderList;
         public IEnumerable<Department> departmentList;
         public IList<IdentityRole> Roles;
 
-
-        public IndexModel(IHttpContextAccessor httpContextAccessor, UnitOfWork unitOfWork, ICalendarService calendarService, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public IndexModel(UnitOfWork unitOfWork, ICalendarService calendarService, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
-            _httpContextAccessor = httpContextAccessor;
             _unitOfWork = unitOfWork;
             _calendarService = calendarService;
             _userManager = userManager;
             _roleManager = roleManager;
 
+            InitializeCollections();
+        }
+
+        private void InitializeCollections()
+        {
             Bookings = new List<Booking>();
             Availabilities = new List<Availability>();
-            SearchRoles = new Dictionary<string, IList<string>>(); // Initialize user roles dictionary
-            
-            objApplicationUserList = new List<ApplicationUser>();
-            objProviderList = new List<int>();
-
+            SearchRoles = new Dictionary<string, IList<string>>();
+            ApplicationUserList = new List<ApplicationUser>();
+            ProviderList = new List<int>();
         }
 
 
         public async Task OnGetAsync(string role, int? department, string? providerUserId)
         {
-            Load();
-            string searchRole = HttpContext.Session.GetString("SearchRole");
-            int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
-            
-            if (string.IsNullOrEmpty(searchRole)) {
-                HttpContext.Session.SetString("SearchRole", role);
-                searchRole = HttpContext.Session.GetString("SearchRole");
-            }
-            if (!role.IsNullOrEmpty() && !string.IsNullOrEmpty(searchRole))
-            {
-                HttpContext.Session.SetString("SearchRole", role);
-                searchRole = HttpContext.Session.GetString("SearchRole");
-            }
-            if (!searchDepartment.HasValue && department.HasValue)
-            {
-               HttpContext.Session.SetInt32("SearchDepartment", department.Value);
-                searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
-            }
+            InitializeSessionStates(role, department, providerUserId);
+            await LoadDataAsync();
 
-            //objApplicationUserList.AddRange(await _userManager.GetUsersInRoleAsync(searchRole));
-
-            if (objApplicationUserList.Count > 0)
-            {
-                foreach (var user in objApplicationUserList)
-                {
-                    objProviderList.Add(_unitOfWork.ProviderProfile.Get(p => p.User == user.Id).Id);
-                }
-            }
-            Availabilities = new List<Availability>();
-            Bookings = new List<Booking>();
-
-            if (!providerUserId.IsNullOrEmpty())
-            {
-                HttpContext.Session.SetString("userProv", providerUserId);
-                var provider = _unitOfWork.ProviderProfile.Get(p => p.User == providerUserId).Id;
-                Availabilities = _unitOfWork.Availability.GetAll()
-                                    .Where(a => a.ProviderProfileID == provider);
-                Bookings = _unitOfWork.Booking.GetAll()
-                                    .Where(a => a.ProviderProfileID == provider);
-            }
-            else
-            {
-                foreach (var p in objProviderList)
-                {
-                    var providerAvailabilities = _unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == p);
-                    Availabilities = Availabilities.Concat(providerAvailabilities);
-
-                    var providerBookings = _unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == p);
-                    Bookings = Bookings.Concat(providerBookings);
-                }
-            }
-            
-           // Availabilities = _unitOfWork.Availability.GetAll() /*.Where(p => p.ProviderProfileID == provider.Id)*/
-            //Bookings = _unitOfWork.Booking.GetAll()/*.Where(p => p.ProviderProfileID == provider.Id)*/;
-
-            CurrentDate = (DateTime?)TempData["CurrentDate"] ?? DateTime.Today;
-            TempData.Keep("CurrentDate");
-            CurrentMonthName = CurrentDate.ToString("MMMM");
-
-            WeekDays = _calendarService.GetWeekDays(CurrentDate);
-            MonthDays = _calendarService.GetMonthDays(CurrentDate);
-
-           
+            SetupDateAndViewData();
             await FetchDataForCurrentViewAsync();
         }
 
 
+        private void InitializeSessionStates(string role, int? department, string? providerUserId)
+        {
+            HttpContext.Session.SetString("SearchRole", role ?? HttpContext.Session.GetString("SearchRole") ?? string.Empty);
+           
+             if (department.HasValue)
+            {
+                HttpContext.Session.SetInt32("SearchDepartment", department.Value);
+            }
+            if (!string.IsNullOrEmpty(providerUserId))
+            {
+                HttpContext.Session.SetString("SearchProvId", providerUserId);
+            }
+        }
+        private async Task LoadDataAsync()
+        {
+            departmentList = _unitOfWork.Department.GetAll();
+            Roles = await _roleManager.Roles.ToListAsync();
+
+            var searchRole = HttpContext.Session.GetString("SearchRole");
+            var usersInRole = await _userManager.GetUsersInRoleAsync(searchRole);
+
+            //var providerList = usersInRole.Select(user => _unitOfWork.ProviderProfile.Get(p => p.User == user.Id).Id);       
+            //FilterAvailabilitiesAndBookings(providerList);
+        }
+
+        private void FilterAvailabilitiesAndBookings(IEnumerable<int> providerList)
+        {
+            var providerUserId = HttpContext.Session.GetString("SearchProvId");
+            if (!string.IsNullOrEmpty(providerUserId))
+            {
+                var providerId = _unitOfWork.ProviderProfile.Get(p => p.User == providerUserId).Id;
+                Availabilities = _unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == providerId);
+                Bookings = _unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == providerId);
+            }
+            else
+            {
+                Availabilities = providerList.SelectMany(id => _unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == id));
+                Bookings = providerList.SelectMany(id => _unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == id));
+            }
+        }
+
+        private void SetupDateAndViewData()
+        {
+            CurrentDate = TempData["CurrentDate"] as DateTime? ?? DateTime.Today;
+            TempData.Keep("CurrentDate");
+            CurrentMonthName = CurrentDate.ToString("MMMM", CultureInfo.CurrentCulture);
+            WeekDays = _calendarService.GetWeekDays(CurrentDate);
+            MonthDays = _calendarService.GetMonthDays(CurrentDate);
+        }
+
         public async Task<IActionResult> OnGetPreviousWeekAsync()
         {
-            Load();
-            string searchRole = HttpContext.Session.GetString("SearchRole");
-            int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
-            string? searchProv = HttpContext.Session.GetString("userProv");
-            CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(-7);
-            TempData["CurrentDate"] = CurrentDate;
-            TempData["ActiveTab"] = "weekly";
-            await FetchDataForCurrentViewAsync();
+            //string searchRole = HttpContext.Session.GetString("SearchRole");
+            //int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
+            //string? searchProv = HttpContext.Session.GetString("SearchProvId");
+            //CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(-7);
+            //TempData["CurrentDate"] = CurrentDate;
+            //TempData["ActiveTab"] = "weekly";
+            //await FetchDataForCurrentViewAsync();
+
+            AdjustDateAndRedirect(-7);
+
             return RedirectToPage();
         }
 
         public async Task<IActionResult> OnGetNextWeekAsync()
         {
-            Load();
-            string searchRole = HttpContext.Session.GetString("SearchRole");
-            int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
-            string? searchProv = HttpContext.Session.GetString("userProv");
-            CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(7);
-            TempData["CurrentDate"] = CurrentDate;
-            TempData["ActiveTab"] = "weekly";
-            await FetchDataForCurrentViewAsync();
+            //string searchRole = HttpContext.Session.GetString("SearchRole");
+            //int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
+            //string? searchProv = HttpContext.Session.GetString("SearchProvId");
+            //CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(7);
+            //TempData["CurrentDate"] = CurrentDate;
+            //TempData["ActiveTab"] = "weekly";
+            //await FetchDataForCurrentViewAsync();
+
+            AdjustDateAndRedirect(7);
             return RedirectToPage();
         }
 
         public async Task<IActionResult> OnGetPreviousMonthAsync()
         {
-            Load();
-            string searchRole = HttpContext.Session.GetString("SearchRole");
-            int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
-            string? searchProv = HttpContext.Session.GetString("userProv");
-            CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(-1);
-            TempData["CurrentDate"] = CurrentDate;
-            TempData["ActiveTab"] = "monthly";
-            CurrentMonthName = CurrentDate.ToString("MMMM");
-            MonthDays = _calendarService.GetMonthDays(CurrentDate);
-            await FetchDataForCurrentViewAsync();
+            //string searchRole = HttpContext.Session.GetString("SearchRole");
+            //int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
+            //string? searchProv = HttpContext.Session.GetString("SearchProvId");
+            //CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(-1);
+            //TempData["CurrentDate"] = CurrentDate;
+            //TempData["ActiveTab"] = "monthly";
+            //CurrentMonthName = CurrentDate.ToString("MMMM");
+            //MonthDays = _calendarService.GetMonthDays(CurrentDate);
+            //await FetchDataForCurrentViewAsync();
+
+            AdjustDateAndRedirect(0, -1);
             return Page();
         }
 
         public async Task<IActionResult> OnGetNextMonthAsync()
         {
-            string searchRole = HttpContext.Session.GetString("SearchRole");
-            int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
-            string? searchProv = HttpContext.Session.GetString("userProv");
-            CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(1);
-            TempData["CurrentDate"] = CurrentDate;
-            TempData["ActiveTab"] = "monthly";
-            await FetchDataForCurrentViewAsync();
+            //string searchRole = HttpContext.Session.GetString("SearchRole");
+            //int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
+            //string? searchProv = HttpContext.Session.GetString("SearchProvId");
+            //CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(1);
+            //TempData["CurrentDate"] = CurrentDate;
+            //TempData["ActiveTab"] = "monthly";
+            //await FetchDataForCurrentViewAsync();
+
+            AdjustDateAndRedirect(0, 1);
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnGetTodayWeekAsync()
+        public IActionResult OnGetToday()
         {
-            Load();
-            string searchRole = HttpContext.Session.GetString("SearchRole");
-            int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
-            string? searchProv = HttpContext.Session.GetString("userProv");
-            CurrentDate = DateTime.Today;
-            TempData["CurrentDate"] = CurrentDate;
-            TempData["ActiveTab"] = "weekly";
-            await FetchDataForCurrentViewAsync();
+            TempData["CurrentDate"] = DateTime.Today;
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnGetTodayMonthAsync()
+        //public async Task<IActionResult> OnGetTodayWeekAsync() { 
+
+        //    string searchRole = HttpContext.Session.GetString("SearchRole");
+        //    int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
+        //    string? searchProv = HttpContext.Session.GetString("SearchProvId");
+        //    CurrentDate = DateTime.Today;
+        //    TempData["CurrentDate"] = CurrentDate;
+        //    TempData["ActiveTab"] = "weekly";
+        //    await FetchDataForCurrentViewAsync();
+        //    return RedirectToPage();
+        //}
+
+        //public async Task<IActionResult> OnGetTodayMonthAsync()
+        //{
+        //    Load();
+        //    string searchRole = HttpContext.Session.GetString("SearchRole");
+        //    int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
+        //    string? searchProv = HttpContext.Session.GetString("SearchProvId");
+        //    CurrentDate = DateTime.Today;
+        //    TempData["CurrentDate"] = CurrentDate;
+        //    TempData["ActiveTab"] = "monthly";
+        //    await FetchDataForCurrentViewAsync();
+        //    return RedirectToPage();
+        //}
+
+        private void AdjustDateAndRedirect(int days = 0, int months = 0)
         {
-            Load();
-            string searchRole = HttpContext.Session.GetString("SearchRole");
-            int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
-            string? searchProv = HttpContext.Session.GetString("userProv");
-            CurrentDate = DateTime.Today;
-            TempData["CurrentDate"] = CurrentDate;
-            TempData["ActiveTab"] = "monthly";
-            await FetchDataForCurrentViewAsync();
-            return RedirectToPage();
+            var date = TempData["CurrentDate"] as DateTime? ?? DateTime.Today;
+            date = date.AddDays(days).AddMonths(months);
+            TempData["CurrentDate"] = date;
         }
 
         public bool IsAvailabilityBooked(Availability availability)
@@ -215,11 +224,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             return Bookings.Any(booking => booking.StartTime >= availability.StartTime && booking.StartTime < availability.EndTime);
         }
 
-        public async Task Load()
-        {
-            departmentList = _unitOfWork.Department.GetAll();
-            Roles = await _roleManager.Roles.ToListAsync();
-        }
+        
         private async Task FetchDataForCurrentViewAsync()
         {
             DateTime startOfMonth = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
