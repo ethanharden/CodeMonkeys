@@ -1,7 +1,6 @@
 using Infrastructure.Interfaces;
 using Infrastructure.Models;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -15,13 +14,13 @@ namespace DataAccess
     {
         private readonly AppDbContext _db;
         private readonly UnitOfWork _unitOfWork;
-        //private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         
-        public DbInitializer(AppDbContext db, UnitOfWork unitOfWork)
+        public DbInitializer(AppDbContext db, UnitOfWork unitOfWork, RoleManager<IdentityRole> roleManager)
         {
             _db = db;
             _unitOfWork = unitOfWork;
-            //_roleManager = roleManager;
+            _roleManager = roleManager;
         }
 
         public void Initialize()
@@ -79,11 +78,11 @@ namespace DataAccess
 
 
 
-            //_roleManager.CreateAsync(new IdentityRole("STUDENT")).GetAwaiter().GetResult();
-            //_roleManager.CreateAsync(new IdentityRole("TEACHER")).GetAwaiter().GetResult();
-            //_roleManager.CreateAsync(new IdentityRole("TUTOR")).GetAwaiter().GetResult();
-            //_roleManager.CreateAsync(new IdentityRole("ADMIN")).GetAwaiter().GetResult();
-            //_roleManager.CreateAsync(new IdentityRole("ADVISOR")).GetAwaiter().GetResult();
+            _roleManager.CreateAsync(new IdentityRole("STUDENT")).GetAwaiter().GetResult();
+            _roleManager.CreateAsync(new IdentityRole("TEACHER")).GetAwaiter().GetResult();
+            _roleManager.CreateAsync(new IdentityRole("TUTOR")).GetAwaiter().GetResult();
+            _roleManager.CreateAsync(new IdentityRole("ADMIN")).GetAwaiter().GetResult();
+            _roleManager.CreateAsync(new IdentityRole("ADVISOR")).GetAwaiter().GetResult();
 
 
             var ApplicationUsers = new List<ApplicationUser>
@@ -274,6 +273,7 @@ namespace DataAccess
                     DayOfTheWeek = DayOfWeek.Thursday,
                     StartTime = new DateTime(2024, 4, 25, 9, 0, 0), // April 25, 2024, 9:00 AM
                     EndTime = new DateTime(2024, 4, 25, 10, 0, 0), // April 25, 2024, 5:00 PM
+                    ProviderFullName = "Pat Dejong",
                 },
                 new Availability
                 {
@@ -282,6 +282,7 @@ namespace DataAccess
                     DayOfTheWeek = DayOfWeek.Friday,
                     StartTime = new DateTime(2024, 4, 26, 9, 0, 0),
                     EndTime = new DateTime(2024, 4, 26, 10, 0, 0),
+                    ProviderFullName = "Pat Dejong",
                 },
                 new Availability
                 {
@@ -290,6 +291,7 @@ namespace DataAccess
                     DayOfTheWeek = DayOfWeek.Saturday,
                     StartTime = new DateTime(2024, 4, 27, 2, 0, 0),
                     EndTime = new DateTime(2024, 4, 27, 2, 30, 0),
+                    ProviderFullName = "Pat Dejong",
                 },
                 new Availability
                 {
@@ -298,6 +300,7 @@ namespace DataAccess
                     DayOfTheWeek = DayOfWeek.Saturday,
                     StartTime = new DateTime(2024, 4, 27, 3, 0, 0),
                     EndTime = new DateTime(2024, 4, 27, 3, 45, 0),
+                    ProviderFullName = "Pat Dejong",
                 },
                 new Availability
                 {
@@ -306,6 +309,7 @@ namespace DataAccess
                     DayOfTheWeek = DayOfWeek.Sunday,
                     StartTime = new DateTime(2024, 4, 28, 7, 0, 0),
                     EndTime = new DateTime(2024, 4, 28, 8, 0, 0),
+                    ProviderFullName = "Pat Dejong",
                 },
                 new Availability
                 {
@@ -314,6 +318,7 @@ namespace DataAccess
                     DayOfTheWeek = DayOfWeek.Monday,
                     StartTime = new DateTime(2024, 4, 29, 7, 0, 0),
                     EndTime = new DateTime(2024, 4, 29, 8, 0, 0),
+                    ProviderFullName = "Pat Dejong",
                 },
                 new Availability
                 {
@@ -322,6 +327,7 @@ namespace DataAccess
                     DayOfTheWeek = DayOfWeek.Monday,
                     StartTime = new DateTime(2024, 4, 29, 8, 0, 0),
                     EndTime = new DateTime(2024, 4, 29, 9, 0, 0),
+                    ProviderFullName = "Pat Dejong",
                 },
                 new Availability
                 {
@@ -330,6 +336,7 @@ namespace DataAccess
                     DayOfTheWeek = DayOfWeek.Monday,
                     StartTime = new DateTime(2024, 4, 29, 9, 0, 0),
                     EndTime = new DateTime(2024, 4, 29, 9, 30, 0),
+                    ProviderFullName = "Pat Dejong",
                 },
                 new Availability
                 {
@@ -338,6 +345,7 @@ namespace DataAccess
                     DayOfTheWeek = DayOfWeek.Monday,
                     StartTime = new DateTime(2024, 4, 29, 9, 45, 0),
                     EndTime = new DateTime(2024, 4, 29, 10, 30, 0),
+                    ProviderFullName = "Pat Dejong",
                 },
                 new Availability
                 {
@@ -346,6 +354,7 @@ namespace DataAccess
                     DayOfTheWeek = DayOfWeek.Tuesday,
                     StartTime = new DateTime(2024, 4, 30, 9, 30, 0),
                     EndTime = new DateTime(2024, 4, 30, 10, 30, 0),
+                    ProviderFullName = "Pat Dejong",
                 },
 
             };

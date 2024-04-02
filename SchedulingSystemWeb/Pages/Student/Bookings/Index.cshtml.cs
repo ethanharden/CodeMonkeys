@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Graph.Models;
 
 namespace SchedulingSystemWeb.Pages.Student.Bookings
 {
@@ -36,7 +37,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         public string CurrentMonthName { get; private set; }
         public Dictionary<string, IList<string>> SearchRoles;
         
-        public List<ApplicationUser> ApplicationUserList;
+        public IList<ApplicationUser> ApplicationUserList;
 
         public new List<int> ProviderList;
         public IEnumerable<Department> departmentList;
@@ -64,6 +65,16 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
         public async Task OnGetAsync(string role, int? department, string? providerUserId)
         {
+            //string currentTab = HttpContext.Request.Query["tab"].ToString().ToLower();
+            //if (string.IsNullOrEmpty(currentTab) || (currentTab != "weekly" && currentTab != "monthly"))
+            //{
+            //    currentTab = "weekly"; // Default tab
+            //}
+            //ViewData["CurrentTab"] = currentTab;
+
+            ViewData["ActiveTab"] = TempData["ActiveTab"] as string ?? "weekly";
+            TempData.Keep("ActiveTab");
+
             InitializeSessionStates(role, department, providerUserId);
             await LoadDataAsync();
 
@@ -91,10 +102,16 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             Roles = await _roleManager.Roles.ToListAsync();
 
             var searchRole = HttpContext.Session.GetString("SearchRole");
-            var usersInRole = await _userManager.GetUsersInRoleAsync(searchRole);
+            ApplicationUserList = await _userManager.GetUsersInRoleAsync(searchRole);
 
-            //var providerList = usersInRole.Select(user => _unitOfWork.ProviderProfile.Get(p => p.User == user.Id).Id);       
-            //FilterAvailabilitiesAndBookings(providerList);
+            //var providerList = usersInRole.Select(user => _unitOfWork.ProviderProfile.Get(p => p.User == user.Id).Id);
+
+            foreach(var u in ApplicationUserList)
+            {
+                ProviderList.Add(_unitOfWork.ProviderProfile.Get(p => p.User == u.Id).Id);
+            }
+
+            FilterAvailabilitiesAndBookings(ProviderList);
         }
 
         private void FilterAvailabilitiesAndBookings(IEnumerable<int> providerList)
@@ -108,8 +125,20 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             }
             else
             {
-                Availabilities = providerList.SelectMany(id => _unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == id));
-                Bookings = providerList.SelectMany(id => _unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == id));
+                Availabilities = new List<Availability>();
+                Bookings = new List<Booking>();
+
+                foreach ( var p in providerList)
+                {
+                    var AList = Availabilities.ToList();
+                    AList.AddRange(_unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == p).ToList());
+                    Availabilities = AList;
+
+                    var BList = Bookings.ToList();
+                    BList.AddRange(_unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == p));
+                    Bookings = BList;
+                }
+
             }
         }
 
@@ -160,14 +189,14 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             //string? searchProv = HttpContext.Session.GetString("SearchProvId");
             //CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(-1);
             //TempData["CurrentDate"] = CurrentDate;
-            //TempData["ActiveTab"] = "monthly";
             //CurrentMonthName = CurrentDate.ToString("MMMM");
             //MonthDays = _calendarService.GetMonthDays(CurrentDate);
             //await FetchDataForCurrentViewAsync();
-            
+
+            TempData["ActiveTab"] = "monthly";
             await LoadDataAsync();
             AdjustDateAndRedirect(0, -1);
-            return Page();
+            return RedirectToPage();
         }
 
         public async Task<IActionResult> OnGetNextMonthAsync()
@@ -177,8 +206,9 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             //string? searchProv = HttpContext.Session.GetString("SearchProvId");
             //CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(1);
             //TempData["CurrentDate"] = CurrentDate;
-            //TempData["ActiveTab"] = "monthly";
             //await FetchDataForCurrentViewAsync();
+
+            TempData["ActiveTab"] = "monthly";
             await LoadDataAsync();
             AdjustDateAndRedirect(0, 1);
             return RedirectToPage();

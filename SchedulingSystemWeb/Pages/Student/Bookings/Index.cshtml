@@ -63,10 +63,10 @@
 <!-- Tab navigation buttons -->
 <ul class="nav nav-tabs" id="calendarTabs" role="tablist">
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="weekly-tab" data-bs-toggle="tab" data-bs-target="#weekly" type="button" role="tab" aria-controls="weekly" aria-selected="true">Weekly</button>
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#weekly" type="button" role="tab" aria-controls="weekly" aria-selected="true" id="weekly-tab">Weekly</button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="monthly-tab" data-bs-toggle="tab" data-bs-target="#monthly" type="button" role="tab" aria-controls="monthly" aria-selected="false" onclick="location.href='?handler=Monthly&UserId=@TempData["ProfId"]'">Monthly</button>
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#monthly" type="button" role="tab" aria-controls="monthly" aria-selected="false" id="monthly-tab">Monthly</button>
     </li>
 </ul>
 
@@ -122,7 +122,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @for (var hour = 0; hour < 24; hour++)
+                    @for (var hour = 0; hour < 24; hour++) @* TODO much later (providerWorkhours)*@
                     {
                         <tr class="week-row">
                             <td class="hour">@hour:00</td>
@@ -139,7 +139,7 @@
                                     {
                                         <a asp-page="/Student/Bookings/Upsert" asp-route-id="@availability.Id" class="availability-link">
                                             <div class="card text-white bg-success mb-3">
-                                                <div class="card-header">@availability.ProviderProfileID Available</div>
+                                                <div class="card-header">@availability.ProviderFullName</div>
                                                 <div class="card-body">
                                                     @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
                                                 </div>
@@ -206,7 +206,7 @@
                                 {
                                     <a asp-page="/Student/Bookings/Upsert" asp-route-id="@availability.Id" class="availability-link">
                                         <div class="card text-white bg-success mb-3">
-                                            <div class="card-header">Available</div>
+                                            <div class="card-header">@availability.ProviderFullName</div>
                                             <div class="card-body">
                                                 @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
                                             </div>
@@ -232,6 +232,45 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        const activeTab = '@ViewData["ActiveTab"]' || 'weekly';
+
+        const tabMap = {
+        'weekly': document.querySelector('#weekly-tab'),
+        'monthly': document.querySelector('#monthly-tab')
+        };
+
+        const tabs = { 'weekly': weeklyTab, 'monthly': monthly - tab };
+
+        function switchTab(tabName) {
+            Object.values(tabMap).forEach(tab => {
+                tab.classList.remove('active');
+                const tabContent = document.querySelector(tab.getAttribute('data-bs-target'));
+                if (tabContent) {
+                    tabContent.classList.remove('show', 'active');
+                }
+            });
+
+            const activeTabElement = tabMap[tabName];
+            if (activeTabElement) {
+                activeTabElement.classList.add('active');
+                const activeTabContent = document.querySelector(activeTabElement.getAttribute('data-bs-target'));
+                if (activeTabContent) {
+                    activeTabContent.classList.add('show', 'active');
+                }
+            }
+        }
+
+        switchTab(activeTab);
+
+        Object.entries(tabMap).forEach(([tabName, tabElement]) => {
+            tabElement.addEventListener('click', () => {
+                switchTab(tabName);
+                sessionStorage.setItem('activeTab', tabName);
+            });
+        });
+    </script>
+
+    @* <script>
 document.addEventListener('DOMContentLoaded', function() {
     const tabs = {
         'weekly': document.querySelector('#weekly-tab'),
@@ -265,7 +304,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     todayButtons.weekly.addEventListener('click', () => {
         // TODO: Logic to bring the weekly view to today's date
-    });b
+    });
     todayButtons.monthly.addEventListener('click', () => {
         // TODO: Logic to bring the monthly view to today's date
     });
@@ -282,12 +321,11 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (activeTab === 'monthly') {
             // TODO: Implement logic for jumping to the current month
         }
-        // TODO update the UI
+        // TODO update UI
     });
 });
-</script>
+</script> *@ li
 
-}
 
     @* <script>
         document.getElementById("roleDropdown").addEventListener('change', function(){
