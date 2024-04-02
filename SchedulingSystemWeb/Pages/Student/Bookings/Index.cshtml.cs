@@ -132,6 +132,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             //TempData["ActiveTab"] = "weekly";
             //await FetchDataForCurrentViewAsync();
 
+            await LoadDataAsync();
             AdjustDateAndRedirect(-7);
 
             return RedirectToPage();
@@ -147,6 +148,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             //TempData["ActiveTab"] = "weekly";
             //await FetchDataForCurrentViewAsync();
 
+            await LoadDataAsync();
             AdjustDateAndRedirect(7);
             return RedirectToPage();
         }
@@ -162,7 +164,8 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             //CurrentMonthName = CurrentDate.ToString("MMMM");
             //MonthDays = _calendarService.GetMonthDays(CurrentDate);
             //await FetchDataForCurrentViewAsync();
-
+            
+            await LoadDataAsync();
             AdjustDateAndRedirect(0, -1);
             return Page();
         }
@@ -176,13 +179,15 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             //TempData["CurrentDate"] = CurrentDate;
             //TempData["ActiveTab"] = "monthly";
             //await FetchDataForCurrentViewAsync();
-
+            await LoadDataAsync();
             AdjustDateAndRedirect(0, 1);
             return RedirectToPage();
         }
 
-        public IActionResult OnGetToday()
+        public async Task<IActionResult> OnGetToday()
         {
+            await LoadDataAsync();
+
             TempData["CurrentDate"] = DateTime.Today;
             return RedirectToPage();
         }

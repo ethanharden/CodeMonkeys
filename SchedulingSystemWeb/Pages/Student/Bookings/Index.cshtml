@@ -63,7 +63,7 @@
 <!-- Tab navigation buttons -->
 <ul class="nav nav-tabs" id="calendarTabs" role="tablist">
     <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="weekly-tab" data-bs-toggle="tab" data-bs-target="#weekly" type="button" role="tab" aria-controls="weekly" aria-selected="true" onclick="location.href='?handler=Weekly&UserId=@TempData["ProfId"]'">Weekly</button>
+        <button class="nav-link" id="weekly-tab" data-bs-toggle="tab" data-bs-target="#weekly" type="button" role="tab" aria-controls="weekly" aria-selected="true">Weekly</button>
     </li>
     <li class="nav-item" role="presentation">
         <button class="nav-link" id="monthly-tab" data-bs-toggle="tab" data-bs-target="#monthly" type="button" role="tab" aria-controls="monthly" aria-selected="false" onclick="location.href='?handler=Monthly&UserId=@TempData["ProfId"]'">Monthly</button>
@@ -84,7 +84,7 @@
                 <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=NextWeek'">Next Week</button>
                 <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=PreviousWeek'">Previous Week</button>
                
-                <button type="button" class="btn btn-secondary" style="float: right;" onclick="location.href='?handler=TodayWeek'">Today</button>
+                <button type="button" class="btn btn-secondary" style="float: right;" id="todayWeek">Today</button>
                 @if (Model.WeekDays.Any())
 {
                     var firstDay = Model.WeekDays.First();
@@ -166,7 +166,7 @@
                 <br />
                 <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=NextMonth'">Next Month</button>
                 <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=PreviousMonth'">Previous Month</button>               
-                <button type="button" class="btn btn-secondary" style="float: right;" onclick="location.href='?handler=TodayMonth'">Today</button>
+                <button type="button" class="btn btn-secondary" style="float: right;" id="todayMonth">Today</button>
                 <h3>@Model.CurrentMonthName @Model.CurrentDate.Year</h3>
                 <table id="monthly-calendar" class="calendar">
                     <thead>
@@ -232,16 +232,63 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Original code to set the active tab on page load based on TempData
-        document.addEventListener('DOMContentLoaded', (event) => {
-            let activeTab = '@TempData["ActiveTab"]';
-            if (activeTab === "monthly") {
-                new bootstrap.Tab(document.querySelector('#monthly-tab')).show();
+document.addEventListener('DOMContentLoaded', function() {
+    const tabs = {
+        'weekly': document.querySelector('#weekly-tab'),
+        'monthly': document.querySelector('#monthly-tab')
+    };
+    const tabContents = {
+        'weekly': document.querySelector('#weekly'),
+        'monthly': document.querySelector('#monthly')
+    };
+    const todayButtons = {
+        'weekly': document.querySelector('#todayWeek'),
+        'monthly': document.querySelector('#todayMonth')
+    };
+
+    function switchTab(activeTab) {
+        // Store active tab in session
+        sessionStorage.setItem('activeTab', activeTab);
+
+        Object.keys(tabs).forEach(tab => {
+            if (tab === activeTab) {
+                tabs[tab].classList.add('active');
+                tabContents[tab].classList.add('show', 'active');
             } else {
-                new bootstrap.Tab(document.querySelector('#weekly-tab')).show();
+                tabs[tab].classList.remove('active');
+                tabContents[tab].classList.remove('show', 'active');
             }
         });
-    </script>
+    }
+    tabs.weekly.addEventListener('click', () => switchTab('weekly'));
+    tabs.monthly.addEventListener('click', () => switchTab('monthly'));
+
+    todayButtons.weekly.addEventListener('click', () => {
+        // TODO: Logic to bring the weekly view to today's date
+    });b
+    todayButtons.monthly.addEventListener('click', () => {
+        // TODO: Logic to bring the monthly view to today's date
+    });
+
+
+    const storedTab = sessionStorage.getItem('activeTab') || 'weekly';
+    switchTab(storedTab);
+
+    // Today button based on the active tab
+    document.querySelector('.btn-secondary').addEventListener('click', function() {
+        const activeTab = sessionStorage.getItem('activeTab');
+        if (activeTab === 'weekly') {
+            // TODO: Implement logic for jumping to the current week
+        } else if (activeTab === 'monthly') {
+            // TODO: Implement logic for jumping to the current month
+        }
+        // TODO update the UI
+    });
+});
+</script>
+
+}
+
     @* <script>
         document.getElementById("roleDropdown").addEventListener('change', function(){
             document.getElementById('filter').submit();
@@ -252,14 +299,4 @@
             document.getElementById('filter').submit();
         });
     </script> *@
-    <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
-            let activeTab = '@TempData["ActiveTab"]';
-            if (activeTab === "monthly") {
-                new bootstrap.Tab(document.querySelector('#monthly-tab')).show();
-            } else {
-                new bootstrap.Tab(document.querySelector('#weekly-tab')).show();
-            }
-        });
-    </script>
 }
