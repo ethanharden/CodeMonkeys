@@ -122,9 +122,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                    @for (var hour = 8; hour < 18; hour++) // Example: from 8 AM to 6 PM
+                    @for (var hour = 6; hour < 18; hour++) // Example: from 8 AM to 6 PM
                     {
-                        for (var minute = 0; minute < 60; minute += 30) // Increment by 30 minutes
+                        for (var minute = 0; minute < 60; minute += 30) // Increment by 30 minutes0
                         {
                             <tr class="week-row">
                                 <td class="hour">@hour:@(minute.ToString("00"))</td>
