@@ -93,7 +93,7 @@
                     <label for="SelectedRecurringTypeId" class="control-label">Recurring Type</label>
                     <select id="SelectedRecurringTypeId" name="SelectedRecurringTypeId" class="form-control">
                         <option value="">Select Recurring Type</option>
-                        @foreach (var type in Model.RecurringTypes)
+                        @foreach(var type in Model.RecurringTypes)
                         {
                             <option value="@type.Id">@type.Name</option>
                         }
@@ -175,35 +175,39 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @for (var hour = 0; hour < 24; hour++)
+                            @* @for (var hour = 0; hour < 24; hour++) *@
+                            @for (var hour = 6; hour < 18; hour++) //from 6 AM to 6 PM
                             {
+                                for (var minute = 0; minute < 60; minute += 30) // Increment by 30 minutes0
+                                {
                                 <tr class="week-row">
-                                    <td class="hour">@hour:00</td>
-                                    @foreach (var day in Model.WeekDays)
-                                    {
-                                        <td class="hour-cell @((day.Date == DateTime.Today) ? "today" : "")">
-                                            <!-- Display bookings for the day and hour -->
-                                            @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == day.Date && b.StartTime.Hour == hour))
-                                            {
-                                                <div class="booking-event" style="background-color: grey; color: white; cursor: pointer;"
-                                                     onclick="showBookingDetails('@booking.Subject', '@booking.StartTime.ToString("dddd, MMMM dd, yyyy HH:mm")')">
-                                                  @booking.Subject @booking.StartTime.ToString("HH:mm") - @booking.StartTime.AddMinutes(booking.Duration).ToString("HH:mm")
-                                                </div>
-                                            }
-                                            <!-- Display availabilities for the day and hour -->
-                                             @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour) /* && !Model.IsAvailabilityBooked(a) */)
-                                            {
-                                                <div class="card text-white bg-success mb-3">
-                                                    <div class="card-header">Available</div>
-                                                    <div class="card-body">
-                                                        @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
+                                    <td class="hour">@hour:@(minute.ToString("00"))</td>
+                                        @foreach (var day in Model.WeekDays)
+                                        {
+                                            <td class="hour-cell @((day.Date == DateTime.Today) ? "today" : "")">
+                                                <!-- Display bookings for the day and hour -->
+                                                @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == day.Date && b.StartTime.Hour == hour))
+                                                {
+                                                    <div class="booking-event" style="background-color: grey; color: white; cursor: pointer;"
+                                                         onclick="showBookingDetails('@booking.Subject', '@booking.StartTime.ToString("dddd, MMMM dd, yyyy HH:mm")')">
+                                                      @booking.Subject @booking.StartTime.ToString("HH:mm") - @booking.StartTime.AddMinutes(booking.Duration).ToString("HH:mm")
                                                     </div>
-                                                    <br>
-                                                </div>
-                                            }
-                                        </td>
-                                    }
-                                </tr>
+                                                }
+                                                <!-- Display availabilities for the day and hour -->
+                                                 @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour) /* && !Model.IsAvailabilityBooked(a) */)
+                                                {
+                                                    <div class="card text-white bg-success mb-3">
+                                                        <div class="card-header">Available</div>
+                                                        <div class="card-body">
+                                                            @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
+                                                        </div>
+                                                        <br>
+                                                    </div>
+                                                }
+                                            </td>
+                                        }
+                                    </tr>
+                                }
                             }
                             </tbody>
                         </table>

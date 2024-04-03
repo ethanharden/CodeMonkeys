@@ -105,8 +105,6 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             var searchRole = HttpContext.Session.GetString("SearchRole");
             ApplicationUserList = await _userManager.GetUsersInRoleAsync(searchRole);
 
-            //var providerList = usersInRole.Select(user => _unitOfWork.ProviderProfile.Get(p => p.User == user.Id).Id);
-
             foreach(var u in ApplicationUserList)
             {
                 ProviderList.Add(_unitOfWork.ProviderProfile.Get(p => p.User == u.Id).Id);

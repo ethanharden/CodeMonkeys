@@ -22,6 +22,8 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         public IEnumerable<Booking> Bookings { get; set; }
         public IEnumerable<Availability> ViewAvailabilities { get; set; }
         public IEnumerable<Booking> ViewBookings { get; set; }
+
+        public IEnumerable<RecurringType> RecurringTypes { get; set; }
         public ProviderProfile providerProfileGet { get; set; }
 
         [BindProperty]
@@ -42,7 +44,6 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         public string CurrentMonthName { get; private set; }
         [BindProperty]
         public List<DayOfWeek> SelectedDaysOfWeek { get; set; }
-        public List<RecurringType> RecurringTypes { get; set; }
 
         [BindProperty]
         public bool recurringCheckbox { get; set; }
@@ -65,13 +66,13 @@ namespace SchedulingSystemWeb.Pages.Availabilities
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-
+            Load();
             CurrentDate = (DateTime?)TempData["CurrentDate"] ?? DateTime.Today;
             TempData.Keep("CurrentDate");
             CurrentMonthName = CurrentDate.ToString("MMMM");
             WeekDays = _calendarService.GetWeekDays(CurrentDate);
             MonthDays = _calendarService.GetMonthDays(CurrentDate);
-            RecurringTypes = _unitOfWork.RecurringType.GetAll().ToList();
+            
 
             if (id.HasValue && id != 0)
             {
@@ -99,9 +100,15 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             return Page();
         }
 
+        public void Load()
+        {
+            RecurringTypes = _unitOfWork.RecurringType.GetAll();
+        }
+
 
         public async Task<IActionResult> OnPostAsync()
         {
+            Load();
             if (SelectedDaysOfWeek == null || !SelectedDaysOfWeek.Any())
             {
                 ModelState.AddModelError("SelectedDaysOfWeek", "Please select at least one day of the week.");
@@ -109,6 +116,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             }
 
             ModelState.Remove("SelectedRecurringTypeId");
+            ModelState.Remove("objAvailability.ProviderFullName");
             if (!ModelState.IsValid)
             {
                 var errorList = ModelState.Values.SelectMany(v => v.Errors.Select(b => b.ErrorMessage)).ToList();
@@ -141,17 +149,17 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                     var daysBetween = recurringType.DaysBetween;
                     var avIds = new List<int>();
                     var datesForAvailabilities = CalculateWeeksForRecurring(startTime, RecurringEndDate.Value, daysBetween);
-                    
+
                     //for each week or biweekly
                     foreach (var date in datesForAvailabilities)
                     {
                         // Creating new availabilities for each selected day
                         foreach (var day in SelectedDaysOfWeek)
                         {
-                            int diffInDay = (int)day + (int)firstDay;
-                            if (diffInDay <6 )
+                            int diffInDay = (int)day - (int)firstDay;
+                            if (diffInDay < 0)
                             {
-                                diffInDay -= 7;
+                                diffInDay += 7;
                             }
                             DateTime weekStart = startTime.AddDays(diffInDay);
                             DateTime weekEnd = endTime.AddDays(diffInDay);
@@ -162,7 +170,8 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                                 DayOfTheWeek = day,
                                 StartTime = weekStart,
                                 EndTime = weekEnd,
-                                ProviderProfileID = objAvailability.ProviderProfileID,
+                                ProviderProfileID = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id,
+                                ProviderFullName = _unitOfWork._ProviderProfile.Get(p => p.Id == objAvailability.ProviderProfileID).userFullName,
                                 LocationId = 1,
                             };
 
@@ -180,7 +189,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                         RecurringEndDate = RecurringEndDate,
                         AvailabilityIDList = avIds,
                     };
-                    
+
                     _unitOfWork.AvailabilityGroup.Add(availabilityGroup);
                     await _unitOfWork.CommitAsync();
 
@@ -195,28 +204,29 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                     }
                     await _unitOfWork.CommitAsync();
                 }
-                else 
+                else
                 {
                     foreach (var day in SelectedDaysOfWeek)
                     {
-                        int diffInDay = (int)day + (int)firstDay;
-                        if (diffInDay < 6)
+                        int diffInDay = (int)day - (int)firstDay;
+                        if (diffInDay < 0)
                         {
-                            diffInDay -= 7;
+                            diffInDay += 7;
                         }
                         DateTime weekStart = startTime.AddDays(diffInDay);
                         DateTime weekEnd = endTime.AddDays(diffInDay);
-                        var newAvailability = new Availability
+                        Availability newAvailability = new Availability
                         {
                             // Assign values
                             DayOfTheWeek = day,
                             StartTime = weekStart,
                             EndTime = weekEnd,
-                            ProviderProfileID = objAvailability.ProviderProfileID,
+                            ProviderProfileID = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id,
+                            ProviderFullName = _unitOfWork._ProviderProfile.Get(p=>p.Id == objAvailability.ProviderProfileID).userFullName,
                             LocationId = 1,
                         };
                         _unitOfWork.Availability.Add(newAvailability);
-                    }                 
+                    }
                     await _unitOfWork.CommitAsync();
                 }
             }
@@ -246,6 +256,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
 
         public async Task<IActionResult> OnGetPreviousWeekAsync(int? id)
         {
+            Load();
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(-7);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
@@ -255,6 +266,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         }
         public async Task<IActionResult> OnGetNextWeekAsync(int? id)
         {
+            Load();
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(7);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
@@ -264,6 +276,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         }
         public async Task<IActionResult> OnGetPreviousMonthAsync(int? id)
         {
+            Load();
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(-1);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
@@ -275,6 +288,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         }
         public async Task<IActionResult> OnGetNextMonthAsync(int? id)
         {
+            Load();
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(1);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
@@ -284,6 +298,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         }
         public async Task<IActionResult> OnGetTodayWeekAsync(int? id)
         {
+            Load();
             CurrentDate = DateTime.Today;
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
@@ -293,6 +308,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         }
         public async Task<IActionResult> OnGetTodayMonthAsync(int? id)
         {
+            Load();
             CurrentDate = DateTime.Today;
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
@@ -310,7 +326,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             var dates = new List<DateTime>();
             int multiplier = 1;
             for (var dt = start; dt <= end; dt = dt.AddDays(daysBetween))
-            {   
+            {
                 dates.Add(dt.AddDays(daysBetween));
                 multiplier *= daysBetween;
             }

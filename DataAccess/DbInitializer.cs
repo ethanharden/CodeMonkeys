@@ -403,7 +403,6 @@ namespace DataAccess
             //        RecurringType = _unitOfWork.RecurringType.Get(p=> p.Id == 2),
             //        RecurringEndDate = new DateTime(2024, 5, 1, 0, 0, 0),
             //    },
-
             //};
 
             //foreach (var c in AvailabilityGroups)
@@ -411,8 +410,6 @@ namespace DataAccess
             //    _db.AvailabilityGroups.Add(c);
             //}
             //_db.SaveChanges();
-
-
         }
     }
 }

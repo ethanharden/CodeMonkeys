@@ -42,6 +42,9 @@ builder.Services.AddScoped<UnitOfWork>();
 builder.Services.AddScoped<ICalendarService, CalendarService>();
 builder.Services.AddScoped<DbInitializer>();
 builder.Services.AddHttpClient();
+
+builder.Services.AddMemoryCache();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
