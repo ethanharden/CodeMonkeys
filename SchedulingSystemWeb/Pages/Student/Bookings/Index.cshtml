@@ -59,7 +59,8 @@
     <button type="submit" > Filter </button>
 </form>
 
-
+<br />
+<br />
 <!-- Tab navigation buttons -->
 <ul class="nav nav-tabs" id="calendarTabs" role="tablist">
     <li class="nav-item" role="presentation">
@@ -69,7 +70,6 @@
         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#monthly" type="button" role="tab" aria-controls="monthly" aria-selected="false" id="monthly-tab">Monthly</button>
     </li>
 </ul>
-
 
 
 <!-- Tab content -->
@@ -122,34 +122,41 @@
                         </tr>
                     </thead>
                     <tbody>
-                    @for (var hour = 0; hour < 24; hour++) @* TODO much later (providerWorkhours)*@
+                    @for (var hour = 8; hour < 18; hour++) // Example: from 8 AM to 6 PM
                     {
-                        <tr class="week-row">
-                            <td class="hour">@hour:00</td>
-                            @foreach (var day in Model.WeekDays)
-                            {
-                                <td class="hour-cell @((day.Date == DateTime.Today) ? "today" : "")">
-                                    <!-- Display bookings for the day and hour -->
-                                    @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == day.Date && b.StartTime.Hour == hour))
-                                    {
-                                        <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
-                                    }
-                                    <!-- Display availabilities for the day and hour -->
-                                    @foreach(var availability in Model.ViewAvailabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour))
-                                    {
-                                        <a asp-page="/Student/Bookings/Upsert" asp-route-id="@availability.Id" class="availability-link">
-                                            <div class="card text-white bg-success mb-3">
-                                                <div class="card-header">@availability.ProviderFullName</div>
-                                                <div class="card-body">
-                                                    @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
+                        for (var minute = 0; minute < 60; minute += 30) // Increment by 30 minutes
+                        {
+                            <tr class="week-row">
+                                <td class="hour">@hour:@(minute.ToString("00"))</td>
+                                @foreach (var day in Model.WeekDays)
+                                {
+                                    // Example date for the start of the time slot
+                                    var timeSlotStart = new DateTime(day.Year, day.Month, day.Day, hour, minute, 0);
+                                    var timeSlotEnd = timeSlotStart.AddMinutes(30); // End of the time slot
+
+                                    <td class="hour-cell @((day.Date == DateTime.Today) ? "today" : "")">
+                                        @* Display bookings for the day and time slot *@
+                                        @foreach (var booking in Model.ViewBookings.Where(b => b.StartTime >= timeSlotStart && b.StartTime < timeSlotEnd))
+                                        {
+                                            <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
+                                        }
+                                        @* Display availabilities for the day and time slot *@
+                                        @foreach (var availability in Model.ViewAvailabilities.Where(a => a.StartTime >= timeSlotStart && a.StartTime < timeSlotEnd && !Model.IsAvailabilityBooked(a)))
+                                        {
+                                            <a asp-page="/Student/Bookings/Upsert" asp-route-id="@availability.Id" class="availability-link">
+                                                <div class="card text-white bg-success mb-3">
+                                                    <div class="card-header">@availability.ProviderFullName</div>
+                                                    <div class="card-body">
+                                                        @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </a>
-                                        <br>
-                                    }
-                                </td>
-                            }
-                        </tr>
+                                            </a>
+                                            <br>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
                     }
                     </tbody>
                 </table>
@@ -232,42 +239,38 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+        // Retrieve the activeTab value from ViewData or default to 'weekly'
         const activeTab = '@ViewData["ActiveTab"]' || 'weekly';
 
-        const tabMap = {
-        'weekly': document.querySelector('#weekly-tab'),
-        'monthly': document.querySelector('#monthly-tab')
-        };
+        // Initialize tab buttons
+        const weeklyTab = document.querySelector('#weekly-tab');
+        const monthlyTab = document.querySelector('#monthly-tab');
 
-        const tabs = { 'weekly': weeklyTab, 'monthly': monthly - tab };
-
+        // Function to switch tabs
         function switchTab(tabName) {
-            Object.values(tabMap).forEach(tab => {
-                tab.classList.remove('active');
-                const tabContent = document.querySelector(tab.getAttribute('data-bs-target'));
-                if (tabContent) {
-                    tabContent.classList.remove('show', 'active');
-                }
+            // Reset active states
+            [weeklyTab, monthlyTab].forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.classList.remove('show', 'active');
             });
 
-            const activeTabElement = tabMap[tabName];
-            if (activeTabElement) {
-                activeTabElement.classList.add('active');
-                const activeTabContent = document.querySelector(activeTabElement.getAttribute('data-bs-target'));
-                if (activeTabContent) {
-                    activeTabContent.classList.add('show', 'active');
-                }
-            }
+            // Set the selected tab and pane as active
+            document.querySelector(`#${tabName}-tab`).classList.add('active');
+            document.querySelector(`#${tabName}`).classList.add('show', 'active');
+
+            // Store the selected tab name in sessionStorage for persistence
+            sessionStorage.setItem('activeTab', tabName);
         }
 
-        switchTab(activeTab);
+        // Event listeners for tab buttons
+        weeklyTab.addEventListener('click', () => switchTab('weekly'));
+        monthlyTab.addEventListener('click', () => switchTab('monthly'));
 
-        Object.entries(tabMap).forEach(([tabName, tabElement]) => {
-            tabElement.addEventListener('click', () => {
-                switchTab(tabName);
-                sessionStorage.setItem('activeTab', tabName);
-            });
-        });
+        // Check sessionStorage or use the activeTab value and activate the corresponding tab
+        const storedTab = sessionStorage.getItem('activeTab') || activeTab;
+        switchTab(storedTab);
+    });
     </script>
 
     @* <script>
@@ -324,7 +327,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // TODO update UI
     });
 });
-</script> *@ li
+</script> *@
 
 
     @* <script>

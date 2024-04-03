@@ -30,6 +30,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         public ProviderProfile provider { get; set; }
         public IEnumerable<Booking> ViewBookings { get; set; }
         public IEnumerable<Availability> ViewAvailabilities { get; set; }
+        public IEnumerable<Availability> ViewWeekAvailabilities { get; set; }
 
         public DateTime CurrentDate { get; private set; }
         public List<DateTime> WeekDays { get; private set; } = new List<DateTime>();
@@ -169,14 +170,6 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
         public async Task<IActionResult> OnGetNextWeekAsync()
         {
-            //string searchRole = HttpContext.Session.GetString("SearchRole");
-            //int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
-            //string? searchProv = HttpContext.Session.GetString("SearchProvId");
-            //CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(7);
-            //TempData["CurrentDate"] = CurrentDate;
-            //TempData["ActiveTab"] = "weekly";
-            //await FetchDataForCurrentViewAsync();
-
             await LoadDataAsync();
             AdjustDateAndRedirect(7);
             return RedirectToPage();
@@ -184,15 +177,6 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
         public async Task<IActionResult> OnGetPreviousMonthAsync()
         {
-            //string searchRole = HttpContext.Session.GetString("SearchRole");
-            //int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
-            //string? searchProv = HttpContext.Session.GetString("SearchProvId");
-            //CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(-1);
-            //TempData["CurrentDate"] = CurrentDate;
-            //CurrentMonthName = CurrentDate.ToString("MMMM");
-            //MonthDays = _calendarService.GetMonthDays(CurrentDate);
-            //await FetchDataForCurrentViewAsync();
-
             TempData["ActiveTab"] = "monthly";
             await LoadDataAsync();
             AdjustDateAndRedirect(0, -1);
@@ -201,13 +185,6 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
         public async Task<IActionResult> OnGetNextMonthAsync()
         {
-            //string searchRole = HttpContext.Session.GetString("SearchRole");
-            //int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
-            //string? searchProv = HttpContext.Session.GetString("SearchProvId");
-            //CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(1);
-            //TempData["CurrentDate"] = CurrentDate;
-            //await FetchDataForCurrentViewAsync();
-
             TempData["ActiveTab"] = "monthly";
             await LoadDataAsync();
             AdjustDateAndRedirect(0, 1);
@@ -269,6 +246,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             ViewBookings = Bookings.Where(b => b.StartTime.Date >= startOfMonth && b.StartTime.Date <= endOfMonth);
             // Filter availabilities within the month. Adjust this logic if your availabilities work differently.
             ViewAvailabilities = Availabilities.Where(a => a.StartTime.Date >= startOfMonth && a.StartTime.Date <= endOfMonth);
+
         }
 
     }

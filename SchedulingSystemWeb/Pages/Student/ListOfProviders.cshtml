@@ -3,7 +3,7 @@
 
 <form id="searchForm" method="post">
     <select name="role" required>
-        <option value="">Select Role</option>
+        <option value="">-- Select Role --</option>
         @foreach (var role in Model.Roles)
         {
             if (role.Name != "STUDENT") @* this makes sure that student schedules can't be searched' *@
@@ -15,7 +15,7 @@
 
     <!-- Deparment dropdown-->
     <select name="department" required>
-        <option value="">Department</option>
+        <option value="">-- Department --</option>
         @foreach(var d in Model.departmentList)
         {
             <option value ="@d.Id">@d.Name</option>
