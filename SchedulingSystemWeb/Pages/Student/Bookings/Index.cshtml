@@ -23,11 +23,11 @@
             {
                 if(role.Name == HttpContext.Session.GetString("SearchRole"))
                 {
-                    <option value="@role.Id" selected>@role.Name</option>
+                    <option value="@role.Name" selected>@role.Name</option>
                 }
                 else
                 {
-                    <option value="@role.Id">role.Name</option>
+                    <option value="@role.Name">@role.Name</option>
                 }        
         }     
     }
@@ -53,7 +53,7 @@
         <option value=""> ---- </option>
         @foreach(var prov in Model.ApplicationUserList)
         {
-            <option value="prov.id">@prov.FullName</option>
+            <option value="@prov.Id">@prov.FullName</option>
         }
     </select>
     <button type="submit" > Filter </button>
