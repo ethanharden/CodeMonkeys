@@ -75,16 +75,30 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
             ViewData["ActiveTab"] = TempData["ActiveTab"] as string ?? "weekly";
             TempData.Keep("ActiveTab");
+            int? provProfID = null;
 
-            InitializeSessionStates(role, department, providerUserId);
-            await LoadDataAsync();
+            if (!providerUserId.IsNullOrEmpty())
+            {
+                provProfID = _unitOfWork.ProviderProfile.Get(p => p.User == providerUserId).Id;
+            }
+
+            
+            InitializeSessionStates(role, department, provProfID);
+            await LoadDataAsync(provProfID);
 
             SetupDateAndViewData();
             await FetchDataForCurrentViewAsync();
         }
+        //public async Task<IActionResult> OnPostAsync(string role, int department, int providerUserId)
+        //{
+        //    TempData["SelectedRole"] = role;
+        //    TempData["SelectedDepartment"] = department.ToString();
+
+        //    return RedirectToPage("/Student/Bookings/Index", new { role = role, department = department, providerUserId = providerUserId });
+        //}
 
 
-        private void InitializeSessionStates(string role, int? department, string? providerUserId)
+        private void InitializeSessionStates(string role, int? department, int? providerUserId)
         {
             HttpContext.Session.SetString("SearchRole", role ?? HttpContext.Session.GetString("SearchRole") ?? string.Empty);
            
@@ -92,12 +106,17 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             {
                 HttpContext.Session.SetInt32("SearchDepartment", department.Value);
             }
-            if (!string.IsNullOrEmpty(providerUserId))
+            if (providerUserId != null)
             {
-                HttpContext.Session.SetString("SearchProvId", providerUserId);
+                HttpContext.Session.SetInt32("SearchProvId", providerUserId.Value);
+                HttpContext.Session.SetInt32("provChecker", 1);
+            }
+            else
+            {
+                HttpContext.Session.SetInt32("provChecker", 0);
             }
         }
-        private async Task LoadDataAsync()
+        private async Task LoadDataAsync(int? providerUserId)
         {
             departmentList = _unitOfWork.Department.GetAll();
             Roles = await _roleManager.Roles.ToListAsync();
@@ -105,6 +124,11 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             var searchRole = HttpContext.Session.GetString("SearchRole");
             ApplicationUserList = await _userManager.GetUsersInRoleAsync(searchRole);
 
+            //var providerList = usersInRole.Select(user => _unitOfWork.ProviderProfile.Get(p => p.User == user.Id).Id);
+            if (providerUserId != null)
+            {
+                ProviderList.Add(_unitOfWork.ProviderProfile.Get(p => p.Id == providerUserId).Id);
+            }
             foreach(var u in ApplicationUserList)
             {
                 ProviderList.Add(_unitOfWork.ProviderProfile.Get(p => p.User == u.Id).Id);
@@ -115,13 +139,32 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
         private void FilterAvailabilitiesAndBookings(IEnumerable<int> providerList)
         {
-            var providerUserId = HttpContext.Session.GetString("SearchProvId");
-            if (!string.IsNullOrEmpty(providerUserId))
+            if (HttpContext.Session.GetInt32("provChecker") == 1)
             {
-                var providerId = _unitOfWork.ProviderProfile.Get(p => p.User == providerUserId).Id;
-                Availabilities = _unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == providerId);
-                Bookings = _unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == providerId);
+                var providerUserId = HttpContext.Session.GetInt32("SearchProvId");
+                if (providerUserId != null)
+                {
+                    Availabilities = _unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == providerUserId);
+                    Bookings = _unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == providerUserId);
+                }
+                else
+                {
+                    Availabilities = new List<Availability>();
+                    Bookings = new List<Booking>();
+
+                    foreach (var p in providerList)
+                    {
+                        var AList = Availabilities.ToList();
+                        AList.AddRange(_unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == p).ToList());
+                        Availabilities = AList;
+
+                        var BList = Bookings.ToList();
+                        BList.AddRange(_unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == p));
+                        Bookings = BList;
+                    }
+                }
             }
+            
             else
             {
                 Availabilities = new List<Availability>();
@@ -150,7 +193,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             MonthDays = _calendarService.GetMonthDays(CurrentDate);
         }
 
-        public async Task<IActionResult> OnGetPreviousWeekAsync()
+        public async Task<IActionResult> OnGetPreviousWeekAsync(int? providerUserId)
         {
             //string searchRole = HttpContext.Session.GetString("SearchRole");
             //int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
@@ -160,38 +203,38 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             //TempData["ActiveTab"] = "weekly";
             //await FetchDataForCurrentViewAsync();
 
-            await LoadDataAsync();
+            await LoadDataAsync(providerUserId);
             AdjustDateAndRedirect(-7);
 
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnGetNextWeekAsync()
+        public async Task<IActionResult> OnGetNextWeekAsync(int? providerUserId)
         {
-            await LoadDataAsync();
+            await LoadDataAsync(providerUserId);
             AdjustDateAndRedirect(7);
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnGetPreviousMonthAsync()
+        public async Task<IActionResult> OnGetPreviousMonthAsync(int? providerUserId)
         {
             TempData["ActiveTab"] = "monthly";
-            await LoadDataAsync();
+            await LoadDataAsync(providerUserId);
             AdjustDateAndRedirect(0, -1);
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnGetNextMonthAsync()
+        public async Task<IActionResult> OnGetNextMonthAsync(int? providerUserId)
         {
             TempData["ActiveTab"] = "monthly";
-            await LoadDataAsync();
+            await LoadDataAsync(providerUserId);
             AdjustDateAndRedirect(0, 1);
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnGetToday()
+        public async Task<IActionResult> OnGetToday(int? providerUserId)
         {
-            await LoadDataAsync();
+            await LoadDataAsync(providerUserId);
 
             TempData["CurrentDate"] = DateTime.Today;
             return RedirectToPage();
