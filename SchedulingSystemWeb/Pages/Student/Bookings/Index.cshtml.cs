@@ -64,7 +64,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         }
 
 
-        public async Task OnGetAsync(string role, int? department, int? providerUserId)
+        public async Task OnGetAsync(string role, int? department, string? providerUserId)
         {
             //string currentTab = HttpContext.Request.Query["tab"].ToString().ToLower();
             //if (string.IsNullOrEmpty(currentTab) || (currentTab != "weekly" && currentTab != "monthly"))
@@ -75,13 +75,27 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
             ViewData["ActiveTab"] = TempData["ActiveTab"] as string ?? "weekly";
             TempData.Keep("ActiveTab");
+            int? provProfID = null;
 
-            InitializeSessionStates(role, department, providerUserId);
-            await LoadDataAsync(providerUserId);
+            if (!providerUserId.IsNullOrEmpty())
+            {
+                provProfID = _unitOfWork.ProviderProfile.Get(p => p.User == providerUserId).Id;
+            }
+
+            
+            InitializeSessionStates(role, department, provProfID);
+            await LoadDataAsync(provProfID);
 
             SetupDateAndViewData();
             await FetchDataForCurrentViewAsync();
         }
+        //public async Task<IActionResult> OnPostAsync(string role, int department, int providerUserId)
+        //{
+        //    TempData["SelectedRole"] = role;
+        //    TempData["SelectedDepartment"] = department.ToString();
+
+        //    return RedirectToPage("/Student/Bookings/Index", new { role = role, department = department, providerUserId = providerUserId });
+        //}
 
 
         private void InitializeSessionStates(string role, int? department, int? providerUserId)
@@ -95,6 +109,11 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             if (providerUserId != null)
             {
                 HttpContext.Session.SetInt32("SearchProvId", providerUserId.Value);
+                HttpContext.Session.SetInt32("provChecker", 1);
+            }
+            else
+            {
+                HttpContext.Session.SetInt32("provChecker", 0);
             }
         }
         private async Task LoadDataAsync(int? providerUserId)
@@ -120,13 +139,32 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
         private void FilterAvailabilitiesAndBookings(IEnumerable<int> providerList)
         {
-            var providerUserId = HttpContext.Session.GetString("SearchProvId");
-            if (providerUserId != null)
+            if (HttpContext.Session.GetInt32("provChecker") == 1)
             {
-                var providerId = _unitOfWork.ProviderProfile.Get(p => p.User == providerUserId).Id;
-                Availabilities = _unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == providerId);
-                Bookings = _unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == providerId);
+                var providerUserId = HttpContext.Session.GetInt32("SearchProvId");
+                if (providerUserId != null)
+                {
+                    Availabilities = _unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == providerUserId);
+                    Bookings = _unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == providerUserId);
+                }
+                else
+                {
+                    Availabilities = new List<Availability>();
+                    Bookings = new List<Booking>();
+
+                    foreach (var p in providerList)
+                    {
+                        var AList = Availabilities.ToList();
+                        AList.AddRange(_unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == p).ToList());
+                        Availabilities = AList;
+
+                        var BList = Bookings.ToList();
+                        BList.AddRange(_unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == p));
+                        Bookings = BList;
+                    }
+                }
             }
+            
             else
             {
                 Availabilities = new List<Availability>();
