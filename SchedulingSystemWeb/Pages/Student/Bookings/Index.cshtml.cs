@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Graph.Models;
-using Microsoft.AspNet.Identity;
+//using Microsoft.AspNet.Identity;
 
 namespace SchedulingSystemWeb.Pages.Student.Bookings
 {
@@ -123,25 +123,31 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             Roles = await _roleManager.Roles.ToListAsync();
 
             var searchRole = HttpContext.Session.GetString("SearchRole");
-            var searchDepartment = HttpContext.Session.GetString("SearchDepartment");
-            ApplicationUserList = await _userManager.GetUsersInRoleAsync(searchRole);
-            //ApplicationUserList = await _userManager.GetUsersInDepartmentAsync(searchDepartment);
-            foreach (var user in ApplicationUserList)
+            var roleApplicationUserList = await _userManager.GetUsersInRoleAsync(searchRole);
+
+            var dep = HttpContext.Session.GetInt32("SearchDepartment");
+            ApplicationUserList = new List<ApplicationUser>();
+
+            foreach (var u in roleApplicationUserList)
             {
-                ProviderList = _unitOfWork.ProviderProfile.Get(u => u.User == user.Id);
-                if (ProviderList != null && ProviderList.DepartmentId == searchDepartment)
+                var prov = _unitOfWork.ProviderProfile.Get(p => p.User == u.Id);
+                if (prov != null && prov.DeparmentId == dep)
                 {
-                    ApplicationUserList.Add(user);
+                    ApplicationUserList.Add(u);
                 }
             }
-                //ApplicationUserList = ApplicationUserList.Where(u => u.DepartmentId == department).ToList();
 
-                //var providerList = usersInRole.Select(user => _unitOfWork.ProviderProfile.Get(p => p.User == user.Id).Id);
-               
+            if (providerUserId != null)
+            {
+                ProviderList.Add(_unitOfWork.ProviderProfile.Get(p => p.Id == providerUserId).Id);
+            }
+            foreach (var u in ApplicationUserList)
+            {
+                ProviderList.Add(_unitOfWork.ProviderProfile.Get(p => p.User == u.Id).Id);
+            }
 
             FilterAvailabilitiesAndBookings(ProviderList);
         }
-
         private void FilterAvailabilitiesAndBookings(IEnumerable<int> providerList)
         {
             if (HttpContext.Session.GetInt32("provChecker") == 1)
