@@ -122,14 +122,25 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             Roles = await _roleManager.Roles.ToListAsync();
 
             var searchRole = HttpContext.Session.GetString("SearchRole");
-            ApplicationUserList = await _userManager.GetUsersInRoleAsync(searchRole);
+            var roleApplicationUserList = await _userManager.GetUsersInRoleAsync(searchRole);
 
-            //var providerList = usersInRole.Select(user => _unitOfWork.ProviderProfile.Get(p => p.User == user.Id).Id);
+            var dep = HttpContext.Session.GetInt32("SearchDepartment");
+            ApplicationUserList = new List<ApplicationUser>();
+
+            foreach (var u in roleApplicationUserList)
+            {
+                var prov = _unitOfWork.ProviderProfile.Get(p => p.User == u.Id);
+                if (prov != null && prov.DeparmentId == dep)
+                {
+                    ApplicationUserList.Add(u);
+                }
+            }
+
             if (providerUserId != null)
             {
                 ProviderList.Add(_unitOfWork.ProviderProfile.Get(p => p.Id == providerUserId).Id);
             }
-            foreach(var u in ApplicationUserList)
+            foreach (var u in ApplicationUserList)
             {
                 ProviderList.Add(_unitOfWork.ProviderProfile.Get(p => p.User == u.Id).Id);
             }
