@@ -12,6 +12,31 @@
 }
 
 <h2 class="text-primary">@ViewData["Title"]</h2>
+
+<div>
+    <h4>Upcoming Bookings</h4>
+    @if (Model.nextBookings.Any())
+    {
+        foreach (var booking in Model.nextBookings)
+        {
+            <div>
+                <a href="@Url.Page("/Teacher/Appointment", new { id = booking.Id })" class="text-decoration-none">
+                    <div class="p-2 mb-2 border rounded">
+                        <div><strong>Subject:</strong> @booking.Subject</div>
+                        <div><strong>Date:</strong> @booking.StartTime.ToString("yyyy-MM-dd HH:mm")</div>
+                        <div><strong>Duration:</strong> @booking.Duration</div>
+                    </div>
+                </a>
+            </div>
+        }
+    }
+    else
+    {
+        <p>No upcoming bookings found.</p>
+    }
+</div>
+
+
 <!-- Tab navigation buttons -->
 <ul class="nav nav-tabs" id="calendarTabs" role="tablist">
     <li class="nav-item" role="presentation">

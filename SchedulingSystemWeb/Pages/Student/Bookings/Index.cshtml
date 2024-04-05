@@ -18,16 +18,15 @@
     <option value="">Select Role</option>
     @foreach (var role in Model.Roles)
     {
-
             if (role.Name != "STUDENT") @* this makes sure that student schedules can't be searched' *@
             {
                 if(role.Name == HttpContext.Session.GetString("SearchRole"))
                 {
-                    <option value="@role.Id" selected>@role.Name</option>
+                    <option value="@role.Name" selected>@role.Name</option>
                 }
                 else
                 {
-                    <option value="@role.Id">@role.Name</option>
+                    <option value="@role.Name">@role.Name</option>
                 }        
         }     
     }
@@ -49,11 +48,12 @@
             
         }
     </select>
-    <select name="providers" id="providerFilter">
+    <select name="providerUserId">
         <option value=""> ---- </option>
+        <option value=""> All Providers </option>
         @foreach(var prov in Model.ApplicationUserList)
         {
-            <option value="prov.id">@prov.FullName</option>
+            <option value="@prov.Id">@prov.FullName</option>
         }
     </select>
     <button type="submit" > Filter </button>
