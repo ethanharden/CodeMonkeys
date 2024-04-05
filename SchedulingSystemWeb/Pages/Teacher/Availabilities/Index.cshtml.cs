@@ -25,6 +25,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         public List<DateTime> WeekDays { get; private set; } = new List<DateTime>();
         public List<DateTime> MonthDays { get; private set; }
         public string CurrentMonthName { get; private set; }
+        public IEnumerable<Booking> nextBookings { get; set; }
 
         public IndexModel(UnitOfWork unitOfWork, ICalendarService calendarService, UserManager<ApplicationUser> userManager)
         {
@@ -47,6 +48,8 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             int provId = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id;
             Availabilities = _unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == provId);
             Bookings = _unitOfWork.Booking.GetAll().Where(p => p.ProviderProfileID == provId);
+
+            nextBookings = Bookings.Where(b => b.StartTime.Date >= DateTime.Today).OrderBy(b => b.StartTime).Take(5).ToList();
 
             await FetchDataForCurrentViewAsync();
         }
