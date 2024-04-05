@@ -24,9 +24,21 @@
 
     <button type="submit">Search</button>
 </form>
-<button>New Student</button> <!--call General deaprment-->
+
+<form id="newStudentForm" method="post">
+    <input type="hidden" name="role" value="ADVISOR">
+    <input type="hidden" name="department" value="2">
+    <button type="submit">New Student</button>
+</form>
+
 
 <script>
+    document.getElementById("newStudentForm").addEventListener("submit", function (event) {
+        // Prevent the default form submission behavior
+        event.preventDefault();
+        // Submit the form
+        document.getElementById("newStudentForm").submit();
+    });
     document.getElementById("searchForm").addEventListener("submit", function (event) {
         var role = document.getElementsByName("role")[0].value;
         var department = document.getElementsByName("department")[0].value;
