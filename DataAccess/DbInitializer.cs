@@ -90,33 +90,33 @@ namespace DataAccess
                 new ApplicationUser { FirstName = "John",
                     LastName = "Doe",
                     PhoneNum = "801-555-5555",
-                    ProfilePicture = "",
+                    
                     Email = "JohnDoe@JohnDoe.com",
                     
                 },  
                 new ApplicationUser { FirstName = "Jane",
                     LastName = "Doe",
                     PhoneNum = "801-555-5556",
-                    ProfilePicture = "",
+                    
                     Email = "JaneDoe@JaneDoe.com"
                     //Role
                 },
                 new ApplicationUser { FirstName = "Richard",
                     LastName = "Fry",
                     PhoneNum = "801-555-5557",
-                    ProfilePicture = "",
+                    
                     Email = "RichardFry@RichardFry.com"
                 },
                 new ApplicationUser { FirstName = "Pat",
                     LastName = "DeJong",
                     PhoneNum = "801-555-5558",
-                    ProfilePicture = "",
+                    
                     Email = "PatDeJong@PatDeJong.com"
                 },
                 new ApplicationUser { FirstName = "Julie",
                     LastName = "Christensen",
                     PhoneNum = "801-555-5559",
-                    ProfilePicture = "",
+                    
                     Email = "JulieChristensen@JulieChristensen.com"
                 },
             };

@@ -101,7 +101,7 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
             
             public string Role { get; set; }
             public IEnumerable<SelectListItem> RoleList { get; set; }
-
+            
             [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
@@ -140,7 +140,7 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
                 user.FirstName = Input.FirstName;
                 user.LastName = Input.LastName;
                 user.PhoneNum = Input.PhoneNum;
-         
+                user.Email = Input.Email;
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 //await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);

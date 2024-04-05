@@ -77,8 +77,10 @@
                         <input asp-for="RemoteLink" class="form-control"  />
                         <label asp-for="BookingPrompt" class="form-label"></label>
                         <input asp-for="BookingPrompt" class="form-control"  />
-                        <label asp-for="Department" class="form-label"></label>
-                        <input asp-for="Department" class="form-control"  />
+                        <label asp-for="Department" class="form-label">Department</label>
+                        <select asp-for="Department" asp-items="@Model.DepartmentList" class="form-select">
+                            <option disabled selected>--Select Department--</option>
+                        </select>
                     }
                     else
                     {

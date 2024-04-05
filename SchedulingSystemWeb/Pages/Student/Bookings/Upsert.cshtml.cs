@@ -26,6 +26,8 @@ using Azure.Identity;
 using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Client;
+using SendGrid.Helpers.Mail;
+using SendGrid;
 namespace SchedulingSystemWeb.Pages.Student.Bookings
 {
     public class UpsertModel : PageModel
@@ -101,74 +103,21 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                 //associate real URL and save to DB
                 newBooking.Attachment = @"\bookingFiles\" + fileName + extension;
             }
-            else
-            {
-                newBooking.Attachment = "";
-            }
-            if (description == null)
-            {
-                newBooking.Note = "";
-            }
+            
+            
             if (course == null)
             {
                 newBooking.Subject = "";
             }
             _unitOfWork.Booking.Add(newBooking); //Reactivate when ready.
             _unitOfWork.Commit();
-            var selectedCalendar = Request.Form["calendar"];
+            await SendEmail(newBooking);
+            var selectedCalendar = Request.Form["calendar"]; // For adding to google 
             if (selectedCalendar.Count > 0)
             {               
                     var calendarType = selectedCalendar[0];
-                    if (calendarType == "outlook") //OUTLOOK------------------------------------------------
-                    {
-                        // var scopes = new[] { "User.Read", "Calendars.ReadWrite" };
-
-                        // // Multi-tenant apps can use "common",
-                        // // single-tenant apps must use the tenant ID from the Azure portal
-                        // var tenantId = "common";
-
-                        // // Value from app registration
-                        // var clientId = "454e3802-aff2-4a88-987d-d4b1d41af5a2";
-                        // //var clientId = "qIF8Q~zdJ6shocjRL.9IU3~CRghLjsgSmfO_ubpF";
-                        // // using Azure.Identity;
-
-
-                        // // using Azure.Identity;
-                        // var options = new InteractiveBrowserCredentialOptions
-                        // {
-
-                        //     ClientId = "454e3802-aff2-4a88-987d-d4b1d41af5a2",
-                        //     TenantId = "common",
-                        //     RedirectUri = new Uri("http://localhost:5039/")
-                        // };
-
-                        // var credential = new InteractiveBrowserCredential(options);
-
-                        // var graphClient = new GraphServiceClient(credential, scopes);
-
-                        //// var graphClient = new GraphServiceClient(deviceCodeCredential, scopes);
-                        // var requestBody = new Microsoft.Graph.Models.Event
-                        // {
-                        //     Subject = "My event",
-                        //     Start = new DateTimeTimeZone
-                        //     {
-                        //         DateTime = "2024-03-28T01:18:32.003Z",
-                        //         TimeZone = "UTC",
-                        //     },
-                        //     End = new DateTimeTimeZone
-                        //     {
-                        //         DateTime = "2024-04-04T01:18:32.003Z",
-                        //         TimeZone = "UTC",
-                        //     },
-                        // };
-                        // var t = credential.GetToken;
-                        // //var result = await graphClient.Me.GetAsync();
-                        // await credential.AuthenticateAsync();
-                        // // To initialize your graphClient, see https://learn.microsoft.com/en-us/graph/sdks/create-client?from=snippets&tabs=csharp
-                        // var result = await graphClient.Me.Events.PostAsync(requestBody);
-
-                    }
-                    else if (calendarType == "google") //GOOGLE-------------------------------------------------------------------------------
+                    
+                     if (calendarType == "google") //GOOGLE-------------------------------------------------------------------------------
                     {
                         UserCredential credential;
                         string[] Scopes = { Google.Apis.Calendar.v3.CalendarService.Scope.CalendarEvents };
@@ -216,6 +165,26 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                     }
             }
             return Redirect("/student/home/index");
+        }
+        public async Task SendEmail(Booking newBooking)
+        {   
+            ProviderProfile p = _unitOfWork.ProviderProfile.Get(p => p.Id == newBooking.ProviderProfileID);
+            ApplicationUser Teacherinfo = _unitOfWork.ApplicationUser.Get(u => u.Id == p.User);
+            ApplicationUser student = _unitOfWork.ApplicationUser.Get(b => b.Id == newBooking.User);
+
+            var sendgridclient = new SendGridClient("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");
+            var from = new SendGrid.Helpers.Mail.EmailAddress("CodemonkeysScheduling@outlook.com", "Code Monkeys");
+            var to = new SendGrid.Helpers.Mail.EmailAddress(Teacherinfo.Email, Teacherinfo.FirstName + " " + Teacherinfo.LastName);
+            var subject = "Booking Created";
+            var plainText = student.FirstName + " " + student.LastName + " Created an appointment on " + newBooking.StartTime.ToShortDateString() + " at " + newBooking.StartTime.ToShortTimeString();
+            var htmlContent = "<p>" + plainText + "</p>";
+            var message = MailHelper.CreateSingleEmail(from, to, subject, plainText, htmlContent);
+            var response = await sendgridclient.SendEmailAsync(message); //Teacher Message
+            to = new SendGrid.Helpers.Mail.EmailAddress(student.Email, student.FirstName + " " + student.LastName);
+            plainText = "You successfully made a booking with " + Teacherinfo.FirstName + " " + Teacherinfo.LastName + " on " + newBooking.StartTime.ToShortDateString() + " at " + newBooking.StartTime.ToShortTimeString();
+            htmlContent = "<p>" + plainText + "</p>";
+            message = MailHelper.CreateSingleEmail(from, to, subject, plainText, htmlContent);
+            response = await sendgridclient.SendEmailAsync(message); //Student Message
         }
     }
 }

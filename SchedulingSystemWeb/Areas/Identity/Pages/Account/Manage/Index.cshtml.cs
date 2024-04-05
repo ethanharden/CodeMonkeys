@@ -8,10 +8,13 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using DataAccess;
 using Infrastructure.Models;
+
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Graph.Models;
 
 namespace SchedulingSystemWeb.Areas.Identity.Pages.Account.Manage
 {
@@ -24,40 +27,23 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account.Manage
         public IndexModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            UnitOfWork unitOfWork
-,
-
-            IWebHostEnvironment webhostenvironment
-            )
+            UnitOfWork unitOfWork,
+            IWebHostEnvironment webhostenvironment)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
             _signInManager = signInManager;
             _webhostenvironment = webhostenvironment;
         }
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
+        
         public string Username { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
        
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
+        
         public bool Edit {  get; set; }
         [BindProperty]  
         public string FirstName { get; set; }
@@ -65,8 +51,7 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account.Manage
         public string LastName { get; set; }
         [BindProperty]
         public string PhoneNum { get; set; }
-        [BindProperty]
-        public string Department {  get; set; }
+        
         [BindProperty]
         public string RemoteLink { get; set; }
         [BindProperty]
@@ -77,8 +62,9 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account.Manage
         public string ProfilePicture { get; set; }
         [BindProperty]
         public bool IsProvider { get; set; }
-
-
+        [BindProperty]
+        public string Department { get; set; }
+        public IEnumerable<SelectListItem> DepartmentList { get; set; }
         private async Task LoadAsync(ApplicationUser user)
         {
             Edit = false;
@@ -88,6 +74,11 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account.Manage
             LastName = user.LastName;
             ProfilePicture = user.ProfilePicture;
             Username = userName;
+            DepartmentList = _unitOfWork.Department.GetAll().Select(r => new SelectListItem
+            {
+                Text = r.Name,
+                Value = r.Id.ToString(),
+            });
             var role = await _userManager.GetRolesAsync(user);
             if (role[0] == "STUDENT")
             {
@@ -96,9 +87,10 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account.Manage
             if (role[0] == "TEACHER" || role[0] == "ADVISOR" || role[0] == "TUTOR")
             {
                 IsProvider = true;
-                //Department = _unitOfWork.Department.Get(d => d.Name == DepartmentString).Id; 
-                BookingPrompt = _unitOfWork.ProviderProfile.Get(u => u.User == user.Id).BookingPrompt;
-                RemoteLink = _unitOfWork.ProviderProfile.Get(u => u.User == user.Id).RemoteLink;
+                var prof = _unitOfWork.ProviderProfile.Get(u => u.User == user.Id);
+                Department = _unitOfWork.Department.Get(u => u.Id == prof.DeparmentId).Name;
+                BookingPrompt = prof.BookingPrompt;
+                RemoteLink = prof.RemoteLink;
             }
         }
 
@@ -158,7 +150,7 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account.Manage
                 user.FirstName = FirstName;
             user.LastName = LastName;
             user.PhoneNum = PhoneNum;
-            //user.ProfilePicture = ProfilePicture;
+           
             await _userManager.UpdateAsync(user);
             var role = await _userManager.GetRolesAsync(user);
             if (role[0] == "STUDENT")
@@ -169,8 +161,10 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account.Manage
             }
             if (role[0] == "TEACHER" || role[0] == "TUTOR" || role[0] == "ADVISOR")
             {
+                
                 ProviderProfile profiderProfile = _unitOfWork.ProviderProfile.Get(u => u.User == user.Id);
                 profiderProfile.BookingPrompt = BookingPrompt;
+                profiderProfile.DeparmentId = Int32.Parse(Department);
                 //profiderProfile.DepartmentString = Department;
                 profiderProfile.RemoteLink = RemoteLink;
                 _unitOfWork.ProviderProfile.Update(profiderProfile);

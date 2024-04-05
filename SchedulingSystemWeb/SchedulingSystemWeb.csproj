@@ -48,6 +48,7 @@
   <ItemGroup>
     <Folder Include="wwwroot\images\profile\" />
     <Folder Include="wwwroot\bookingFiles\" />
+    <Folder Include="wwwroot\bookingFiles\" />
   </ItemGroup>
 
 </Project>
