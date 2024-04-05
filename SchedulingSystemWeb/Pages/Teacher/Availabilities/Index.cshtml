@@ -17,18 +17,28 @@
     <h4>Upcoming Bookings</h4>
     @if (Model.nextBookings.Any())
     {
-        foreach (var booking in Model.nextBookings)
-        {
-            <div>
-                <a href="@Url.Page("/Teacher/Appointment", new { id = booking.Id })" class="text-decoration-none">
-                    <div class="p-2 mb-2 border rounded">
-                        <div><strong>Subject:</strong> @booking.Subject</div>
-                        <div><strong>Date:</strong> @booking.StartTime.ToString("yyyy-MM-dd HH:mm")</div>
-                        <div><strong>Duration:</strong> @booking.Duration</div>
+        
+        <div class="container">
+            <div class="row">
+                @foreach (var booking in Model.nextBookings)
+                {
+                     <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                    
+                                        
+                                <p class="card-title">Subject: @booking.Subject</p>
+                                <hr />
+                                <p class="card-text">Date: @booking.StartTime.ToShortDateString()</p>
+                                <p class="card-text">@booking.StartTime.ToShortTimeString() - @booking.StartTime.AddMinutes(booking.Duration).ToShortTimeString()</p>
+                                <a asp-page="/Teacher/Appointments/Index" asp-route-id="@booking.Id" class="btn btn-primary">More Info</a>       
+                                    
+                            </div>
+                        </div>
                     </div>
-                </a>
-            </div>
-        }
+                }
+        </div>
+        </div>
     }
     else
     {

@@ -48,6 +48,17 @@
                                 <label for="info7" class="form-label"><strong>Time:</strong></label>
                                 <label>@Model.booking.StartTime.ToShortTimeString() to @Model.booking.StartTime.AddMinutes(Model.booking.Duration).ToShortTimeString()</label>
                             </div>
+                            <div class="mb-3">
+                                <label for="info7" class="form-label"><strong>Location:</strong></label>
+                                @if (Model.location.LocationName == "Virtual")
+                                {
+                                    <label>Virtual</label>
+                                }
+                                else
+                                {
+                                    <label>@Model.location.LocationName Room @Model.location.RoomNumber</label>
+                                }
+                            </div>
                             @if (Model.booking.Attachment != null)
                             {
                                 <a href="@Url.Content(Model.filepath)" download="@Model.filepath" class="btn btn-info">Download File</a>
@@ -57,7 +68,7 @@
                     </div>
                     <div class="row justify-content-center">
                         <div class="col">
-                            <a href="/Teacher/Availablities" type="button" class="btn btn-primary">Back</a>
+                            <a href="/Teacher/Availabilities" type="button" class="btn btn-primary">Back</a>
                             <a asp-page="/Student/Home/Delete" asp-route-id="@Model.booking.Id" class="btn btn-danger">Cancel Booking</a>
                             @{
                                 string mail = "mailto:" + @Model.student.Email;

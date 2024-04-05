@@ -49,7 +49,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             Availabilities = _unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == provId);
             Bookings = _unitOfWork.Booking.GetAll().Where(p => p.ProviderProfileID == provId);
 
-            nextBookings = Bookings.Where(b => b.StartTime.Date >= DateTime.Today).OrderBy(b => b.StartTime).Take(5).ToList();
+            nextBookings = Bookings.Where(b => b.StartTime.Date >= DateTime.Today && b.ProviderProfileID == provId).OrderBy(b => b.StartTime).Take(5).ToList();
 
             await FetchDataForCurrentViewAsync();
         }

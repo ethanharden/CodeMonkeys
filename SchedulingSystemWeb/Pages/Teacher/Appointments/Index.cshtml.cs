@@ -24,7 +24,7 @@ namespace SchedulingSystemWeb.Pages.Teacher.Appointments
         public ApplicationUser student { get; set; }
         public ApplicationUser teacher { get; set; }
         public string filepath { get; set; }
-
+        public Location location { get; set; }
         public async Task OnGet(int? id )
         {
 
@@ -33,6 +33,8 @@ namespace SchedulingSystemWeb.Pages.Teacher.Appointments
             booking = _unitOfWork.Booking.Get(b => b.Id == id & b.ProviderProfileID ==provId);
             teacher = _unitOfWork.ApplicationUser.Get(u => u.Id == _userManager.GetUserId(User));
             student = _unitOfWork.ApplicationUser.Get(s => s.Id == booking.User);
+            var aval = _unitOfWork.Availability.Get(i => i.Id == booking.objAvailability);
+            location = _unitOfWork.Location.Get(l=> l.LocationId == aval.LocationId);
             if (booking.Attachment != null)
             {
                 string wwwroot = _webHostEnvironment.WebRootPath;
