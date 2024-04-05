@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Graph.Models;
+//using Microsoft.AspNet.Identity;
 
 namespace SchedulingSystemWeb.Pages.Student.Bookings
 {
@@ -147,7 +148,6 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
             FilterAvailabilitiesAndBookings(ProviderList);
         }
-
         private void FilterAvailabilitiesAndBookings(IEnumerable<int> providerList)
         {
             if (HttpContext.Session.GetInt32("provChecker") == 1)
