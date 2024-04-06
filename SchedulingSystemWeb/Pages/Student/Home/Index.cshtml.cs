@@ -53,7 +53,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
                 currentUserId = currentUser.Id;
             }
 
-                Bookings = _unitOfWork.Booking.GetAll().Where(u=>u.User == currentUserId);
+            Bookings = _unitOfWork.Booking.GetAll().Where(u=>u.User == currentUserId);
             Bookings = Bookings.ToList().OrderBy(obj => obj.StartTime); // Order bookings by date
             Providers = new List<ProviderProfile>();
             Locations = new List<Location>();
