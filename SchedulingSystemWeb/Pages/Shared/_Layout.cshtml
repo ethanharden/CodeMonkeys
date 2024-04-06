@@ -40,19 +40,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link text-light" asp-area="" asp-page="/Teacher/Availabilities/Index">Availability</a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-light" asp-area="" asp-page="/Teacher/Locations/Index">Locations</a>
-                                </li>
-
-
-
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link text-light dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Content Managment</a>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" asp-area="" asp-page="/Admin/Roles/Index">Roles</a>
-                                        <a class="dropdown-item" asp-area="" asp-page="/Admin/Users/UserIndex">Users</a>
-                                    </div>
-                                </li>
+                                
                             }
                             else if (User.IsInRole("TUTOR"))
                             {
@@ -65,6 +53,22 @@
 
                                 <li class="nav-item">
                                     <a class="nav-link text-light" asp-area="" asp-page="/Tutor/Bookings/Index">Bookings</a>
+                                </li>
+                            }
+                            else if (User.IsInRole("ADMIN"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-light" asp-area="" asp-page="/Teacher/Locations/Index">Locations</a>
+                                </li>
+
+
+
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link text-light dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Content Managment</a>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" asp-area="" asp-page="/Admin/Roles/Index">Roles</a>
+                                        <a class="dropdown-item" asp-area="" asp-page="/Admin/Users/UserIndex">Users</a>
+                                    </div>
                                 </li>
                             }
                             else

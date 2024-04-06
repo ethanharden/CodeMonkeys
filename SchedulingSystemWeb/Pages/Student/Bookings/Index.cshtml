@@ -136,10 +136,10 @@
 
                                     <td class="hour-cell @((day.Date == DateTime.Today) ? "today" : "")">
                                         @* Display bookings for the day and time slot *@
-                                        @foreach (var booking in Model.ViewBookings.Where(b => b.StartTime >= timeSlotStart && b.StartTime < timeSlotEnd))
+                                        @* @foreach (var booking in Model.ViewBookings.Where(b => b.StartTime >= timeSlotStart && b.StartTime < timeSlotEnd))
                                         {
                                             <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
-                                        }
+                                        } *@
                                         @* Display availabilities for the day and time slot *@
                                         @foreach (var availability in Model.ViewAvailabilities.Where(a => a.StartTime >= timeSlotStart && a.StartTime < timeSlotEnd && !Model.IsAvailabilityBooked(a)))
                                         {
@@ -204,10 +204,10 @@
                             <td class="month-day @(currentDay.Date == DateTime.Today.Date ? "today" : "")">
                                 @currentDay.Day
                                 <!-- Display bookings for the day -->
-                                @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == currentDay))
+                               @*  @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == currentDay))
                                 {
                                     <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
-                                }
+                                } *@
                                 <!-- Display availabilities for the day -->
                                 @foreach(var availability in Model.ViewAvailabilities.Where(a => a.StartTime.Date == currentDay && !Model.IsAvailabilityBooked(a)))
                                 {
