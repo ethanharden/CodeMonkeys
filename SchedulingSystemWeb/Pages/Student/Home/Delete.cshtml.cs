@@ -28,7 +28,12 @@ namespace SchedulingSystemWeb.Pages.Student.Home
             Role = (List<string>)await _userManager.GetRolesAsync(user);
             string first = Role.First();
             bookings = _unitOfWork.Booking.Get(b => b.Id == id);
-            ProviderProfile prov = _unitOfWork.ProviderProfile.Get(p => p.Id == bookings.ProviderProfileID);
+            ProviderProfile prov;
+           //if(first != "STUDENT")
+           // {
+                prov = _unitOfWork.ProviderProfile.Get(p => p.Id == bookings.ProviderProfileID);
+            //}
+            
             Teacherinfo = _unitOfWork.ApplicationUser.Get(u => u.Id == prov.User);
             student = _unitOfWork.ApplicationUser.Get(b => b.Id == bookings.User);
             return Page();
@@ -40,8 +45,17 @@ namespace SchedulingSystemWeb.Pages.Student.Home
            // _unitOfWork.Booking.Delete(bookings);
           //  _unitOfWork.Commit();
             await SendEmail(id);
-            
-            return Redirect("/Teacher/Availabilities");
+            var user = _unitOfWork.ApplicationUser.Get(i => i.Id == _userManager.GetUserId(User));
+            Role = (List<string>)await _userManager.GetRolesAsync(user);
+            if (Role.First() != "TEACHER")
+            {
+                return Redirect("/Student/Home");
+                
+            }
+            else
+            {
+                return Redirect("/Student/Home");
+            }
         }
         public async Task SendEmail(int? id)
         {
@@ -52,7 +66,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
             Teacherinfo = _unitOfWork.ApplicationUser.Get(u => u.Id == p.User);
             student = _unitOfWork.ApplicationUser.Get(b => b.Id == bookings.User);
             var sendgridclient = new SendGridClient("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");
-            if (Role.First() =="Student")
+            if (Role.First() =="STUDENT")
             {
                 var from = new SendGrid.Helpers.Mail.EmailAddress("CodemonkeysScheduling@outlook.com", "Code Monkeys");
                 var to = new SendGrid.Helpers.Mail.EmailAddress(Teacherinfo.Email, Teacherinfo.FirstName + " " + Teacherinfo.LastName);
@@ -81,8 +95,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
                 htmlContent = "<p>" + plainText + "</p>";
                 message = MailHelper.CreateSingleEmail(from, to, subject, plainText, htmlContent);
                 response = await sendgridclient.SendEmailAsync(message); //Student Message
-            }
-            
+            }           
         }
     }
 }
