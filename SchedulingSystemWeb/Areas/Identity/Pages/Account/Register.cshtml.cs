@@ -157,7 +157,7 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
                         {
                             CustomerProfile customerProfile = new CustomerProfile();
                             customerProfile.User = user.Id;
-                            if (Input.WNumber.ToString() != null)
+                            if (Input.WNumber != null)
                             {
                                 customerProfile.WNumber = Int32.Parse(Input.WNumber);
                             }

@@ -61,7 +61,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
         {
             ApplicationUser user = _unitOfWork.ApplicationUser.Get(i => i.Id == _userManager.GetUserId(User));
             Role = (List<string>)await _userManager.GetRolesAsync(user);
-            bookings = _unitOfWork.Booking.Get(b => b.Id == id);
+        
             ProviderProfile p = _unitOfWork.ProviderProfile.Get(p => p.Id == bookings.ProviderProfileID);
             Teacherinfo = _unitOfWork.ApplicationUser.Get(u => u.Id == p.User);
             student = _unitOfWork.ApplicationUser.Get(b => b.Id == bookings.User);

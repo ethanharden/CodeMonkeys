@@ -82,7 +82,12 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account.Manage
             var role = await _userManager.GetRolesAsync(user);
             if (role[0] == "STUDENT")
             {
-                WNumber = _unitOfWork.CustomerProfile.Get(u => u.User == user.Id).WNumber;
+                var studentprofile = _unitOfWork.CustomerProfile.Get(u => u.User == user.Id);
+                if (studentprofile.WNumber != null) 
+                {
+                    WNumber = _unitOfWork.CustomerProfile.Get(u => u.User == user.Id).WNumber;
+                }
+                
             }
             if (role[0] == "TEACHER" || role[0] == "ADVISOR" || role[0] == "TUTOR")
             {
