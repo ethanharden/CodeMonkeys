@@ -45,14 +45,14 @@
                             else if (User.IsInRole("TUTOR"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-light" asp-area="" asp-page="/Tutor/Availabilities">Home</a>
+                                    <a class="nav-link text-light" asp-area="" asp-page="/Tutor/Home/Index">Home</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-light" asp-area="" asp-page="/Tutor/Availabilities/Index">Availability</a>
+                                    <a class="nav-link text-light" asp-area="" asp-page="/Teacher/Availabilities/Upsert">Availability</a>
                                 </li>
 
                                 <li class="nav-item">
-                                    <a class="nav-link text-light" asp-area="" asp-page="/Tutor/Bookings/Index">Bookings</a>
+                                    <a class="nav-link text-light" asp-area="" asp-page="/Student/ListOfProviders">Bookings</a>
                                 </li>
                             }
                             else if (User.IsInRole("ADMIN"))
