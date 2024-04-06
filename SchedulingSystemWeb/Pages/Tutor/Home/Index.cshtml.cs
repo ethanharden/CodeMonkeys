@@ -115,13 +115,16 @@ namespace SchedulingSystemWeb.Pages.Tutor.Home
             return RedirectToPage();
         }
 
+
         private async Task FetchDataForCurrentViewAsync()
         {
             DateTime startOfMonth = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
             DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
-            ViewBookings = await _unitOfWork.Booking.GetAllAsync(
-                b => b.StartTime >= startOfMonth && b.StartTime <= endOfMonth);
+            // Filter bookings within the month.
+            ViewBookings = Bookings.Where(b => b.StartTime.Date >= startOfMonth && b.StartTime.Date <= endOfMonth);
+            // Filter availabilities within the month. Adjust this logic if your availabilities work differently.
+            ViewAvailabilities = Availabilities.Where(a => a.StartTime.Date >= startOfMonth && a.StartTime.Date <= endOfMonth);
 
         }
     }
