@@ -34,6 +34,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
             _calendarService = calendarService;
             Bookings = new List<Booking>();
             Availabilities = new List<Availability>();
+            _userManager = userManager;
         }
        
         public async Task OnGetAsync()
@@ -45,8 +46,14 @@ namespace SchedulingSystemWeb.Pages.Student.Home
             WeekDays = _calendarService.GetWeekDays(CurrentDate);
             MonthDays = _calendarService.GetMonthDays(CurrentDate);
 
-            var currentUser = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            Bookings = _unitOfWork.Booking.GetAll().Where(u=>u.User == currentUser);
+            var currentUser = await _userManager.GetUserAsync(User);
+            string currentUserId = "";
+            if (currentUser != null)
+            {
+                currentUserId = currentUser.Id;
+            }
+
+                Bookings = _unitOfWork.Booking.GetAll().Where(u=>u.User == currentUserId);
             Bookings = Bookings.ToList().OrderBy(obj => obj.StartTime); // Order bookings by date
             Providers = new List<ProviderProfile>();
             Locations = new List<Location>();
