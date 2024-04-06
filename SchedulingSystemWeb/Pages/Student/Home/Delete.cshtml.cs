@@ -42,8 +42,8 @@ namespace SchedulingSystemWeb.Pages.Student.Home
         {
             
             bookings = _unitOfWork.Booking.Get(b => b.Id == id);
-           // _unitOfWork.Booking.Delete(bookings);
-          //  _unitOfWork.Commit();
+            _unitOfWork.Booking.Delete(bookings);
+            _unitOfWork.Commit();
             await SendEmail(id);
             var user = _unitOfWork.ApplicationUser.Get(i => i.Id == _userManager.GetUserId(User));
             Role = (List<string>)await _userManager.GetRolesAsync(user);
