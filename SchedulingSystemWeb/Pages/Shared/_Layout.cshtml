@@ -13,38 +13,41 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-purple border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">SchedulingSystemWeb</a>
+                <a asp-area="" asp-page="/Index">
+                <img src="~/images/logo/WeberLogo.jpg" style="max-height: 55px; max-width: 100px;" />
+                </a>
+                <a class="navbar-brand" asp-area="" asp-page="/Index">Code Monkeys Scheduling</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    @if(User.Identity.IsAuthenticated)
+                    @if (User.Identity.IsAuthenticated)
                     {
                         <ul class="navbar-nav flex-grow-1">
                             @if (User.IsInRole("TEACHER") || User.IsInRole("ADVISOR"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-page="/Teacher/Availabilities">Home</a>
+                                    <a class="nav-link text-light" asp-area="" asp-page="/Teacher/Availabilities">Home</a>
                                 </li>
 
 
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-page="/About">About</a>
+                                    <a class="nav-link text-light" asp-area="" asp-page="/About">About</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-page="/Teacher/Availabilities/Index">Availability</a>
+                                    <a class="nav-link text-light" asp-area="" asp-page="/Teacher/Availabilities/Index">Availability</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-page="/Teacher/Locations/Index">Locations</a>
+                                    <a class="nav-link text-light" asp-area="" asp-page="/Teacher/Locations/Index">Locations</a>
                                 </li>
 
 
 
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link text-dark dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Content Managment</a>
+                                    <a class="nav-link text-light dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Content Managment</a>
                                     <div class="dropdown-menu">
                                         <a class="dropdown-item" asp-area="" asp-page="/Admin/Roles/Index">Roles</a>
                                         <a class="dropdown-item" asp-area="" asp-page="/Admin/Users/UserIndex">Users</a>
@@ -54,35 +57,36 @@
                             else if (User.IsInRole("TUTOR"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-page="/Tutor/Availabilities">Home</a>
+                                    <a class="nav-link text-light" asp-area="" asp-page="/Tutor/Availabilities">Home</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-page="/Tutor/Availabilities/Index">Availability</a>
+                                    <a class="nav-link text-light" asp-area="" asp-page="/Tutor/Availabilities/Index">Availability</a>
                                 </li>
 
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-page="/Tutor/Bookings/Index">Bookings</a>
+                                    <a class="nav-link text-light" asp-area="" asp-page="/Tutor/Bookings/Index">Bookings</a>
                                 </li>
                             }
                             else
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-page="/Student/Home/index">Home</a>
+                                    <a class="nav-link text-light" asp-area="" asp-page="/Student/Home/index">Home</a>
                                 </li>
 
 
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-page="/About">About</a>
+                                    <a class="nav-link text-light" asp-area="" asp-page="/About">About</a>
                                 </li>
                             }
 
                         </ul>
                     }
-                    
+
                     <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
+
     </header>
     <div class="container">
         <main role="main" class="pb-3">
