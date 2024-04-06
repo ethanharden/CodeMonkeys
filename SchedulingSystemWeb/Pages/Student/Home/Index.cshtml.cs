@@ -132,8 +132,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
             DateTime startOfMonth = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
             DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
-            ViewBookings = await _unitOfWork.Booking.GetAllAsync(
-                b => b.StartTime >= startOfMonth && b.StartTime <= endOfMonth);
+            ViewBookings = Bookings.Where(b => b.StartTime.Date >= startOfMonth && b.StartTime.Date <= endOfMonth);
 
         }
     }
