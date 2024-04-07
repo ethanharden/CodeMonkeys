@@ -118,6 +118,18 @@
                                     {
                                         <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
                                     }
+                                    @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour && !Model.IsAvailabilityBooked(a)))
+                                    {
+                                        <a asp-page="/Teacher/Availabilities/Upsert" asp-route-id="@availability.Id" class="availability-link">
+                                            <div class="card text-white bg-success mb-3">
+                                                <div class="card-header">Available</div>
+                                                <div class="card-body">
+                                                    @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
+                                                </div>
+                                                <br>
+                                            </div>
+                                        </a>
+                                    }
                                 </td>
                             }
                         </tr>
@@ -172,6 +184,19 @@
                                 {
                                     <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
                                 }
+                                @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == currentDay && !Model.IsAvailabilityBooked(a)))
+                                {
+                                    <a asp-page="/Teacher/Availabilities/Upsert" asp-route-id="@availability.Id" class="availability-link">
+                                        <div class="card text-white bg-success mb-3">
+                                            <div class="card-header">Available</div>
+                                            <div class="card-body">
+                                                @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
+                                            </div>
+                                            <br>
+                                        </div>
+                                    </a>
+                                }
+                                
                             </td>
                         }
 

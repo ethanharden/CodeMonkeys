@@ -114,7 +114,10 @@ namespace SchedulingSystemWeb.Pages.Tutor.Home
             await FetchDataForCurrentViewAsync();
             return RedirectToPage();
         }
-
+        public bool IsAvailabilityBooked(Availability availability)
+        {
+            return Bookings.Any(booking => booking.StartTime >= availability.StartTime && booking.StartTime < availability.EndTime);
+        }
 
         private async Task FetchDataForCurrentViewAsync()
         {
