@@ -109,6 +109,10 @@
 
             <!-- Submit button -->
             <button type="submit" class="btn btn-primary">Save</button>
+            @if(Model.objAvailability.Id != 0)
+            {
+                    <a class="btn btn-danger" asp-page="Delete" asp-route-id="@Model.objAvailability.Id">Delete</a>
+                }
         </form>
         </div>
     </div>
@@ -194,7 +198,7 @@
                                                     </div>
                                                 }
                                                 <!-- Display availabilities for the day and hour -->
-                                                 @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour) /* && !Model.IsAvailabilityBooked(a) */)
+                                                 @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour  && !Model.IsAvailabilityBooked(a)))
                                                 {
                                                     <div class="card text-white bg-success mb-3">
                                                         <div class="card-header">Available</div>
@@ -265,7 +269,7 @@
                                         <!-- Display availabilities for the day -->
                                         @if(Model.ViewAvailabilities != null)
                                         {
-                                            @foreach(var availability in Model.ViewAvailabilities.Where(a => a.StartTime.Date == currentDay) /* && !Model.IsAvailabilityBooked(a) */)
+                                            @foreach(var availability in Model.ViewAvailabilities.Where(a => a.StartTime.Date == currentDay && !Model.IsAvailabilityBooked(a)))
                                             {
                                             @* <a asp-page="/Availabilities/Upsert" asp-route-id="@availability.Id" class="card-link"> *@
                                                 <div class="card text-white bg-success mb-3">
