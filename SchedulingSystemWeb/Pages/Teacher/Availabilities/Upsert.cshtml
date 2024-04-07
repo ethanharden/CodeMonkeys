@@ -109,6 +109,10 @@
 
             <!-- Submit button -->
             <button type="submit" class="btn btn-primary">Save</button>
+            @if(Model.objAvailability.Id != 0)
+            {
+                    <a class="btn btn-danger" asp-page="Delete" asp-route-id="@Model.objAvailability.Id">Delete</a>
+                }
         </form>
         </div>
     </div>

@@ -1,0 +1,24 @@
+﻿@page
+@model SchedulingSystemWeb.Pages.Teacher.Availabilities.DeleteModel
+@{
+}
+<form method="post" class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                
+                    
+                        <p class="card-text text-center font-weight-bold">
+                            Availability on @Model.availability.StartTime.ToShortDateString() at @Model.availability.StartTime.ToShortTimeString() - @Model.availability.EndTime.ToShortTimeString()
+                    
+                
+                <hr />
+                <form method="post">
+                    <button type="submit" class="btn btn-danger form-control">Delete</button>
+                </form>
+                 <a href="/Teacher/Availabilities" class="btn btn-outline-primary border  form-control">Back</a>
+               
+            </div>
+        </div>
+    </div>
+</form>
