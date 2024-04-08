@@ -53,6 +53,10 @@ namespace SchedulingSystemWeb.Pages.Availabilities
 
             await FetchDataForCurrentViewAsync();
         }
+        public string GetUserName(string id)
+        {
+            return _unitOfWork.ApplicationUser.Get(i => i.Id == id).FullName;
+        }
 
         public async Task<IActionResult> OnGetPreviousWeekAsync()
         {

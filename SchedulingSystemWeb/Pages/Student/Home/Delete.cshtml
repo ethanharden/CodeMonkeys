@@ -8,23 +8,31 @@
     <div class="col-md-6 mx-auto">
         <div class="card">
             <div class="card-body">
+                
                 @{
                     if (Model.Role != null && Model.Role.FirstOrDefault() != "STUDENT") //TEACHER
-
-                        {
-                        <p class="card-text text-center font-weight-bold">
-                            Meeting with @Model.student.FullName on @Model.bookings.StartTime.ToShortDateString() at @Model.bookings.StartTime.ToShortTimeString()
-                        </p>
+                    {
+                    <p class="card-text text-center font-weight-bold">
+                        Meeting with @Model.student.FullName on @Model.bookings.StartTime.ToShortDateString() at @Model.bookings.StartTime.ToShortTimeString()
+                    </p>
+                    }
+                    else //STUDENT
+                    {
+                    <p class="card-text text-center font-weight-bold">
+                        Meeting with @Model.Teacherinfo.FullName on @Model.bookings.StartTime.ToShortDateString() at @Model.bookings.StartTime.ToShortTimeString()
+                    </p>
                         }
-                        else //STUDENT
-                        {
-                        <p class="card-text text-center font-weight-bold">
-                            Meeting with @Model.Teacherinfo.FullName on @Model.bookings.StartTime.ToShortDateString() at @Model.bookings.StartTime.ToShortTimeString()
-                        </p>
-                        }
-                      }
-                <hr />
+                        <hr />
+                }
                 <form method="post">
+                    <div class="form-group">
+                        <label class="card-text" for="CancelReason">Cancellation Reason: </label>
+                        <input asp-for="CancelReason" id="CancelReason" name="CancelReason" class="form-control" />
+                        <span asp-validation-for="CancelReason" class="text-danger"></span>
+                    </div>
+
+                    <hr />
+
                     <button type="submit" class="btn btn-danger form-control">Delete</button>
                 </form>
                 @if (Model.Role.First() != "STUDENT")
@@ -35,7 +43,7 @@
                 {
                     <a asp-page="./Index" class="btn btn-outline-primary border  form-control">Back</a>
                 }
-
+                
                 
             </div>
         </div>

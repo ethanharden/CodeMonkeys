@@ -120,7 +120,7 @@
                                     @foreach(var booking in Model.Bookings.Where(b => b.StartTime.Date == day.Date && b.StartTime.Hour == hour))
                                     {
                                         <a asp-page="/Teacher/Appointments/Index" asp-route-id="@booking.Id">
-                                        <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
+                                        <div class="booking-event">@Model.GetUserName(booking.User) @booking.StartTime.ToShortTimeString()</div>
                                         </a>
                                     }
                                     <!-- Display availabilities for the day and hour -->
@@ -192,8 +192,8 @@
                                 @foreach(var booking in Model.Bookings.Where(b => b.StartTime.Date == currentDay))
                                 {
                                     <a asp-page="/Teacher/Appointments/Index" asp-route-id="@booking.Id">
-                                    <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
-                                    </a>
+                                        <div class="booking-event">@Model.GetUserName(booking.User) @booking.StartTime.ToShortTimeString()</div>
+                                        </a>
                                 }
                                 <!-- Display availabilities for the day -->
                                 @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == currentDay && !Model.IsAvailabilityBooked(a)))

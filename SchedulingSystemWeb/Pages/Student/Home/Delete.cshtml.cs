@@ -6,6 +6,7 @@ using SendGrid;
 using Microsoft.Graph.Models;
 using SendGrid.Helpers.Mail;
 using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace SchedulingSystemWeb.Pages.Student.Home
 {
@@ -22,6 +23,9 @@ namespace SchedulingSystemWeb.Pages.Student.Home
         public ApplicationUser Teacherinfo { get; set; }
         public ApplicationUser student { get; set; }
         public List<string> Role { get; set; }
+        [Required]
+        [BindProperty]
+        public string CancelReason { get; set; }
         public async Task<IActionResult> OnGetAsync(int? id)
         {
             ApplicationUser user = _unitOfWork.ApplicationUser.Get(i => i.Id == _userManager.GetUserId(User));
@@ -29,10 +33,8 @@ namespace SchedulingSystemWeb.Pages.Student.Home
             string first = Role.First();
             bookings = _unitOfWork.Booking.Get(b => b.Id == id);
             ProviderProfile prov;
-           //if(first != "STUDENT")
-           // {
-                prov = _unitOfWork.ProviderProfile.Get(p => p.Id == bookings.ProviderProfileID);
-            //}
+            prov = _unitOfWork.ProviderProfile.Get(p => p.Id == bookings.ProviderProfileID);
+            
             
             Teacherinfo = _unitOfWork.ApplicationUser.Get(u => u.Id == prov.User);
             student = _unitOfWork.ApplicationUser.Get(b => b.Id == bookings.User);
@@ -66,12 +68,13 @@ namespace SchedulingSystemWeb.Pages.Student.Home
             Teacherinfo = _unitOfWork.ApplicationUser.Get(u => u.Id == p.User);
             student = _unitOfWork.ApplicationUser.Get(b => b.Id == bookings.User);
             var sendgridclient = new SendGridClient("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");
-            if (Role.First() =="STUDENT")
+            if (Role.First() =="STUDENT") // STUDENT 
             {
                 var from = new SendGrid.Helpers.Mail.EmailAddress("CodemonkeysScheduling@outlook.com", "Code Monkeys");
                 var to = new SendGrid.Helpers.Mail.EmailAddress(Teacherinfo.Email, Teacherinfo.FirstName + " " + Teacherinfo.LastName);
                 var subject = "Booking Canceled!";
-                var plainText = student.FirstName + " " + student.LastName + " Cancelled their appointment with you on " + bookings.StartTime.ToShortDateString() + " at " + bookings.StartTime.ToShortTimeString();
+                var plainText = student.FirstName + " " + student.LastName + " Cancelled their appointment with you on " + bookings.StartTime.ToShortDateString() + " at " + bookings.StartTime.ToShortTimeString()
+                    + " With the reason of: " + CancelReason;
                 var htmlContent = "<p>" + plainText + "</p>";
                 var message = MailHelper.CreateSingleEmail(from, to, subject, plainText, htmlContent);
                 var response = await sendgridclient.SendEmailAsync(message); //Teacher Message
@@ -81,7 +84,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
                 message = MailHelper.CreateSingleEmail(from, to, subject, plainText, htmlContent);
                 response = await sendgridclient.SendEmailAsync(message); //Student Message
             }
-            else
+            else //TEACHER
             {
                 var from = new SendGrid.Helpers.Mail.EmailAddress("CodemonkeysScheduling@outlook.com", "Code Monkeys");
                 var to = new SendGrid.Helpers.Mail.EmailAddress(Teacherinfo.Email, Teacherinfo.FirstName + " " + Teacherinfo.LastName);
@@ -91,7 +94,8 @@ namespace SchedulingSystemWeb.Pages.Student.Home
                 var message = MailHelper.CreateSingleEmail(from, to, subject, plainText, htmlContent);
                 var response = await sendgridclient.SendEmailAsync(message); //Teacher Message
                 to = new SendGrid.Helpers.Mail.EmailAddress(student.Email, student.FirstName + " " + student.LastName);
-                plainText = Teacherinfo.FirstName + " " + Teacherinfo.LastName + " Cancelled their appointment with you on " + bookings.StartTime.ToShortDateString() + " at " + bookings.StartTime.ToShortTimeString();
+                plainText = Teacherinfo.FirstName + " " + Teacherinfo.LastName + " Cancelled their appointment with you on " + bookings.StartTime.ToShortDateString() + " at " + bookings.StartTime.ToShortTimeString()
+                    + " With the reason of: " + CancelReason;
                 htmlContent = "<p>" + plainText + "</p>";
                 message = MailHelper.CreateSingleEmail(from, to, subject, plainText, htmlContent);
                 response = await sendgridclient.SendEmailAsync(message); //Student Message
