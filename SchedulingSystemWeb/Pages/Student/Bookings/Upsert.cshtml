@@ -5,11 +5,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meeting Form</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     
+    <script>
+        tinymce.init({
+            selector: '#mytextarea'
+        });
+    </script>
 </head>
 <body>
     <div class="container mt-5">
@@ -44,7 +45,7 @@
                         {
                             <label for="description">Description (Optional):</label>
                         }
-                        <textarea class="form-control" asp-for="description" id="description" placeholder="Enter description"></textarea>
+                        <textarea id="mytextarea" class="form-control" asp-for="description" id="description" placeholder="Enter description"></textarea>
                     </div>
 
                     <div class="form-group">

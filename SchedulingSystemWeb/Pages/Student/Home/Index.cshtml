@@ -180,10 +180,13 @@
                             <td class="month-day @(currentDay.Date == DateTime.Today.Date ? "today" : "")">
                                 @currentDay.Day
                                 <!-- Display bookings for the day -->
-                                @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == currentDay))
-                                {
-                                    <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
-                                }
+                                                
+                                <div class="combined-container" style="max-height: 30vh; overflow: auto;">
+                                    @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == currentDay))
+                                    {
+                                        <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
+                                    }
+                                </div>
                             </td>
                         }
 

@@ -146,21 +146,22 @@
         </div>
     </div>
     
-    <!-- Monthly Schedule Tab -->
-    <div class="tab-pane fade" id="monthly" role="tabpanel" aria-labelledby="monthly-tab">
+ <!-- Monthly Schedule Tab -->
+<div class="tab-pane fade" id="monthly" role="tabpanel" aria-labelledby="monthly-tab">
+    <div class="container">
+        <!-- Monthly Calendar and its navigation buttons -->
         <div class="container">
-            <!-- Monthly Calendar and its navigation buttons -->
-             <div class="container">
-                <!-- Monthly Calendar -->
-                <br />
-                <button type="button" class="btn btn-success mb-3" onclick="window.location.href='@Url.Page("/Teacher/Availabilities/Upsert")'">
-                    Create Availability
-                </button>
-                <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=NextMonth'">Next Month</button>
-                <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=PreviousMonth'">Previous Month</button>               
-                <button type="button" class="btn btn-secondary" style="float: right;" onclick="location.href='?handler=TodayMonth'">Today</button>
-                <h3>@Model.CurrentMonthName @Model.CurrentDate.Year</h3>
-                <table id="monthly-calendar" class="calendar">
+            <!-- Monthly Calendar -->
+            <br />
+            <button type="button" class="btn btn-success mb-3" onclick="window.location.href='@Url.Page("/Teacher/Availabilities/Upsert")'">
+                Create Availability
+            </button>
+            <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=NextMonth'">Next Month</button>
+            <button type="button" class="btn btn-primary" style="float: right; margin-left: 10px;" onclick="location.href='?handler=PreviousMonth'">Previous Month</button>               
+            <button type="button" class="btn btn-secondary" style="float: right;" onclick="location.href='?handler=TodayMonth'">Today</button>
+            <h3>@Model.CurrentMonthName @Model.CurrentDate.Year</h3>
+            <div class="table-responsive"> <!-- Added a container for the table to make it scrollable -->
+                <table id="monthly-calendar" class="calendar table table-bordered">
                     <thead>
                         <tr class="month-header">
                             @for (int i = 0; i < 7; i++)
@@ -173,54 +174,62 @@
                     </thead>
                     <tbody>
                        @for (int i = 0; i < leadingDays + daysInMonth; i++)
-                    {
-                        if (i % 7 == 0)
                         {
-                            @:<tr class="week-row">
-                        }
+                            if (i % 7 == 0)
+                            {
+                                @:<tr class="week-row">
+                            }
 
-                        if (i < leadingDays)
-                        {
-                            <td class="empty-day"></td>
-                        }
-                        else
-                        {
-                            var currentDay = firstDayOfMonth.AddDays(i - leadingDays);
-                            <td class="month-day @(currentDay.Date == DateTime.Today.Date ? "today" : "")">
-                                @currentDay.Day
-                                <!-- Display bookings for the day -->
-                                @foreach(var booking in Model.Bookings.Where(b => b.StartTime.Date == currentDay))
-                                {
-                                    <a asp-page="/Teacher/Appointments/Index" asp-route-id="@booking.Id">
-                                        <div class="booking-event">@Model.GetUserName(booking.User) @booking.StartTime.ToShortTimeString()</div>
-                                        </a>
-                                }
-                                <!-- Display availabilities for the day -->
-                                @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == currentDay && !Model.IsAvailabilityBooked(a)))
-                                {
-                                    <a asp-page="/Teacher/Availabilities/Upsert" asp-route-id="@availability.Id" class="availability-link">
-                                        <div class="card text-white bg-success mb-3">
-                                            <div class="card-header">Available</div>
-                                            <div class="card-body">
-                                                @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
-                                            </div>
-                                            <br>
-                                        </div>
-                                    </a>
-                                }
-                                </td>
-                        }
+                            if (i < leadingDays)
+                            {
+                                <td class="empty-day"></td>
+                            }
+                            else
+                            {
+                                var currentDay = firstDayOfMonth.AddDays(i - leadingDays);
+                                <td class="month-day @(currentDay.Date == DateTime.Today.Date ? "today" : "")">
+                                    @currentDay.Day
+                                    <!-- Display bookings for the day -->
+                                    <div class="combined-container" style="max-height: 30vh; overflow: auto;">
+                                        @foreach(var booking in Model.Bookings.Where(b => b.StartTime.Date == currentDay))
+                                        {
+                                            <a asp-page="/Teacher/Appointments/Index" asp-route-id="@booking.Id">
+                                                
+                                                    <div class="booking-event">@Model.GetUserName(booking.User) @booking.StartTime.ToShortTimeString()</div>
+                                                
+                                            </a>
+                                        }
 
-                        if ((i + 1) % 7 == 0)
-                        {
-                            @:</tr>
+                                        <!-- Display availabilities for the day -->
+                                        @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == currentDay && !Model.IsAvailabilityBooked(a)))
+                                        {
+                                            <a asp-page="/Teacher/Availabilities/Upsert" asp-route-id="@availability.Id" class="availability-link">
+                                                
+                                                    <div class="card text-white bg-success mb-3">
+                                                        <div class="card-header">Available</div>
+                                                        <div class="card-body">
+                                                            @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
+                                                        </div>
+                                                        <br>
+                                                    </div>
+                                                
+                                            </a>
+                                          }
+                                     </div>
+                                 </td>
+                            }
+
+                            if ((i + 1) % 7 == 0)
+                            {
+                                @:</tr>
+                            }
                         }
-                    }
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+</div>
 </div>
 
 @section Scripts {
