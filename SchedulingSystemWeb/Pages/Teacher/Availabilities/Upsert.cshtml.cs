@@ -109,10 +109,11 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         public async Task<IActionResult> OnPostAsync()
         {
             Load();
-            if (SelectedDaysOfWeek == null || !SelectedDaysOfWeek.Any())
+            bool multipleDaysSelected = Request.Form["multipleDaysCheckbox"].FirstOrDefault() == "on";
+
+            if (!multipleDaysSelected || (SelectedDaysOfWeek == null || !SelectedDaysOfWeek.Any()))
             {
-                ModelState.AddModelError("SelectedDaysOfWeek", "Please select at least one day of the week.");
-                return Page();
+                SelectedDaysOfWeek = new List<DayOfWeek> { MeetingDate.DayOfWeek };
             }
 
             ModelState.Remove("SelectedRecurringTypeId");

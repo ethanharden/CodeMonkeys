@@ -68,9 +68,16 @@
                 </select>
             </div>
 
-            <!-- Days of Week -->
-            <div class="form-group">
-                <label class="control-label">Days of Week (Required)</label>
+            <!-- Days of Week Section-->
+            <br />
+            <div class="form-check">
+                <label class="form-check-label" for="multipleDaysCheckbox">
+                    Multiple Days of the Week
+                </label>
+                <input class="form-check-input" type="checkbox" id="multipleDaysCheckbox" name="multipleDaysCheckbox">    
+            </div>
+            <div class="form-group" id="daysOfWeekGroup" style="display:none;">
+                <label class="control-label">Days of Week</label>
                 @{
                     var dayOfWeekValues = Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>();
                     foreach (var day in dayOfWeekValues)
@@ -82,11 +89,13 @@
                     }
                 }
             </div>
+            <br />
 
             <!--Recurring section-->
             <div class="form-group">
-                <label  class="control-label">Recurring</label>
                 <input  asp-for="recurringCheckbox" class="form-check-input" type="checkbox" id="recurringCheckbox" name="recurringCheckbox"/>
+                <label  class="control-label">Recurring</label>
+               
             </div>
             <div>
                 <div class="form-group" style="display:none;" id="recurringTypeGroup">
@@ -106,6 +115,7 @@
                 <input  asp-for="recurringCheckbox" class="form-control" type="date" name="RecurringEndDate" />
                 <span @* asp-validation-for="objAvailability.RecurringEndDate" *@ class="text-danger"></span>
             </div>
+            <br />
 
             <!-- Submit button -->
             <button type="submit" class="btn btn-primary">Save</button>
@@ -420,4 +430,18 @@
         }
     });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var multipleDaysCheckbox = document.getElementById('multipleDaysCheckbox');
+            var daysOfWeekGroup = document.getElementById('daysOfWeekGroup');
+
+            function toggleDaysOfWeek() {
+                daysOfWeekGroup.style.display = multipleDaysCheckbox.checked ? 'block' : 'none';
+            }
+
+            multipleDaysCheckbox.addEventListener('change', toggleDaysOfWeek);
+
+            toggleDaysOfWeek();
+        });
+        </script>
 }
