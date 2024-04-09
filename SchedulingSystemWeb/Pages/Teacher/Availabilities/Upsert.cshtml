@@ -59,18 +59,26 @@
 
             <!-- Duration -->
             <div class="form-group">
-                <label for="duration" class="control-label">Duration</label>
-                <select id="duration" class="form-control">
-                    @for (int i = 15; i <= 300; i += 15)
+            <label for="duration" class="control-label">Duration</label>
+                <select id="duration" class="form-control" >
+                    @for (int i = 30; i <= 200; i += 30)
                     {
                         <option value="@i">@TimeSpan.FromMinutes(i).ToString(@"hh\:mm")</option>
                     }
                 </select>
             </div>
 
-            <!-- Days of Week -->
-            <div class="form-group">
-                <label class="control-label">Days of Week (Required)</label>
+
+            <!-- Days of Week Section-->
+            <br />
+            <div class="form-check">
+                <label class="form-check-label" for="multipleDaysCheckbox">
+                    Multiple Days of the Week
+                </label>
+                <input class="form-check-input" type="checkbox" id="multipleDaysCheckbox" name="multipleDaysCheckbox">    
+            </div>
+            <div class="form-group" id="daysOfWeekGroup" style="display:none;">
+                <label class="control-label">Days of Week</label>
                 @{
                     var dayOfWeekValues = Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>();
                     foreach (var day in dayOfWeekValues)
@@ -82,11 +90,13 @@
                     }
                 }
             </div>
+            <br />
 
             <!--Recurring section-->
             <div class="form-group">
-                <label  class="control-label">Recurring</label>
                 <input  asp-for="recurringCheckbox" class="form-check-input" type="checkbox" id="recurringCheckbox" name="recurringCheckbox"/>
+                <label  class="control-label">Recurring</label>
+               
             </div>
             <div>
                 <div class="form-group" style="display:none;" id="recurringTypeGroup">
@@ -106,6 +116,7 @@
                 <input  asp-for="recurringCheckbox" class="form-control" type="date" name="RecurringEndDate" />
                 <span @* asp-validation-for="objAvailability.RecurringEndDate" *@ class="text-danger"></span>
             </div>
+            <br />
 
             <!-- Submit button -->
             <button type="submit" class="btn btn-primary">Save</button>
@@ -368,23 +379,59 @@
     </script>
     <!--Duration/ EndTime-->
     <script>
-        // Update EndTime
-        function updateEndTime() {
-            var startTime = document.getElementById('objAvailability_StartTime').value;
-            var duration = document.getElementById('duration').value;
-            if (startTime) {
-                var startTimeDate = new Date(startTime);
-                var endTimeDate = new Date(startTimeDate.getTime() + parseInt(duration) * 60000);
-                document.getElementById('endTime').value = endTimeDate.toISOString().slice(0, 16);
+        function updateEndTimeOnStartTimeChange() {
+            var startTimeInput = document.getElementById('MeetingStartTime');
+            var endTimeInput = document.getElementById('MeetingEndTime');
+            var durationSelect = document.getElementById('duration');
+
+            if (startTimeInput.value) {
+                var startTime = new Date('1970-01-01T' + startTimeInput.value + 'Z');
+                var existingEndTime = new Date('1970-01-01T' + endTimeInput.value + 'Z');
+
+                // Check if end time is less than 30 minutes after start time
+                if (existingEndTime - startTime < 30 * 60000) {
+                    var updatedEndTime = new Date(startTime.getTime() + 30 * 60000);
+                    endTimeInput.value = updatedEndTime.toISOString().slice(11, 16); // Update the end time
+                }
+
+                // Update duration based on the new end time
+                updateDurationBasedOnEndTime();
             }
         }
 
-        // Event listener for StartTime
-        document.getElementById('objAvailability_StartTime').addEventListener('change', updateEndTime);
-        document.getElementById('duration').addEventListener('change', updateEndTime);
+        // Update EndTime by Duration
+        function updateEndTimeBasedOnDuration() {
+            var startTimeInput = document.getElementById('MeetingStartTime');
+            var durationSelect = document.getElementById('duration');
+            var endTimeInput = document.getElementById('MeetingEndTime');
 
-        updateEndTime();
-    });
+            if(startTimeInput.value && durationSelect.value) {
+                var startTime = startTimeInput.valueAsDate || new Date('1970-01-01T' + startTimeInput.value + 'Z');
+                var duration = parseInt(durationSelect.value);
+                var endTime = new Date(startTime.getTime() + duration * 60000);
+                endTimeInput.value = endTime.toISOString().slice(11, 16); // Updates the end time
+            }
+        }
+        function updateDurationBasedOnEndTime() {
+            var startTimeInput = document.getElementById('MeetingStartTime');
+            var endTimeInput = document.getElementById('MeetingEndTime');
+            var durationSelect = document.getElementById('duration');
+
+            if (startTimeInput.value && endTimeInput.value) {
+                var startTime = new Date('1970-01-01T' + startTimeInput.value + 'Z');
+                var endTime = new Date('1970-01-01T' + endTimeInput.value + 'Z');
+                var durationInMinutes = (endTime - startTime) / 60000;
+        
+                durationSelect.value = durationInMinutes.toString();
+            }
+        }
+
+        // Event listener
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('MeetingStartTime').addEventListener('change', updateEndTimeOnStartTimeChange);
+            document.getElementById('MeetingEndTime').addEventListener('change', updateDurationBasedOnEndTime);
+            document.querySelector('#duration').addEventListener('change', updateEndTimeBasedOnDuration);
+        });
     </script>
     <!--Show Booking Details-->
     <script>
@@ -420,4 +467,18 @@
         }
     });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var multipleDaysCheckbox = document.getElementById('multipleDaysCheckbox');
+            var daysOfWeekGroup = document.getElementById('daysOfWeekGroup');
+
+            function toggleDaysOfWeek() {
+                daysOfWeekGroup.style.display = multipleDaysCheckbox.checked ? 'block' : 'none';
+            }
+
+            multipleDaysCheckbox.addEventListener('change', toggleDaysOfWeek);
+
+            toggleDaysOfWeek();
+        });
+        </script>
 }
