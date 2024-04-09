@@ -1,7 +1,8 @@
 ﻿@page
-@model SchedulingSystem.Pages.Users.UpdateModel
+@model SchedulingSystem.Pages.Admin.Users.UpdateModel
 @{
 }
+<body>
 <div class="container">
     <form class="form" method="post">
         <div class="row">
@@ -28,29 +29,51 @@
                 <input class="form-control" asp-for="@Model.AppUser.PhoneNumber" value="@Model.AppUser.PhoneNumber" />
             </div>
         </div>
-        @{
-            foreach (var r in Model.AllRoles)
-            {
-                <div class="form-check">
-                    @{
-                        if (Model.UsersRoles.Contains(r))
-                        {
-                            <input class="form-check-input" name="roles" type="checkbox" id="@r" value="@r" checked>
-                            <label class="form-check-label">@r</label>
-                        }
-                        else
-                        {
-                            <input class="form-check-input" name="roles" type="checkbox" id="@r" value="@r">
-                            <label class="form-check-label">@r</label>
-                        }
-                    }
+            <div class="row">
+                <div class="form-group col-md-6" id="departmentGroup" style="display: none;">
+                    <label asp-for="Department">Providers Department</label>
+                    <select asp-for="Department" asp-items="@Model.DepartmentList" class="form-select" id="department">
+                        <option disabled selected>--Select Department--</option>
+                    </select>
                 </div>
+            </div>
+
+            @{
+                foreach (var r in Model.AllRoles)
+                {
+                    <div class="form-check">
+                        @{
+                            if (Model.UsersRoles.Contains(r))
+                            {
+                                <input class="form-check-input" name="roles" type="checkbox" id="@r" value="@r" checked>
+                                <label class="form-check-label">@r</label>
+                            }
+                            else
+                            {
+                                <input class="form-check-input" name="roles" type="checkbox" id="@r" value="@r">
+                                <label class="form-check-label">@r</label>
+                            }
+                        }
+                    </div>
+                }
             }
-        }
-        <button type="submit">Update</button>
-    </form>
-</div>
+            <button type="submit">Update</button>
+        </form>
+    </div>
 
+    <script>
+        var departmentGroup = document.getElementById('departmentGroup');
+        var teacherCheckbox = document.querySelector('input[name="roles"][value="TEACHER"]');
 
+        teacherCheckbox.addEventListener('change', function () {
+            console.log('Checkbox state changed');
+            if (this.checked) {
+                departmentGroup.style.display = 'block';
+            } else {
+                departmentGroup.style.display = 'none';
+            }
+        });
+    </script>
+</body>
 
 

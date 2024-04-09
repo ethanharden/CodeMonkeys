@@ -175,8 +175,8 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
                             _unitOfWork.Commit();
                             
                             ReturnUrl = "/Teacher/Availabilities";
-                            
                         }
+                        
                     }
                     else
                     {

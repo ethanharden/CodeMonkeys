@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace SchedulingSystem.Pages.Users
+namespace SchedulingSystem.Pages.Admin.Users
 {
     public class UserIndexModel : PageModel
     {

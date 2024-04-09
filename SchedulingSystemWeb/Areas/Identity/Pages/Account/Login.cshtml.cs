@@ -124,6 +124,10 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
                     {
                         return LocalRedirect("/Tutor/Home");
                     }
+                    else if (User.IsInRole("ADMIN"))
+                    {
+                        return LocalRedirect("/Admin/Users/UserIndex");
+                    }
                     else
                     {
                         return LocalRedirect("/Teacher/Availabilities");
