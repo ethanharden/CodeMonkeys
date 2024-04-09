@@ -82,7 +82,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             CurrentMonthName = CurrentDate.ToString("MMMM");
             MonthDays = _calendarService.GetMonthDays(CurrentDate);
             await FetchDataForCurrentViewAsync();
-            return Page();
+            return RedirectToPage();
         }
         public async Task<IActionResult> OnGetNextMonthAsync()
         {
