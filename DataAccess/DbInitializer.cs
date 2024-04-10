@@ -207,6 +207,13 @@ namespace DataAccess
             }
             _db.SaveChanges();
 
+            var locationTypes = new List<LocationType> { 
+                new LocationType
+                {
+
+                }
+            }
+
             var Locations = new List<Location>
             {
                 new Location {

@@ -24,5 +24,8 @@ namespace Infrastructure.Models
         public string? BuildingName { get; set; }
         [DisplayName("Room Number")]
         public string? RoomNumber { get; set; }
+
+        public int locationType { get; set; }
+        public int profileId { get; set; }
     }
 }

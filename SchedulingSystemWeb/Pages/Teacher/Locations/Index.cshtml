@@ -1,4 +1,70 @@
 ﻿@page
 @model SchedulingSystemWeb.Pages.Teacher.Locations.IndexModel
 @{
+    ViewData["Title"] = "Locations";
+}
+
+<h2 class="text-primary">@ViewData["Title"]</h2>
+
+<div>
+    <h4>
+        Appointment Locations
+    </h4>
+<div>
+    <button >Create a new Location</button>
+    <div>
+        <form method="post">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-title">Virtual</p>
+                        <hr />
+                        <p class="card-text">
+                            <input asp-for="providerProfile.RemoteLink" disabled="disabled" class="form-control" />
+                        </p>
+                        <input type="checkbox" id="editRemoteLinkCheckbox" onclick="toggleEditability()"> Edit
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+    </div>
+
+    @foreach(var location in Model.LocationList)
+    {
+      <div class="col-md-4">
+         <div class="card">
+            <div class="card-body">                                                                        
+                <p class="card-title">@location.LocationName</p>
+                <hr />
+                    <p class="card-text"> @location.BuildingName</p>
+                    <p class="card-text"> @location.RoomNumber</p>
+                    @if (location.locationType == 1)
+                    {
+                        <p class="card-text"> Campus: Ogden </p>
+                    }
+                    @if (location.locationType == 2)
+                    {
+                        <p class="card-text"> Campus: Ogden </p>
+                    }
+                    <p class="card-text"> @location.Address1</p>
+                    @if(location.Address2 != "" || location.Address2 == null){
+                        <p class="card-text"> @location.Address2</p>
+                    }                         
+                    <p class="card-text"> @location.AddressCity</p>
+                <a asp-page="/Teacher/Locations/Upsert" asp-route-id="@location.LocationId" class="btn btn-primary">Edit</a>                                          
+            </div>
+         </div>
+     </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function toggleEditability() {
+            var checkBox = document.getElementById("editRemoteLinkCheckbox");
+            var inputField = document.querySelector('input[asp-for="providerProfile.RemoteLink"]');
+            inputField.disabled = !checkBox.checked;
+        }
+    </script>
 }

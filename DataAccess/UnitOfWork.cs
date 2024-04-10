@@ -25,6 +25,19 @@ namespace DataAccess
         public IGenericRepository<ApplicationUser> _ApplicationUser;
         public IGenericRepository<AvailabilityGroup> _AvailabilityGroup;
         public IGenericRepository<Department> _Department;
+        public IGenericRepository<LocationType> _LocationType;
+
+        public IGenericRepository<LocationType> LocationType
+        {
+            get
+            {
+                if (_LocationType == null)
+                {
+                    _LocationType = new GenericRepository<LocationType>(_DbContext);
+                }
+                return _LocationType;
+            }
+        }
 
         public IGenericRepository<Department> Department
         {

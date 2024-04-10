@@ -19,6 +19,8 @@ namespace Infrastructure.Interfaces
         public IGenericRepository<RecurringType> RecurringType { get; }
         public IGenericRepository<CustomerProfile> CustomerProfile { get; }
         public IGenericRepository<Department> Department { get; }
+        public IGenericRepository<LocationType> LocationType { get; }
+
         int Commit();
 
         Task<int> CommitAsync();

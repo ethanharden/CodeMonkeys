@@ -24,6 +24,7 @@ namespace DataAccess
         public DbSet <RecurringType> RecurringTypes { get; set; }
         public DbSet<AvailabilityGroup> AvailabilityGroups { get; set; }
         public DbSet<Department> Department { get; set; }
+        public DbSet<LocationType> LocationTypes { get; set; }
 
     }
 }
