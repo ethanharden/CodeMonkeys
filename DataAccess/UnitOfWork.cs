@@ -26,6 +26,19 @@ namespace DataAccess
         public IGenericRepository<AvailabilityGroup> _AvailabilityGroup;
         public IGenericRepository<Department> _Department;
         public IGenericRepository<LocationType> _LocationType;
+        public IGenericRepository<Category> _Category;
+
+        public IGenericRepository<Category> Category
+        {
+            get
+            {
+                if (_Category == null)
+                {
+                    _Category = new GenericRepository<Category>(_DbContext);
+                }
+                return _Category;
+            }
+        }
 
         public IGenericRepository<LocationType> LocationType
         {

@@ -38,7 +38,7 @@ namespace SchedulingSystemWeb.Pages.Teacher.Appointments
             if (booking.Attachment != null)
             {
                 string wwwroot = _webHostEnvironment.WebRootPath;
-                filepath = Path.Combine(wwwroot, booking.Attachment);
+                filepath = Path.Combine(wwwroot, booking.Attachment[0]);
             }
             
         }

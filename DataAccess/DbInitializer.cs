@@ -15,12 +15,14 @@ namespace DataAccess
         private readonly AppDbContext _db;
         private readonly UnitOfWork _unitOfWork;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         
-        public DbInitializer(AppDbContext db, UnitOfWork unitOfWork, RoleManager<IdentityRole> roleManager)
+        public DbInitializer(AppDbContext db, UnitOfWork unitOfWork, RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
         {
             _db = db;
             _unitOfWork = unitOfWork;
             _roleManager = roleManager;
+            _userManager = userManager;
         }
 
         public void Initialize()
@@ -85,46 +87,79 @@ namespace DataAccess
             _roleManager.CreateAsync(new IdentityRole("ADVISOR")).GetAwaiter().GetResult();
 
 
-            var ApplicationUsers = new List<ApplicationUser>
+            //Create at least one "Super Admin Account"
+            _userManager.CreateAsync(new ApplicationUser
             {
-                new ApplicationUser { FirstName = "John",
-                    LastName = "Doe",
-                    PhoneNum = "801-555-5555",
-                    
-                    Email = "JohnDoe@JohnDoe.com",
-                    
-                },  
-                new ApplicationUser { FirstName = "Jane",
-                    LastName = "Doe",
-                    PhoneNum = "801-555-5556",
-                    
-                    Email = "JaneDoe@JaneDoe.com"
-                    //Role
-                },
-                new ApplicationUser { FirstName = "Richard",
-                    LastName = "Fry",
-                    PhoneNum = "801-555-5557",
-                    
-                    Email = "RichardFry@RichardFry.com"
-                },
-                new ApplicationUser { FirstName = "Pat",
-                    LastName = "DeJong",
-                    PhoneNum = "801-555-5558",
-                    
-                    Email = "PatDeJong@PatDeJong.com"
-                },
-                new ApplicationUser { FirstName = "Julie",
-                    LastName = "Christensen",
-                    PhoneNum = "801-555-5559",
-                    
-                    Email = "JulieChristensen@JulieChristensen.com"
-                },
-            };
+                FirstName = "Supreme",
+                LastName = "Admin",
+                PhoneNum = "801-555-5555",
+                Email = "Admin@Admin.com",
+            }, "Password123!").GetAwaiter().GetResult();
 
-            foreach (var c in ApplicationUsers)
+            ApplicationUser user = _db.ApplicationUsers.FirstOrDefault(u => u.Email == "Admin@Admin.com");
+            _userManager.AddToRoleAsync(user, "ADMIN").GetAwaiter().GetResult();
+
+
+            //other accounts
+            _userManager.CreateAsync(new ApplicationUser
             {
-                _db.ApplicationUsers.Add(c);
-            }
+                FirstName = "John",
+                LastName = "Doe",
+                PhoneNum = "801-555-5555",
+                Email = "JohnDoe@JohnDoe.com",
+            }, "Password123!").GetAwaiter().GetResult();
+
+             user = _db.ApplicationUsers.FirstOrDefault(u => u.Email == "JohnDoe@JohnDoe.com");
+            _userManager.AddToRoleAsync(user, "STUDENT").GetAwaiter().GetResult();
+
+            _userManager.CreateAsync(new ApplicationUser
+            {
+                FirstName = "Jane",
+                LastName = "Doe",
+                PhoneNum = "801-555-5556",
+
+                Email = "JaneDoe@JaneDoe.com"
+            }, "Password123!").GetAwaiter().GetResult();
+
+            user = _db.ApplicationUsers.FirstOrDefault(u => u.Email == "JaneDoe@JaneDoe.com");
+            _userManager.AddToRoleAsync(user, "TUTOR").GetAwaiter().GetResult();
+
+            _userManager.CreateAsync(new ApplicationUser
+            {
+                FirstName = "Richard",
+                LastName = "Fry",
+                PhoneNum = "801-555-5557",
+
+                Email = "RichardFry@RichardFry.com"
+            }, "Password123!").GetAwaiter().GetResult();
+
+            user = _db.ApplicationUsers.FirstOrDefault(u => u.Email == "RichardFry@RichardFry.com");
+            _userManager.AddToRoleAsync(user, "TEACHER").GetAwaiter().GetResult();
+
+            _userManager.CreateAsync(new ApplicationUser
+            {
+                FirstName = "Pat",
+                LastName = "DeJong",
+                PhoneNum = "801-555-5558",
+
+                Email = "PatDeJong@PatDeJong.com"
+            }, "Password123!").GetAwaiter().GetResult();
+
+            user = _db.ApplicationUsers.FirstOrDefault(u => u.Email == "PatDeJong@PatDeJong.com");
+            _userManager.AddToRoleAsync(user, "ADVISOR").GetAwaiter().GetResult();
+
+
+            _userManager.CreateAsync(new ApplicationUser
+            {
+                FirstName = "Julie",
+                LastName = "Christensen",
+                PhoneNum = "801-555-5559",
+                Email = "JulieChristensen@JulieChristensen.com"
+            }, "Password123!").GetAwaiter().GetResult();
+
+            user = _db.ApplicationUsers.FirstOrDefault(u => u.Email == "JulieChristensen@JulieChristensen.com");
+            _userManager.AddToRoleAsync(user, "ADVISOR").GetAwaiter().GetResult();
+
             _db.SaveChanges();
 
 
@@ -207,38 +242,68 @@ namespace DataAccess
             }
             _db.SaveChanges();
 
-            var locationTypes = new List<LocationType> { 
+            var locationTypes = new List<LocationType> {
                 new LocationType
                 {
-
-                }
+                    LocationTypeName = "Virtual Zoom Link",
+                    Address1="",
+                    Address2="",
+                    AddressCity=""
+                },
+                new LocationType
+                {
+                    LocationTypeName = "Ogden Campus",
+                    Address1 = "3848 Harrison Blvd",
+                    Address2 = "",
+                    AddressCity = "Ogden"
+                },
+                new LocationType
+                {
+                    LocationTypeName = "Davis Campus",
+                    Address1 = "2750 University Park Blvd",
+                    Address2 = "",
+                    AddressCity = "Layton"
+                },
+                new LocationType
+                {
+                    LocationTypeName = "Farmington Campus",
+                   Address1 = "240 N East Promontory",
+                    Address2 = "",
+                    AddressCity = "Farmington"
+                },
+            };
+            foreach (var locationType in locationTypes)
+            {
+                _db.LocationTypes.Add(locationType);
             }
+            _db.SaveChanges();
+
+            var patId = _unitOfWork.ApplicationUser.Get(u => u.Email == "PatDeJong@PatDeJong.com").Id;
+            var richId = _unitOfWork.ApplicationUser.Get(u => u.Email == "RichardFry@RichardFry.com").Id;
+            var julieId = _unitOfWork.ApplicationUser.Get(u => u.Email == "JulieChristensen@JulieChristensen.com").Id;
 
             var Locations = new List<Location>
             {
                 new Location {
-                    LocationName = "Ogden Campus",
-                    Address1 = "3848 Harrison Blvd",
-                    Address2 = "",
-                    AddressCity = "Ogden",
+                    LocationName = "Norda Ogden Campus",
                     BuildingName = "Norda",
-                    RoomNumber = "101"
+                    RoomNumber = "101",
+                    LocationType=2,
+                    ProfileId = _unitOfWork.ProviderProfile.Get(p => p.User == julieId).Id,
                 },
                 new Location {
-                    LocationName = "Davis Campus",
-                    Address1 = "2750 University Park Blvd",
-                    Address2 = "",
-                    AddressCity = "Layton",
+                    LocationName = "D2 Davis Campus",
                     BuildingName = "D2",
-                    RoomNumber = "102"
+                    RoomNumber = "102",
+                    LocationType=3,
+                    ProfileId = _unitOfWork.ProviderProfile.Get(p => p.User == patId).Id,
                 },
                 new Location {
-                    LocationName = "Farmington Campus",
-                    Address1 = "240 N East Promontory",
-                    Address2 = "",
-                    AddressCity = "Farmington",
+                    LocationName = "Main Farmington Campus",
                     BuildingName = "Main",
-                    RoomNumber = "103"
+                    RoomNumber = "103",
+                    LocationType=4,
+                    ProfileId = _unitOfWork.ProviderProfile.Get(p => p.User == richId).Id,
                 }
             };
 
@@ -265,11 +330,6 @@ namespace DataAccess
                 _db.RecurringTypes.Add(c);
             }
             _db.SaveChanges();
-
-
-            var patId = _unitOfWork.ApplicationUser.Get(u => u.Email == "PatDeJong@PatDeJong.com").Id;
-            var richId = _unitOfWork.ApplicationUser.Get(u => u.Email == "RichardFry@RichardFry.com").Id;
-            var julieId = _unitOfWork.ApplicationUser.Get(u => u.Email == "JulieChristensen@JulieChristensen.com").Id;
 
             var Availabilitys = new List<Availability>
             {
@@ -375,7 +435,6 @@ namespace DataAccess
             var bookAvailabilities = _unitOfWork.Availability.GetAll().Take(5).ToList();
             for (int i = 1; i <= 5; i++)
             {
-                var user = _unitOfWork.ApplicationUser.Get(u=> u.Id == patId);
                 var booking = new Booking
                 {
                     ProviderProfileID = _unitOfWork.ProviderProfile.Get(p => p.User == patId).Id,

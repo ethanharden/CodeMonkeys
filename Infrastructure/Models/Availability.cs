@@ -34,6 +34,10 @@ namespace Infrastructure.Models
         [Required]
         [DisplayName("End Time")]
         public DateTime EndTime { get; set; }
+
+        [Required]
+        public List<int> Category { get; set; }
+
         
     }
 }

@@ -16,16 +16,13 @@ namespace Infrastructure.Models
         [Required]
         public string LocationName { get; set; }
         
-        public string? Address1 { get; set; }
-        public string? Address2 { get; set; }
-        [DisplayName("City")]
-        public string? AddressCity { get; set; }
-
         public string? BuildingName { get; set; }
+
         [DisplayName("Room Number")]
         public string? RoomNumber { get; set; }
 
-        public int locationType { get; set; }
-        public int profileId { get; set; }
+        public int LocationType { get; set; }
+
+        public int ProfileId { get; set; }
     }
 }

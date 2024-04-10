@@ -20,8 +20,12 @@ namespace Infrastructure.Models
         public int DeparmentId { get; set; }
 
         public string userFullName { get; set; }
-        public string? RemoteLink {  get; set; }
+        public string? RemoteLink { get; set; }
         public string? BookingPrompt { get; set; }
+
+        public TimeSpan? workingStartHours { get; set; }
+        public TimeSpan? workingEndHours { get; set; }
+
 
     }
 }

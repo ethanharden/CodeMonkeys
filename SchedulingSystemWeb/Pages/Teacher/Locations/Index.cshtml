@@ -20,7 +20,7 @@
                         <p class="card-title">Virtual</p>
                         <hr />
                         <p class="card-text">
-                            <input asp-for="providerProfile.RemoteLink" disabled="disabled" class="form-control" />
+                            @* <input asp-for="providerProfile.RemoteLink" disabled="disabled" class="form-control" /> *@
                         </p>
                         <input type="checkbox" id="editRemoteLinkCheckbox" onclick="toggleEditability()"> Edit
                     </div>
@@ -30,7 +30,7 @@
         </form>
     </div>
 
-    @foreach(var location in Model.LocationList)
+    @* @foreach(var location in Model.LocationList)
     {
       <div class="col-md-4">
          <div class="card">
@@ -56,7 +56,7 @@
             </div>
          </div>
      </div>
-    }
+    } *@
 </div>
 
 @section Scripts {

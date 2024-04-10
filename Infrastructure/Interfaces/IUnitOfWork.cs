@@ -20,6 +20,7 @@ namespace Infrastructure.Interfaces
         public IGenericRepository<CustomerProfile> CustomerProfile { get; }
         public IGenericRepository<Department> Department { get; }
         public IGenericRepository<LocationType> LocationType { get; }
+        public IGenericRepository<Category> Category { get; }
 
         int Commit();
 

@@ -24,7 +24,7 @@ namespace SchedulingSystemWeb.Pages.Teacher.Locations
         public void OnGet()
         {
             providerProfile = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User));
-            LocationList = _unitOfWork.Location.GetAll().Where(l=>l.profileId == providerProfile.Id);
+            //LocationList = _unitOfWork.Location.GetAll().Where(l=>l.profileId == providerProfile.Id);
         }
         public async Task<IActionResult> OnPostAsync()
         {

@@ -23,7 +23,7 @@ namespace Infrastructure.Models
         public DateTime StartTime { get; set; }
         [Required]
         public int Duration { get; set; }
-        public string? Attachment {  get; set; }
+        public List<string>? Attachment {  get; set; }
 
         [ForeignKey("ProviderId")]
         public int ProviderProfileID { get; set; }

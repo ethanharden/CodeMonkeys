@@ -25,6 +25,7 @@ namespace DataAccess
         public DbSet<AvailabilityGroup> AvailabilityGroups { get; set; }
         public DbSet<Department> Department { get; set; }
         public DbSet<LocationType> LocationTypes { get; set; }
+        public DbSet<Category> Categories { get; set; }
 
     }
 }

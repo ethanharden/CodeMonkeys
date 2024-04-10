@@ -101,7 +101,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                 using var fileStream = System.IO.File.Create(fullPath);
                 files[0].CopyTo(fileStream);
                 //associate real URL and save to DB
-                newBooking.Attachment = @"\bookingFiles\" + fileName + extension;
+                newBooking.Attachment[0] = @"\bookingFiles\" + fileName + extension;
             }
             
             
