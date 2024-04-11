@@ -3,7 +3,31 @@
 @{
     ViewData["Title"] = "Register";
 }
+<head>
+    <script>
+        function toggleInput() {
+            var checkbox = document.getElementById("showWNumber");
+            var wNumberField = document.getElementById("wNumberField");
 
+            if (checkbox.checked) {
+                wNumberField.style.display = "block";
+            } else {
+                wNumberField.style.display = "none";
+            }
+        }
+        function validateForm() {
+            var wNumberInput = document.getElementById("wNumber");
+            var wNumberValue = wNumberInput.value.trim();
+
+            if (wNumberValue !== "" && !/^\d+$/.test(wNumberValue)) {
+                alert("WNumber must contain only numbers.");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</head>
 <h1>@ViewData["Title"]</h1>
 <h2 id="external-login-title">Associate your @Model.ProviderDisplayName account.</h2>
 <hr />
@@ -19,9 +43,35 @@
         <form asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
             <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" autocomplete="email" placeholder="Please enter your email."/>
+                <input asp-for="Input.Email" class="form-control" autocomplete="email" placeholder="Please enter your email." />
                 <label asp-for="Input.Email" class="form-label"></label>
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Phone Number" />
+                <label asp-for="Input.PhoneNumber" class="form-label"></label>
+                <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.FirstName" class="form-control" />
+                <label asp-for="Input.FirstName" class="form-label"></label>
+                <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.LastName" class="form-control" />
+                <label asp-for="Input.LastName" class="form-label"></label>
+                <span asp-validation-for="Input.LastName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="showWNumber" onchange="toggleInput()">
+                    <label class="form-check-label" for="showWNumber">Are you a current WSU student?</label>
+                </div>
+                <div id="wNumberField" style="display: none;">
+                    <label for="wNumber">WNumber (Only Numbers):</label>
+                    <input class="form-control" id="wNumber" asp-for="Input.WNumber">
+                    <span asp-validation-for="Input.WNumber" class="text-danger"></span>
+                </div>
             </div>
             <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
         </form>

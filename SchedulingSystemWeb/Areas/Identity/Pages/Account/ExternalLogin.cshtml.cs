@@ -1,6 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-#nullable disable
+﻿#nullable disable
 
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -100,11 +98,11 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
             [Required]
             [Display(Name = "Last Name")]
             public string LastName { get; set; }
-
+            public int WNumber { get; set; } 
 
 
         }
-        
+
         public IActionResult OnGet() => RedirectToPage("./Login");
 
         public IActionResult OnPost(string provider, string returnUrl = null)
@@ -179,9 +177,9 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
                 user.FirstName = Input.FirstName;
                 user.LastName = Input.LastName;
                 user.PhoneNum = Input.PhoneNumber;
-                
+
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-             //   await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                //   await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
 
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
@@ -201,6 +199,7 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
                             protocol: Request.Scheme);
                         await _userManager.AddToRoleAsync(user, "STUDENT"); // Add profile
                         CustomerProfile customerProfile = new CustomerProfile();
+                        if (Input.WNumber != null) { customerProfile.WNumber = Input.WNumber; }
                         customerProfile.User = user.Id;
                         _unitOfWork.CustomerProfile.Add(customerProfile);
                         _unitOfWork.Commit();

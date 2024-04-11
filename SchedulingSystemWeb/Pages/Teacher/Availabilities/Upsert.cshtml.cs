@@ -9,9 +9,11 @@ using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SchedulingSystemWeb.Pages.Availabilities
 {
+    [Authorize(Roles = "TUTOR, TEACHER, ADVISOR")]
     public class UpsertModel : PageModel
     {
 

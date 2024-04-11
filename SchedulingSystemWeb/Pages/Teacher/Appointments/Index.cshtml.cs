@@ -1,5 +1,6 @@
 using DataAccess;
 using Infrastructure.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace SchedulingSystemWeb.Pages.Teacher.Appointments
 {
+    [Authorize(Roles = "TUTOR, TEACHER, ADVISOR")]
     public class IndexModel : PageModel
     {
         private readonly UnitOfWork _unitOfWork;

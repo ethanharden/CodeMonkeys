@@ -1,10 +1,12 @@
 using DataAccess;
 using Infrastructure.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace SchedulingSystemWeb.Pages.Teacher.Availabilities
 {
+    [Authorize(Roles = "TUTOR, TEACHER, ADVISOR")]
     public class DeleteModel : PageModel
     {
         private readonly UnitOfWork _unitOfWork;

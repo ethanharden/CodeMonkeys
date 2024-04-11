@@ -10,10 +10,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Graph.Models;
+using Microsoft.AspNetCore.Authorization;
 //using Microsoft.AspNet.Identity;
 
 namespace SchedulingSystemWeb.Pages.Student.Bookings
 {
+    [Authorize(Roles = "STUDENT, TUTOR")]
     public class IndexModel : PageModel
     {
         private readonly UnitOfWork _unitOfWork;

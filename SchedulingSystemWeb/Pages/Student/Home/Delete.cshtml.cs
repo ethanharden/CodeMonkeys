@@ -7,9 +7,11 @@ using Microsoft.Graph.Models;
 using SendGrid.Helpers.Mail;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SchedulingSystemWeb.Pages.Student.Home
 {
+    [Authorize]
     public class DeleteModel : PageModel
     {
         private readonly UnitOfWork _unitOfWork;

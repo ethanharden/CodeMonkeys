@@ -1,5 +1,6 @@
 using DataAccess;
 using Infrastructure.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace SchedulingSystem.Pages.Admin.Users
 {
+    [Authorize(Roles = "ADMIN")]
     public class UpdateModel : PageModel
     {
 

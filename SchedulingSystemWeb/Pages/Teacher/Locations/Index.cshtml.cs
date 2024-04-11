@@ -1,12 +1,14 @@
 using DataAccess;
 using Infrastructure.Interfaces;
 using Infrastructure.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace SchedulingSystemWeb.Pages.Teacher.Locations
 {
+    [Authorize(Roles = "TUTOR, TEACHER, ADVISOR, ADMIN")]
     public class IndexModel : PageModel
     {
 

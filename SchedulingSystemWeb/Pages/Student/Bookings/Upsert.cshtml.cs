@@ -28,8 +28,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Client;
 using SendGrid.Helpers.Mail;
 using SendGrid;
+using Microsoft.AspNetCore.Authorization;
 namespace SchedulingSystemWeb.Pages.Student.Bookings
 {
+    [Authorize(Roles = "STUDENT, TUTOR")]
     public class UpsertModel : PageModel
     {
         private readonly IHttpClientFactory _httpClientFactory;
