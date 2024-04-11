@@ -23,8 +23,8 @@ namespace Infrastructure.Models
         public string? RemoteLink { get; set; }
         public string? BookingPrompt { get; set; }
 
-        public TimeSpan? workingStartHours { get; set; }
-        public TimeSpan? workingEndHours { get; set; }
+        public TimeOnly? workingStartHours { get; set; }
+        public TimeOnly? workingEndHours { get; set; }
 
 
     }
