@@ -80,124 +80,124 @@ namespace DataAccess
 
 
 
-            //_roleManager.CreateAsync(new IdentityRole("STUDENT")).GetAwaiter().GetResult();
-            //_roleManager.CreateAsync(new IdentityRole("TEACHER")).GetAwaiter().GetResult();
-            //_roleManager.CreateAsync(new IdentityRole("TUTOR")).GetAwaiter().GetResult();
-            //_roleManager.CreateAsync(new IdentityRole("ADMIN")).GetAwaiter().GetResult();
-            //_roleManager.CreateAsync(new IdentityRole("ADVISOR")).GetAwaiter().GetResult();
+            _roleManager.CreateAsync(new IdentityRole("STUDENT")).GetAwaiter().GetResult();
+            _roleManager.CreateAsync(new IdentityRole("TEACHER")).GetAwaiter().GetResult();
+            _roleManager.CreateAsync(new IdentityRole("TUTOR")).GetAwaiter().GetResult();
+            _roleManager.CreateAsync(new IdentityRole("ADMIN")).GetAwaiter().GetResult();
+            _roleManager.CreateAsync(new IdentityRole("ADVISOR")).GetAwaiter().GetResult();
 
-            // _db.SaveChanges();
+            _db.SaveChanges();
 
-            // Create the super admin account
-    //        var adminUser = new ApplicationUser
-    //        {
-    //            FirstName = "Supreme",
-    //            LastName = "Admin",
-    //            UserName = "Admin@Admin.com", // Ensure UserName is set for IdentityUser
-    //            Email = "Admin@Admin.com",
-    //            PhoneNum = "801-555-5555",
-    //        };
-    //        //_db.ApplicationUsers.AddAsync(adminUser);
+           // Create the super admin account
+           var adminUser = new ApplicationUser
+           {
+               FirstName = "Supreme",
+               LastName = "Admin",
+               UserName = "Admin@Admin.com", // Ensure UserName is set for IdentityUser
+               Email = "Admin@Admin.com",
+               PhoneNum = "801-555-5555",
+           };
+            //_db.ApplicationUsers.AddAsync(adminUser);
 
-    //        _userManager.CreateAsync(adminUser, "Password123!").GetAwaiter().GetResult();     
-    //        _userManager.AddToRoleAsync(adminUser, "ADMIN").GetAwaiter().GetResult();
-
-
-    //        //other accounts
-    //       var studentUser = new ApplicationUser
-    //        {
-    //            FirstName = "John",
-    //            LastName = "Doe",
-    //            PhoneNum = "801-555-5555",
-    //            Email = "JohnDoe@JohnDoe.com",
-    //};
-    //        _db.ApplicationUsers.AddAsync(studentUser);
-
-    //        _userManager.CreateAsync(studentUser, "Password123!").GetAwaiter().GetResult();
-    //        _userManager.AddToRoleAsync(studentUser, "STUDENT").GetAwaiter().GetResult();
-
-    //        var tutorUser = new ApplicationUser
-    //        {
-    //            FirstName = "Jane",
-    //            LastName = "Doe",
-    //            PhoneNum = "801-555-5556",
-    //            Email = "JaneDoe@JaneDoe.com",
-
-    //        };
-    //        _db.ApplicationUsers.AddAsync(tutorUser);
-
-    //        _userManager.CreateAsync(tutorUser, "Password123!").GetAwaiter().GetResult();
-    //        _userManager.AddToRoleAsync(tutorUser, "TUTOR").GetAwaiter().GetResult();
-
-    //        var teacherUser = new ApplicationUser
-    //        {
-    //            FirstName = "Richard",
-    //            LastName = "Fry",
-    //            PhoneNum = "801-555-5557",
-    //            Email = "RichardFry@RichardFry.com"
-    //        };
-    //        _db.ApplicationUsers.AddAsync(teacherUser);
-
-    //        _userManager.CreateAsync(teacherUser, "Password123!").GetAwaiter().GetResult();
-    //        _userManager.AddToRoleAsync(teacherUser, "TEACHER").GetAwaiter().GetResult();
-
-    //        var advisorUser = new ApplicationUser
-    //        {
-    //            FirstName = "Pat",
-    //            LastName = "DeJong",
-    //            PhoneNum = "801-555-5558",
-    //            Email = "PatDeJong@PatDeJong.com"
-    //        };
-    //        _db.ApplicationUsers.AddAsync(advisorUser);
-
-    //        _userManager.CreateAsync(advisorUser, "Password123!").GetAwaiter().GetResult();
-    //        _userManager.AddToRoleAsync(advisorUser, "ADVISOR").GetAwaiter().GetResult();
+            _userManager.CreateAsync(adminUser, "Password123!").GetAwaiter().GetResult();
+            _userManager.AddToRoleAsync(adminUser, "ADMIN").GetAwaiter().GetResult();
 
 
-    //        var advisorUser2 = new ApplicationUser
-    //        {
-    //            FirstName = "Julie",
-    //            LastName = "Christensen",
-    //            PhoneNum = "801-555-5559",
-    //            Email = "JulieChristensen@JulieChristensen.com"
-    //        };
-    //        _db.ApplicationUsers.AddAsync(advisorUser2);
+            //other accounts
+            var studentUser = new ApplicationUser
+            {
+                FirstName = "John",
+                LastName = "Doe",
+                PhoneNum = "801-555-5555",
+                Email = "JohnDoe@JohnDoe.com",
+            };
+            _db.ApplicationUsers.AddAsync(studentUser);
 
-    //        _userManager.CreateAsync(advisorUser2, "Password123!").GetAwaiter().GetResult();
-    //        _userManager.AddToRoleAsync(advisorUser2, "ADVISOR").GetAwaiter().GetResult();
+            _userManager.CreateAsync(studentUser, "Password123!").GetAwaiter().GetResult();
+            _userManager.AddToRoleAsync(studentUser, "STUDENT").GetAwaiter().GetResult();
 
-    //        _db.SaveChanges();
+            var tutorUser = new ApplicationUser
+            {
+                FirstName = "Jane",
+                LastName = "Doe",
+                PhoneNum = "801-555-5556",
+                Email = "JaneDoe@JaneDoe.com",
+
+            };
+            _db.ApplicationUsers.AddAsync(tutorUser);
+
+            _userManager.CreateAsync(tutorUser, "Password123!").GetAwaiter().GetResult();
+            _userManager.AddToRoleAsync(tutorUser, "TUTOR").GetAwaiter().GetResult();
+
+            var teacherUser = new ApplicationUser
+            {
+                FirstName = "Richard",
+                LastName = "Fry",
+                PhoneNum = "801-555-5557",
+                Email = "RichardFry@RichardFry.com"
+            };
+            _db.ApplicationUsers.AddAsync(teacherUser);
+
+            _userManager.CreateAsync(teacherUser, "Password123!").GetAwaiter().GetResult();
+            _userManager.AddToRoleAsync(teacherUser, "TEACHER").GetAwaiter().GetResult();
+
+            var advisorUser = new ApplicationUser
+            {
+                FirstName = "Pat",
+                LastName = "DeJong",
+                PhoneNum = "801-555-5558",
+                Email = "PatDeJong@PatDeJong.com"
+            };
+            _db.ApplicationUsers.AddAsync(advisorUser);
+
+            _userManager.CreateAsync(advisorUser, "Password123!").GetAwaiter().GetResult();
+            _userManager.AddToRoleAsync(advisorUser, "ADVISOR").GetAwaiter().GetResult();
 
 
-    //        var Departments = new List<Department>
-    //        {
-    //            new Department
-    //            {
-    //                Name = "Computer Science"
-    //            },
-    //            new Department
-    //            {
-    //                Name = "General Studies"
-    //            },
-    //            new Department
-    //            {
-    //                Name = "Networking"
-    //            },
-    //            new Department
-    //            {
-    //                Name = "Web Development"
-    //            },
-    //            new Department
-    //            {
-    //                Name = "Cybersecurity"
-    //            }
-    //        };
+            var advisorUser2 = new ApplicationUser
+            {
+                FirstName = "Julie",
+                LastName = "Christensen",
+                PhoneNum = "801-555-5559",
+                Email = "JulieChristensen@JulieChristensen.com"
+            };
+            _db.ApplicationUsers.AddAsync(advisorUser2);
 
-    //        foreach (var d in Departments)
-    //        {
-    //            _db.Department.Add(d);
-    //        }
-    //        _db.SaveChanges();
+            _userManager.CreateAsync(advisorUser2, "Password123!").GetAwaiter().GetResult();
+            _userManager.AddToRoleAsync(advisorUser2, "ADVISOR").GetAwaiter().GetResult();
+
+            _db.SaveChanges();
+
+
+            var Departments = new List<Department>
+            {
+                new Department
+                {
+                    Name = "Computer Science"
+                },
+                new Department
+                {
+                    Name = "General Studies"
+                },
+                new Department
+                {
+                    Name = "Networking"
+                },
+                new Department
+                {
+                    Name = "Web Development"
+                },
+                new Department
+                {
+                    Name = "Cybersecurity"
+                }
+            };
+
+            foreach (var d in Departments)
+            {
+                _db.Department.Add(d);
+            }
+            _db.SaveChanges();
 
             var ProviderProfiles = new List<ProviderProfile>
             {
