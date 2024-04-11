@@ -254,7 +254,14 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             await _unitOfWork.CommitAsync();
             TempData["FormStatus"] = "Success";
             TempData["SuccessMessage"] = "Availability saved successfully.";
-            return RedirectToPage("./Index");
+            if (User.IsInRole("TEACHER"))
+            {
+                return Redirect("/teacher/appointments/index");
+            }
+            else if (User.IsInRole("TUTOR"))
+            {
+                return Redirect("/tutor/home/index");
+            }
         }
 
         public async Task<IActionResult> OnGetPreviousWeekAsync(int? id)

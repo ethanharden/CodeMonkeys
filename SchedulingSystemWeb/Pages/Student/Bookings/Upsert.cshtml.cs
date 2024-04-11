@@ -166,7 +166,17 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
                     }
             }
-            return Redirect("/student/home/index");
+            
+            if (User.IsInRole("STUDENT"))
+            {
+                return Redirect("/student/home/index");
+            }
+            else if (User.IsInRole("TUTOR"))
+            {
+                return Redirect("/tutor/home/index");
+            }
+
+
         }
         public async Task SendEmail(Booking newBooking)
         {   
