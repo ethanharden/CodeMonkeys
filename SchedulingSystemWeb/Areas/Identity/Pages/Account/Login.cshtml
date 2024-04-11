@@ -4,7 +4,37 @@
 @{
     ViewData["Title"] = "Log in";
 }
+<head>
+    <style>
+        .google-login-button {
+            background-color: #fff;
+            color: #757575;
+            border: 1px solid #757575;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-family: Roboto, sans-serif;
+            display: flex;
+            align-items: center;
+        }
 
+            .google-login-button:hover {
+                background-color: #f1f1f1;
+            }
+
+        .google-logo {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+        }
+
+        .google-login-button span {
+            flex: 1;
+            text-align: center;
+        }
+    </style>
+</head>
 <h1>@ViewData["Title"]</h1>
 <div class="row">
     <div class="col-md-4">
@@ -67,7 +97,14 @@
                             <p>
                                 @foreach (var provider in Model.ExternalLogins!)
                                 {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
+                                    
+                                    <button type="submit" class="google-login-button" value="@provider.Name" title="Log in using your @provider.DisplayName account" name="provider">
+                                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo" class="google-logo">
+                                        <span>Login with Google</span>
+                                    </button>
+                                    
+                                    
+                                    
                                 }
                             </p>
                         </div>
