@@ -262,6 +262,8 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             {
                 return Redirect("/tutor/home/index");
             }
+            
+            return Redirect("/Index");
         }
 
         public async Task<IActionResult> OnGetPreviousWeekAsync(int? id)

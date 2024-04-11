@@ -176,7 +176,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                 return Redirect("/tutor/home/index");
             }
 
-
+            return Redirect("/Index");
         }
         public async Task SendEmail(Booking newBooking)
         {   
