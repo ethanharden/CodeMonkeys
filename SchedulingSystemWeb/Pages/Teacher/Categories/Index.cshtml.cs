@@ -11,7 +11,7 @@ namespace SchedulingSystemWeb.Pages.Teacher.Categories
         private readonly UnitOfWork _unitOfWork;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public IEnumerable<Category> Categories { get; set; }
+        public IEnumerable<Category> Categories { get; set; } = Enumerable.Empty<Category>();
 
         public IndexModel(UnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
         {
@@ -23,6 +23,19 @@ namespace SchedulingSystemWeb.Pages.Teacher.Categories
         {
             var prof = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id;
             Categories = _unitOfWork.Category.GetAll().Where(c => c.ProviderProfile == prof);
+        }
+
+        public async Task<IActionResult> OnPostAsync(int id)
+        {
+            var category = _unitOfWork.Category.Get(c => c.Id == id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+            _unitOfWork.Category.Delete(category);
+            await _unitOfWork.CommitAsync();
+
+            return RedirectToPage();
         }
     }
 }

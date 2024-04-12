@@ -21,8 +21,20 @@ namespace SchedulingSystemWeb.Pages.Teacher.Categories
             _userManager = userManager;
         }
 
-        public IActionResult OnGet()
+        public IActionResult OnGet(int? id)
         {
+            if (id.HasValue)
+            {
+                objCategory = _unitOfWork.Category.GetById(id.Value);
+                if (objCategory == null)
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                objCategory = new Category();
+            }
             return Page();
         }
 
@@ -34,11 +46,18 @@ namespace SchedulingSystemWeb.Pages.Teacher.Categories
             }
 
             objCategory.ProviderProfile = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id;
-
-            _unitOfWork.Category.Add(objCategory);
+            if (objCategory.Id == 0)// Adding a new
+            {              
+                _unitOfWork.Category.Add(objCategory);
+            }
+            else// editing existing
+            {              
+                _unitOfWork.Category.Update(objCategory);
+            }
             await _unitOfWork.CommitAsync();
 
             return RedirectToPage("./Index");
         }
+
     }
 }

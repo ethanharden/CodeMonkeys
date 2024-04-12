@@ -2,16 +2,17 @@
 @model SchedulingSystemWeb.Pages.Teacher.Categories.UpsertModel
 @{
 }
-<h2>Create New Category</h2>
+<h2>@(Model.objCategory.Id == 0 ? "Create New Category" : "Edit Category")</h2>
 
 <form method="post">
+    <input type="hidden" asp-for="objCategory.Id" />
     <div class="mb-3">
         <label for="Name" class="form-label">Name</label>
-        <input type="text" class="form-control" id="Name" name="Name" required>
+        <input type="text" class="form-control" id="Name" asp-for="objCategory.Name" required>
     </div>
     <div class="mb-3">
         <label for="Color" class="form-label">Color</label>
-        <input type="color" class="form-control form-control-color" id="Color" name="Color" required value="#563d7c" title="Choose your color">
+        <input type="color" class="form-control form-control-color" id="Color" asp-for="objCategory.Color" required>
     </div>
-    <button type="submit" class="btn btn-primary">Create Category</button>
+    <button type="submit" class="btn btn-primary">Submit</button>
 </form>
