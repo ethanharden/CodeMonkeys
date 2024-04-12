@@ -1,6 +1,7 @@
 using DataAccess;
 using Infrastructure.Interfaces;
 using Infrastructure.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,6 +11,7 @@ using System.Security.Claims;
 
 namespace SchedulingSystemWeb.Pages.Student.Home
 {
+    [Authorize(Roles = "STUDENT, TUTOR")]
     public class IndexModel : PageModel
     {
         private readonly UnitOfWork _unitOfWork;

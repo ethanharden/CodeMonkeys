@@ -45,25 +45,39 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account.Manage
        
         
         public bool Edit {  get; set; }
-        [BindProperty]  
+        [BindProperty]
+
+        [Display(Name = "First Name")]
         public string FirstName { get; set; }
         [BindProperty]
+        [Display(Name = "Last Name")]
         public string LastName { get; set; }
         [BindProperty]
+        [Display(Name = "Phone Number")]
         public string PhoneNum { get; set; }
         
         [BindProperty]
+        [Display(Name = "Remote Link")]
         public string RemoteLink { get; set; }
         [BindProperty]
+        [Display(Name = "Booking Prompt")]
         public string BookingPrompt { get; set; }
         [BindProperty]
+        
         public int? WNumber { get; set; }
         [BindProperty]
+        [Display(Name = "Profile Picture")]
         public string ProfilePicture { get; set; }
         [BindProperty]
         public bool IsProvider { get; set; }
         [BindProperty]
         public string Department { get; set; }
+        [BindProperty]
+        [Display(Name = "Working Start Time")]
+        public TimeOnly? StartTime { get; set; }
+        [BindProperty]
+        [Display(Name = "Working End Time")]
+        public TimeOnly? EndTime { get; set; }
         public IEnumerable<SelectListItem> DepartmentList { get; set; }
         private async Task LoadAsync(ApplicationUser user)
         {
@@ -74,6 +88,7 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account.Manage
             LastName = user.LastName;
             ProfilePicture = user.ProfilePicture;
             Username = userName;
+            
             DepartmentList = _unitOfWork.Department.GetAll().Select(r => new SelectListItem
             {
                 Text = r.Name,
@@ -93,7 +108,20 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account.Manage
             {
                 IsProvider = true;
                 var prof = _unitOfWork.ProviderProfile.Get(u => u.User == user.Id);
-                Department = _unitOfWork.Department.Get(u => u.Id == prof.DeparmentId).Name;
+                if (prof.DeparmentId == 0)
+                {
+                    Department = "No Department";
+                }
+                else
+                {
+                    Department = _unitOfWork.Department.Get(u => u.Id == prof.DeparmentId).Name;
+                }
+                if(prof.workingStartHours!=null)
+                {
+                    StartTime = (TimeOnly)prof.workingStartHours;
+                }
+                if(prof.workingEndHours!=null) { EndTime = (TimeOnly)prof.workingEndHours;}
+                
                 BookingPrompt = prof.BookingPrompt;
                 RemoteLink = prof.RemoteLink;
             }
@@ -169,8 +197,11 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account.Manage
                 
                 ProviderProfile profiderProfile = _unitOfWork.ProviderProfile.Get(u => u.User == user.Id);
                 profiderProfile.BookingPrompt = BookingPrompt;
-                profiderProfile.DeparmentId = Int32.Parse(Department);
-                //profiderProfile.DepartmentString = Department;
+                profiderProfile.workingStartHours = StartTime;
+                profiderProfile.workingEndHours = EndTime;
+                if (Department != null) { profiderProfile.DeparmentId = Int32.Parse(Department); }
+               
+                
                 profiderProfile.RemoteLink = RemoteLink;
                 _unitOfWork.ProviderProfile.Update(profiderProfile);
             }

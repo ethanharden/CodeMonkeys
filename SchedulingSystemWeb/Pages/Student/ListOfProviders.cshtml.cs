@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SchedulingSystemWeb.Pages.Student
 {
+    [Authorize(Roles = "STUDENT, TUTOR")]
     public class ListOfProvidersModel : PageModel
     {
         private readonly UnitOfWork _unitOfWork;

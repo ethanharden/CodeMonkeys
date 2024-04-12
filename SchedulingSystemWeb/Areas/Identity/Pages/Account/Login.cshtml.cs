@@ -104,7 +104,7 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync()
         {
-            
+
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
@@ -116,11 +116,11 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
-                    if(User.IsInRole("STUDENT"))
+                    if (User.IsInRole("STUDENT"))
                     {
                         return LocalRedirect("/Student/Home");
                     }
-                    else if(User.IsInRole("TUTOR"))
+                    else if (User.IsInRole("TUTOR"))
                     {
                         return LocalRedirect("/Tutor/Home");
                     }
@@ -133,7 +133,7 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
                         return LocalRedirect("/Teacher/Availabilities");
                     }
                 }
-                
+
                 if (result.IsLockedOut)
                 {
                     _logger.LogWarning("User account locked out.");

@@ -7,9 +7,11 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SchedulingSystemWeb.Pages.Availabilities
 {
+    [Authorize(Roles = "TUTOR, TEACHER, ADVISOR")]
     public class IndexModel : PageModel
     {
         private readonly UnitOfWork _unitOfWork;

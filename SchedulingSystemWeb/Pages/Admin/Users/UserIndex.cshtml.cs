@@ -1,12 +1,14 @@
 using DataAccess;
 using Infrastructure;
 using Infrastructure.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace SchedulingSystem.Pages.Admin.Users
 {
+    [Authorize(Roles = "ADMIN")]
     public class UserIndexModel : PageModel
     {
         private readonly UnitOfWork _unitOfWork;

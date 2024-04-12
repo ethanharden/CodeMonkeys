@@ -7,6 +7,8 @@ using Infrastructure.Models;
 using Infrastructure.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
+var services = builder.Services;
+var configuration = builder.Configuration;
 
 builder.Services.AddRazorPages();
 
@@ -17,6 +19,11 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer
 
 //builder.Services.AddSingleton<IEmailSender, EmailSender>();
 
+services.AddAuthentication().AddGoogle(googleOptions =>
+{
+    googleOptions.ClientId = "328091863377-t5vqtgru7ripid77tm6n51f015vmv9t6.apps.googleusercontent.com";
+    googleOptions.ClientSecret = "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";
+});
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>() // ApplicationUser should extend IdentityUser
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
@@ -50,7 +57,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error");
+    app.UseDeveloperExceptionPage();
+    //app.UseExceptionHandler("/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
