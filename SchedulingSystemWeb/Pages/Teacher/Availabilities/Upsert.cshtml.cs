@@ -52,6 +52,9 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         public DateTime? RecurringEndDate { get; set; }
         [BindProperty]
         public int SelectedRecurringTypeId { get; set; }
+        public IEnumerable<Category> AllCategories { get; set; }
+        [BindProperty]
+        public List<int> CategoryIds { get; set; } = new List<int>();
 
 
         public UpsertModel(UnitOfWork unitOfWork, ICalendarService calendarService, UserManager<ApplicationUser> userManager)
@@ -72,7 +75,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             CurrentMonthName = CurrentDate.ToString("MMMM");
             WeekDays = _calendarService.GetWeekDays(CurrentDate);
             MonthDays = _calendarService.GetMonthDays(CurrentDate);
-            
+
 
             if (id.HasValue && id != 0)
             {
@@ -89,8 +92,9 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                     Id = 0,
                     StartTime = DateTime.Today.AddDays(1), // Set to tomorrow's date
                     EndTime = DateTime.Today.AddDays(1).AddHours(1), // Set to tomorrow's date + 1 hour
-                    ProviderProfileID = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id,
+                    ProviderProfileID = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id,                  
                 };
+                objAvailability.Category = CategoryIds;
             }
 
             Availabilities = _unitOfWork.Availability.GetAll().Where(p => p.ProviderProfileID == objAvailability.ProviderProfileID);
@@ -103,12 +107,19 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         public void Load()
         {
             RecurringTypes = _unitOfWork.RecurringType.GetAll();
+            var tempProf = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id;
+            AllCategories = _unitOfWork.Category.GetAll().Where(c => c.ProviderProfile == tempProf);
         }
 
 
         public async Task<IActionResult> OnPostAsync()
         {
             Load();
+            if (!CategoryIds.Any())
+            {
+                ModelState.AddModelError("CategoryValidation", "At least one category must be selected.");
+            }
+
             bool multipleDaysSelected = Request.Form["multipleDaysCheckbox"].FirstOrDefault() == "on";
 
             if (!multipleDaysSelected || (SelectedDaysOfWeek == null || !SelectedDaysOfWeek.Any()))
@@ -118,6 +129,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
 
             ModelState.Remove("SelectedRecurringTypeId");
             ModelState.Remove("objAvailability.ProviderFullName");
+            ModelState.Remove("objAvailability.Category");
             if (!ModelState.IsValid)
             {
                 var errorList = ModelState.Values.SelectMany(v => v.Errors.Select(b => b.ErrorMessage)).ToList();
@@ -174,7 +186,8 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                                 ProviderProfileID = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id,
                                 ProviderFullName = _unitOfWork._ProviderProfile.Get(p => p.Id == objAvailability.ProviderProfileID).userFullName,
                                 LocationId = 1,
-                            };
+                                Category = CategoryIds,
+                        };
 
                             _unitOfWork.Availability.Add(newAvailability);
                             await _unitOfWork.CommitAsync();
@@ -225,6 +238,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                             ProviderProfileID = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id,
                             ProviderFullName = _unitOfWork._ProviderProfile.Get(p=>p.Id == objAvailability.ProviderProfileID).userFullName,
                             LocationId = 1,
+                            Category = CategoryIds,
                         };
                         _unitOfWork.Availability.Add(newAvailability);
                     }
@@ -321,7 +335,6 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         {
             return Bookings.Any(booking => booking.StartTime >= availability.StartTime && booking.StartTime < availability.EndTime);
         }
-
         private List<DateTime> CalculateWeeksForRecurring(DateTime start, DateTime end, int daysBetween)
         {
             var dates = new List<DateTime>();
@@ -333,6 +346,21 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             }
             return dates;
         }
+        //public void CreateCategory(string categoryName, string color)
+        //{
+        //    var newCategory = new Category
+        //    {
+        //        Name = categoryName,
+        //        Color = color
+        //    };
+        //    if(newCategory.Name == "")
+        //    {
+        //        newCategory.Name = "New Category";
+        //    }
+
+        //    _unitOfWork.Category.Add(newCategory);
+        //    _unitOfWork.Commit();
+        //}
 
         private async Task FetchDataForCurrentViewAsync()
         {

@@ -118,6 +118,38 @@
             </div>
             <br />
 
+            <!-- Categories -->
+            <div class="form-group">
+                <label>Categories</label>
+                <div id="categoriesBox">
+                    @foreach (var category in Model.AllCategories)
+                    {
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="CategoryIds" id="category-@category.Id" value="@category.Id">
+                            <label class="form-check-label" for="category-@category.Id">@category.Name</label>
+                        </div>
+                    }
+                </div>
+                <!-- Container for dynamically added categories -->
+                @* <div id="newCategoryContainer"></div>
+                <br />
+                <!-- Button to add a new category row -->               
+                <br />
+                <div id="addingCategory" style="display:none;">
+                    <div class="mb-3">
+                        <label for="Name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="Name" name="Name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="Color" class="form-label">Color</label>
+                        <input type="color" class="form-control form-control-color" id="Color" name="Color" required value="#563d7c" title="Choose your color">
+                    </div>
+                </div>
+                <button type="button" id="addCategoryButton" class="btn btn-primary btn-sm"> new category </button> *@
+            </div>
+            <br />
+            <br />
+
             <!-- Submit button -->
             <button type="submit" class="btn btn-primary">Save</button>
             @if(Model.objAvailability.Id != 0)
@@ -481,4 +513,25 @@
             toggleDaysOfWeek();
         });
         </script>
+    <!--Categories-->
+    <script>
+        document.getElementById('addCategoryButton').addEventListener('click', function() {
+            var categoryName = document.getElementById('newCategoryName').value;
+            var categoryColor = document.getElementById('newCategoryColor').value;
+            Model.CreateCategory(categoryName, categoryColor);
+
+            var container = document.getElementById('newCategoryContainer');
+
+            var newCategoryDiv = document.createElement('div');
+            newCategoryDiv.className = 'form-check form-check-inline';
+            newCategoryDiv.innerHTML = `<input class="form-check-input" type="checkbox" id="category-${category.Id}" name="objAvailability.Category" value="${category.Id}">
+                                        <label class="form-check-label" for="category-${category.Id}" style="background-color:${category.Color};">${category.Name}</label>`;
+
+            // Append the new category to the container
+            container.appendChild(newCategoryDiv);
+
+            document.getElementById('newCategoryName').value = '';
+            document.getElementById('newCategoryColor').value = '';
+        });
+    </script>
 }
