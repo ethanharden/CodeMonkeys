@@ -6,7 +6,7 @@
         <option value="">-- Select Role --</option>
         @foreach (var role in Model.Roles)
         {
-            if (role.Name != "STUDENT") @* this makes sure that student schedules can't be searched' *@
+            if (role.Name != "STUDENT" || role.Name != "ADMIN") @* this makes sure that student schedules can't be searched' *@
             {
                 <option value="@role.Name">@role.Name</option>
             }          
@@ -31,6 +31,12 @@
     <button type="submit">New Student</button>
 </form>
 
+<form id="virtualAdvisingForm" method="post">
+    <input type="hidden" name="role" value="ADVISOR">
+    <input type="hidden" name="department" value="1">
+    <input type="hidden" name="locationTypeId" value="2">
+    <button type="submit">Advising Virtual</button>
+</form>
 
 <script>
     document.getElementById("newStudentForm").addEventListener("submit", function (event) {
@@ -38,6 +44,12 @@
         event.preventDefault();
         // Submit the form
         document.getElementById("newStudentForm").submit();
+    });
+    document.getElementById("virtualAdvisingForm").addEventListener("submit", function (event) {
+        // Prevent the default form submission behavior
+        event.preventDefault();
+        // Submit the form
+        document.getElementById("virtualAdvisingForm").submit();
     });
     document.getElementById("searchForm").addEventListener("submit", function (event) {
         var role = document.getElementsByName("role")[0].value;

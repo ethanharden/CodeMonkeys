@@ -69,7 +69,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         }
 
 
-        public async Task OnGetAsync(string role, int? department, string? providerUserId, int? LocationTypeId)
+        public async Task OnGetAsync(string role, int? department, string? providerUserId, int? locationTypeId)
         {
             //string currentTab = HttpContext.Request.Query["tab"].ToString().ToLower();
             //if (string.IsNullOrEmpty(currentTab) || (currentTab != "weekly" && currentTab != "monthly"))
@@ -87,13 +87,13 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             {
                 provProfID = _unitOfWork.ProviderProfile.Get(p => p.User == providerUserId).Id;
             }
-            if (LocationTypeId != null)
+            if (locationTypeId != null)
             {
                 //locationType = _unitOfWork.Availability.Get(p => p.LocationId == LocationId).Id;
-                LocationTypeId = _unitOfWork.LocationType.Get(p => p.Id == LocationTypeId).Id;
+                locationTypeId = _unitOfWork.LocationType.Get(p => p.Id == locationTypeId).Id;
             }
             
-            InitializeSessionStates(role, department, provProfID, LocationTypeId);
+            InitializeSessionStates(role, department, provProfID, locationTypeId);
             await LoadDataAsync(provProfID);
 
             SetupDateAndViewData();
