@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using System.Drawing;
 
 namespace SchedulingSystemWeb.Pages.Availabilities
 {
@@ -28,6 +29,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         public List<DateTime> MonthDays { get; private set; }
         public string CurrentMonthName { get; private set; }
         public IEnumerable<Booking> nextBookings { get; set; }
+
 
         public IndexModel(UnitOfWork unitOfWork, ICalendarService calendarService, UserManager<ApplicationUser> userManager)
         {
@@ -58,6 +60,17 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         public string GetUserName(string id)
         {
             return _unitOfWork.ApplicationUser.Get(i => i.Id == id).FullName;
+        }
+        public List<string> GetCategoryColors(List<int> categoryIds)
+        {
+            var categories = _unitOfWork.Category.GetAll().Where(c => categoryIds.Contains(c.Id)).ToList();
+            return categories.Select(c => c.Color).ToList();
+        }
+        public string GetTextColor(string backgroundColor)
+        {
+            var color = ColorTranslator.FromHtml(backgroundColor);
+            double luminance = (0.299 * color.R + 0.587 * color.G + 0.114 * color.B) / 255;
+            return luminance > 0.5 ? "black" : "white";
         }
 
         public async Task<IActionResult> OnGetPreviousWeekAsync()
