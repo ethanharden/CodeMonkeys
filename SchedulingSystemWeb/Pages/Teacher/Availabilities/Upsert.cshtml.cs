@@ -10,6 +10,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.AspNetCore.Authorization;
+using System.Drawing;
 
 namespace SchedulingSystemWeb.Pages.Availabilities
 {
@@ -271,6 +272,17 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             return RedirectToPage("./Index");
         }
 
+        public List<string> GetCategoryColors(List<int> categoryIds)
+        {
+            var categories = _unitOfWork.Category.GetAll().Where(c => categoryIds.Contains(c.Id)).ToList();
+            return categories.Select(c => c.Color).ToList();
+        }
+        public string GetTextColor(string backgroundColor)
+        {
+            var color = ColorTranslator.FromHtml(backgroundColor);
+            double luminance = (0.299 * color.R + 0.587 * color.G + 0.114 * color.B) / 255;
+            return luminance > 0.5 ? "black" : "white";
+        }
         public async Task<IActionResult> OnGetPreviousWeekAsync(int? id)
         {
             Load();
