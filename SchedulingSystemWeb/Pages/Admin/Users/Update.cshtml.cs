@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.IdentityModel.Tokens;
+using static Microsoft.Kiota.Abstractions.Authentication.ApiKeyAuthenticationProvider;
 
 namespace SchedulingSystem.Pages.Admin.Users
 {
@@ -128,8 +130,28 @@ namespace SchedulingSystem.Pages.Admin.Users
                     if (Department != null) { newprofile.DeparmentId = Int32.Parse(Department); }
                     newprofile.userFullName = user.FullName;
                     _unitOfWork.ProviderProfile.Add(newprofile);
-
                     _unitOfWork.Commit();
+
+                    int profId = _unitOfWork.ProviderProfile.Get(p => p.User == user.Id).Id;
+                    //add a location and category to the new providerProfile
+                    if (_unitOfWork.Location.GetAll().Where(l => l.ProfileId == profId).IsNullOrEmpty())
+                    {
+                        Location newLocation = new Location();
+                        newLocation.ProfileId = profId;
+                        newLocation.LocationName = "Virtual Meeting";
+                        newLocation.LocationType = 1;
+                        _unitOfWork.Location.Add(newLocation);
+                        _unitOfWork.Commit();
+                    }
+                    if ((_unitOfWork.Category.GetAll().Where(c => c.ProviderProfile == profId)).IsNullOrEmpty())
+                    {
+                        Category newCategory = new Category();
+                        newCategory.Name = "General Appointment";
+                        newCategory.ProviderProfile = profId;
+                        newCategory.Color = "#4C0E7D";
+                        _unitOfWork.Category.Add(newCategory);
+                        _unitOfWork.Commit();
+                    }
                 }
             }
             return RedirectToPage("./UserIndex", new { sucess = true, message = "Update Successful" });
