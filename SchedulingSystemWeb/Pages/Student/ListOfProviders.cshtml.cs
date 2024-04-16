@@ -45,12 +45,13 @@ namespace SchedulingSystemWeb.Pages.Student
             return new JsonResult(providerProfiles);
         }
 
-        public async Task<IActionResult> OnPostAsync(string role, int department)
+        public async Task<IActionResult> OnPostAsync(string role, int department, int locationTypeId)
         {
             TempData["SelectedRole"] = role;
             TempData["SelectedDepartment"] = department.ToString();
+            TempData["SelectedLocationTypeId"] = locationTypeId;
 
-            return RedirectToPage("/Student/Bookings/Index", new { role = role, department = department});
+            return RedirectToPage("/Student/Bookings/Index", new { role = role, department = department, locationTypeId = locationTypeId});
         }
         
 
