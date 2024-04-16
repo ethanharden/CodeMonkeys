@@ -32,5 +32,8 @@ namespace Infrastructure.Models
 
         [ForeignKey("AvailabilityId")]
         public int objAvailability { get; set; }
+        [ForeignKey("AvailabilityId")]
+        public int? CategoryID { get; set; }
+        public int LocationID { get; set; }
     }
 }

@@ -108,6 +108,7 @@ namespace DataAccess
             {
                 FirstName = "John",
                 LastName = "Doe",
+                UserName = "JohnDoe@JohnDoe.com",
                 PhoneNum = "801-555-5555",
                 Email = "JohnDoe@JohnDoe.com",
             };
@@ -120,6 +121,7 @@ namespace DataAccess
             {
                 FirstName = "Jane",
                 LastName = "Doe",
+                UserName = "JaneDoe@JaneDoe.com",
                 PhoneNum = "801-555-5556",
                 Email = "JaneDoe@JaneDoe.com",
 
@@ -133,6 +135,7 @@ namespace DataAccess
             {
                 FirstName = "Richard",
                 LastName = "Fry",
+                UserName = "RichardFry@RichardFry.com",
                 PhoneNum = "801-555-5557",
                 Email = "RichardFry@RichardFry.com"
             };
@@ -145,7 +148,9 @@ namespace DataAccess
             {
                 FirstName = "Pat",
                 LastName = "DeJong",
+                UserName = "PatDeJong@PatDeJong.com",
                 PhoneNum = "801-555-5558",
+
                 Email = "PatDeJong@PatDeJong.com"
             };
             _db.ApplicationUsers.AddAsync(advisorUser);
@@ -158,6 +163,7 @@ namespace DataAccess
             {
                 FirstName = "Julie",
                 LastName = "Christensen",
+                UserName = "JulieChristensen@JulieChristensen.com",
                 PhoneNum = "801-555-5559",
                 Email = "JulieChristensen@JulieChristensen.com"
             };
