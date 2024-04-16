@@ -84,7 +84,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             newBooking.ProviderProfileID = availability.ProviderProfileID;
             //newBooking.User = await _userManager.GetUserAsync(User);
             newBooking.Note = description;
-            newBooking.MeetingTitle = title;
+            //newBooking.MeetingTitle = title;
             newBooking.User = _userManager.GetUserId(User);
             newBooking.objAvailability = availability.Id;
             string webRootPath = _webhostenvironment.WebRootPath;

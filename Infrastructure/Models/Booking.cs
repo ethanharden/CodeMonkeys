@@ -14,8 +14,6 @@ namespace Infrastructure.Models
         [Key]
         public int Id { get; set; }
         public int? WNumber { get; set; }
-        [Required]
-        public string MeetingTitle {  get; set; }
         
         public string? Subject { get; set; }
         public string? Note { get; set; }
@@ -32,8 +30,9 @@ namespace Infrastructure.Models
 
         [ForeignKey("AvailabilityId")]
         public int objAvailability { get; set; }
-        [ForeignKey("AvailabilityId")]
+        [ForeignKey("CategoryId")]
         public int? CategoryID { get; set; }
+        [Required]
         public int LocationID { get; set; }
     }
 }

@@ -41,30 +41,30 @@ namespace DataAccess
 
             }
 
-            //if (_db.ApplicationUsers.Any())
-            //{
-            //    return; //DB has been seeded
-            //}
+            if (_db.ApplicationUsers.Any())
+            {
+                return; //DB has been seeded
+            }
 
-            //if (_db.Availabilities.Any())
-            //{
-            //    return; //DB has been seeded
-            //}
+            if (_db.Availabilities.Any())
+            {
+                return; //DB has been seeded
+            }
 
-            //if (_db.Bookings.Any())
-            //{
-            //    return; //DB has been seeded
-            //}
+            if (_db.Bookings.Any())
+            {
+                return; //DB has been seeded
+            }
 
-            //if (_db.CustomerProfiles.Any())
-            //{
-            //    return; //DB has been seeded
-            //}
+            if (_db.CustomerProfiles.Any())
+            {
+                return; //DB has been seeded
+            }
 
-            //if (_db.Locations.Any())
-            //{
-            //    return; //DB has been seeded
-            //}
+            if (_db.Locations.Any())
+            {
+                return; //DB has been seeded
+            }
 
             if (_db.ProviderProfiles.Any())
             {
@@ -342,6 +342,26 @@ namespace DataAccess
             }
             _db.SaveChanges();
 
+            var cat = new List<Category>
+            {
+                new Category
+                {
+                    Name = "General Studies",
+                    ProviderProfile = _unitOfWork.ProviderProfile.Get(p => p.User == patId).Id,
+                    Color = "4C0E7D"
+                }
+            };
+
+            foreach (var c in cat)
+            {
+                _db.Categories.Add(c);
+            }
+            _db.SaveChanges();
+
+            int pId = _unitOfWork.ProviderProfile.Get(p => p.User == patId).Id;
+            List<int> cList = new List<int>();
+            cList.Add(_unitOfWork.Category.Get(c => c.ProviderProfile == pId).Id);
+
             var Availabilitys = new List<Availability>
             {
                 new Availability
@@ -352,6 +372,7 @@ namespace DataAccess
                     StartTime = new DateTime(2024, 4, 25, 9, 0, 0), // April 25, 2024, 9:00 AM
                     EndTime = new DateTime(2024, 4, 25, 10, 0, 0), // April 25, 2024, 5:00 PM
                     ProviderFullName = "Pat Dejong",
+                    Category = cList,
                 },
                 new Availability
                 {
@@ -361,6 +382,7 @@ namespace DataAccess
                     StartTime = new DateTime(2024, 4, 26, 9, 0, 0),
                     EndTime = new DateTime(2024, 4, 26, 10, 0, 0),
                     ProviderFullName = "Pat Dejong",
+                    Category = cList,
                 },
                 new Availability
                 {
@@ -370,6 +392,7 @@ namespace DataAccess
                     StartTime = new DateTime(2024, 4, 27, 2, 0, 0),
                     EndTime = new DateTime(2024, 4, 27, 2, 30, 0),
                     ProviderFullName = "Pat Dejong",
+                    Category = cList,
                 },
                 new Availability
                 {
@@ -379,6 +402,7 @@ namespace DataAccess
                     StartTime = new DateTime(2024, 4, 27, 3, 0, 0),
                     EndTime = new DateTime(2024, 4, 27, 3, 45, 0),
                     ProviderFullName = "Pat Dejong",
+                    Category = cList,
                 },
                 new Availability
                 {
@@ -388,6 +412,7 @@ namespace DataAccess
                     StartTime = new DateTime(2024, 4, 28, 7, 0, 0),
                     EndTime = new DateTime(2024, 4, 28, 8, 0, 0),
                     ProviderFullName = "Pat Dejong",
+                    Category = cList,
                 },
                 new Availability
                 {
@@ -397,6 +422,7 @@ namespace DataAccess
                     StartTime = new DateTime(2024, 4, 29, 7, 0, 0),
                     EndTime = new DateTime(2024, 4, 29, 8, 0, 0),
                     ProviderFullName = "Pat Dejong",
+                    Category = cList,
                 },
                 new Availability
                 {
@@ -406,6 +432,7 @@ namespace DataAccess
                     StartTime = new DateTime(2024, 4, 29, 8, 0, 0),
                     EndTime = new DateTime(2024, 4, 29, 9, 0, 0),
                     ProviderFullName = "Pat Dejong",
+                    Category = cList,
                 },
                 new Availability
                 {
@@ -415,6 +442,7 @@ namespace DataAccess
                     StartTime = new DateTime(2024, 4, 29, 9, 0, 0),
                     EndTime = new DateTime(2024, 4, 29, 9, 30, 0),
                     ProviderFullName = "Pat Dejong",
+                    Category = cList,
                 },
                 new Availability
                 {
@@ -424,6 +452,7 @@ namespace DataAccess
                     StartTime = new DateTime(2024, 4, 29, 9, 45, 0),
                     EndTime = new DateTime(2024, 4, 29, 10, 30, 0),
                     ProviderFullName = "Pat Dejong",
+                    Category = cList,
                 },
                 new Availability
                 {
@@ -433,6 +462,7 @@ namespace DataAccess
                     StartTime = new DateTime(2024, 4, 30, 9, 30, 0),
                     EndTime = new DateTime(2024, 4, 30, 10, 30, 0),
                     ProviderFullName = "Pat Dejong",
+                    Category = cList,
                 },
 
             };
@@ -450,13 +480,14 @@ namespace DataAccess
                 {
                     ProviderProfileID = _unitOfWork.ProviderProfile.Get(p => p.User == patId).Id,
                     User = _unitOfWork.ApplicationUser.Get(u => u.Email == "JaneDoe@JaneDoe.com").Id,
-                    MeetingTitle = "Coolest Test Meeting Ever",
+                    //MeetingTitle = "Coolest Test Meeting Ever",
                     //WNumber = 00000 + i, // Example WNumber
                     Subject = $"Seed Data: {i + 1}",
                     Note = $"Testing Note:  {i + 1}",
                     StartTime = bookAvailabilities[i].StartTime,
                     Duration = (int)(bookAvailabilities[i].EndTime - bookAvailabilities[i].StartTime).TotalMinutes,
-                    objAvailability = bookAvailabilities[i].Id
+                    objAvailability = bookAvailabilities[i].Id,
+                    CategoryID = _unitOfWork.Category.Get(c => c.ProviderProfile == pId).Id
                 };
                 _db.Bookings.Add(booking);
             }
