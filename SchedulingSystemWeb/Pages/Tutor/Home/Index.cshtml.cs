@@ -25,6 +25,8 @@ namespace SchedulingSystemWeb.Pages.Tutor.Home
         public List<DateTime> WeekDays { get; private set; } = new List<DateTime>();
         public List<DateTime> MonthDays { get; private set; }
         public string CurrentMonthName { get; private set; }
+        public List<Location> Locations { get; set; }
+        public List<ProviderProfile> Providers { get; set; }
 
         public IndexModel(UserManager<ApplicationUser> userManager, UnitOfWork unitOfWork, ICalendarService calendarService)
         {
@@ -32,8 +34,9 @@ namespace SchedulingSystemWeb.Pages.Tutor.Home
             _calendarService = calendarService;
             Bookings = new List<Booking>();
             Availabilities = new List<Availability>();
+            _userManager = userManager;
         }
-       
+
         public async Task OnGetAsync()
         {
             CurrentDate = (DateTime?)TempData["CurrentDate"] ?? DateTime.Today;
@@ -43,14 +46,23 @@ namespace SchedulingSystemWeb.Pages.Tutor.Home
             WeekDays = _calendarService.GetWeekDays(CurrentDate);
             MonthDays = _calendarService.GetMonthDays(CurrentDate);
 
-            var currentUser = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            Bookings = _unitOfWork.Booking.GetAll().Where(u=>u.User == currentUser);
+            var currentUser = await _userManager.GetUserAsync(User);
+            string currentUserId = "";
+            if (currentUser != null)
+            {
+                currentUserId = currentUser.Id;
+            }
+
+            Bookings = _unitOfWork.Booking.GetAll().Where(u => u.User == currentUserId);
             Bookings = Bookings.ToList().OrderBy(obj => obj.StartTime); // Order bookings by date
-            List<ProviderProfile> Providers = new List<ProviderProfile>();
+            Providers = new List<ProviderProfile>();
+            Locations = new List<Location>();
             Teachers = new List<ApplicationUser>();
             int i = 0;
             foreach (var booking in Bookings) // Adds Teachers to List for names
             {
+                Availability aval = _unitOfWork.Availability.Get(a => a.Id == booking.objAvailability);
+                Locations.Add(_unitOfWork.Location.Get(l => l.LocationId == aval.LocationId));
                 Providers.Add(_unitOfWork.ProviderProfile.Get(b => b.Id == booking.ProviderProfileID));
                 Teachers.Add(_unitOfWork.ApplicationUser.Get(u => u.Id == Providers[i].User));
                 i++;
@@ -114,6 +126,7 @@ namespace SchedulingSystemWeb.Pages.Tutor.Home
             await FetchDataForCurrentViewAsync();
             return RedirectToPage();
         }
+
         public bool IsAvailabilityBooked(Availability availability)
         {
             return Bookings.Any(booking => booking.StartTime >= availability.StartTime && booking.StartTime < availability.EndTime);
@@ -124,10 +137,7 @@ namespace SchedulingSystemWeb.Pages.Tutor.Home
             DateTime startOfMonth = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
             DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
-            // Filter bookings within the month.
             ViewBookings = Bookings.Where(b => b.StartTime.Date >= startOfMonth && b.StartTime.Date <= endOfMonth);
-            // Filter availabilities within the month. Adjust this logic if your availabilities work differently.
-            ViewAvailabilities = Availabilities.Where(a => a.StartTime.Date >= startOfMonth && a.StartTime.Date <= endOfMonth);
 
         }
     }
