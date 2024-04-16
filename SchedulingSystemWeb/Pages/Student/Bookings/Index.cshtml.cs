@@ -46,7 +46,8 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         public new List<int> ProviderList;
         public IEnumerable<Department> departmentList;
         public IList<IdentityRole> Roles;
-
+        public IEnumerable<Infrastructure.Models.LocationType> locationTypeList;
+        public IEnumerable<Infrastructure.Models.Location> Locations;
         public IndexModel(UnitOfWork unitOfWork, ICalendarService calendarService, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _unitOfWork = unitOfWork;
@@ -64,10 +65,11 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             SearchRoles = new Dictionary<string, IList<string>>();
             ApplicationUserList = new List<ApplicationUser>();
             ProviderList = new List<int>();
+            Locations = new List<Infrastructure.Models.Location>();
         }
 
 
-        public async Task OnGetAsync(string role, int? department, string? providerUserId)
+        public async Task OnGetAsync(string role, int? department, string? providerUserId, int? locationTypeId)
         {
             //string currentTab = HttpContext.Request.Query["tab"].ToString().ToLower();
             //if (string.IsNullOrEmpty(currentTab) || (currentTab != "weekly" && currentTab != "monthly"))
@@ -75,18 +77,23 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             //    currentTab = "weekly"; // Default tab
             //}
             //ViewData["CurrentTab"] = currentTab;
-
+            
             ViewData["ActiveTab"] = TempData["ActiveTab"] as string ?? "weekly";
             TempData.Keep("ActiveTab");
+            //int? locationType = null;
             int? provProfID = null;
 
             if (!providerUserId.IsNullOrEmpty())
             {
                 provProfID = _unitOfWork.ProviderProfile.Get(p => p.User == providerUserId).Id;
             }
-
+            if (locationTypeId != null)
+            {
+                //locationType = _unitOfWork.Availability.Get(p => p.LocationId == LocationId).Id;
+                locationTypeId = _unitOfWork.LocationType.Get(p => p.Id == locationTypeId).Id;
+            }
             
-            InitializeSessionStates(role, department, provProfID);
+            InitializeSessionStates(role, department, provProfID, locationTypeId);
             await LoadDataAsync(provProfID);
 
             SetupDateAndViewData();
@@ -101,13 +108,17 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         //}
 
 
-        private void InitializeSessionStates(string role, int? department, int? providerUserId)
+        private void InitializeSessionStates(string role, int? department, int? providerUserId, int? LocationTypeId)
         {
             HttpContext.Session.SetString("SearchRole", role ?? HttpContext.Session.GetString("SearchRole") ?? string.Empty);
            
              if (department.HasValue)
             {
                 HttpContext.Session.SetInt32("SearchDepartment", department.Value);
+            }
+            if (LocationTypeId.HasValue)
+            {
+                HttpContext.Session.SetInt32("LocationTypeId", LocationTypeId.Value);
             }
             if (providerUserId != null)
             {
@@ -123,16 +134,19 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         {
             departmentList = _unitOfWork.Department.GetAll();
             Roles = await _roleManager.Roles.ToListAsync();
+            //locationTypeList = _unitOfWork.LocationType.GetAll();
 
             var searchRole = HttpContext.Session.GetString("SearchRole");
             var roleApplicationUserList = await _userManager.GetUsersInRoleAsync(searchRole);
-
+            //var availabilityList
             var dep = HttpContext.Session.GetInt32("SearchDepartment");
+            var locationType = HttpContext.Session.GetInt32("LocationTypeId");
             ApplicationUserList = new List<ApplicationUser>();
 
             foreach (var u in roleApplicationUserList)
             {
                 var prov = _unitOfWork.ProviderProfile.Get(p => p.User == u.Id);
+                //var location = _unitOfWork.LocationType.Get(p)
                 if (prov != null && prov.DeparmentId == dep)
                 {
                     ApplicationUserList.Add(u);
@@ -154,6 +168,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         {
             if (HttpContext.Session.GetInt32("provChecker") == 1)
             {
+                var LocationTypeId = HttpContext.Session.GetInt32("LocationTypeId");
                 var providerUserId = HttpContext.Session.GetInt32("SearchProvId");
                 if (providerUserId != null)
                 {
@@ -164,7 +179,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                 {
                     Availabilities = new List<Availability>();
                     Bookings = new List<Booking>();
-
+                    Locations = _unitOfWork.Location.GetAll().Where(l => l.LocationType == LocationTypeId);
                     foreach (var p in providerList)
                     {
                         var AList = Availabilities.ToList();
@@ -175,6 +190,17 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                         BList.AddRange(_unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == p));
                         Bookings = BList;
                     }
+                    foreach (var location in Locations)
+                    {
+                        var AList = Availabilities.ToList();
+                        AList.AddRange(_unitOfWork.Availability.GetAll().Where(a => a.LocationId == location.LocationId));
+                        Availabilities = AList;
+
+                        //var BList = Bookings.ToList();
+                        //BList.AddRange(_unitOfWork.Booking.GetAll().Where(a => a.LocationId == location.LocationId));
+                        //Bookings = BList;
+                    }
+
                 }
             }
             
@@ -192,6 +218,16 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                     var BList = Bookings.ToList();
                     BList.AddRange(_unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == p));
                     Bookings = BList;
+                }
+                foreach (var location in Locations)
+                {
+                    var AList = Availabilities.ToList();
+                    AList.AddRange(_unitOfWork.Availability.GetAll().Where(a => a.LocationId == location.LocationId));
+                    Availabilities = AList;
+
+                    //var BList = Bookings.ToList();
+                    //BList.AddRange(_unitOfWork.Booking.GetAll().Where(a => a.LocationId == location.LocationId));
+                    //Bookings = BList;
                 }
 
             }
