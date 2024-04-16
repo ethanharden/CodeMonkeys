@@ -132,23 +132,51 @@
                                     <!-- Display bookings for the day and hour -->
                                     @foreach(var booking in Model.Bookings.Where(b => b.StartTime.Date == day.Date && b.StartTime.Hour == hour))
                                     {
-                                        <a asp-page="/Teacher/Appointments/Index" asp-route-id="@booking.Id">
+                                        var categoryColors = Model.GetBookingColors(booking.objAvailability);
+                                            string style = "";
+                                            string textColor = "black";
+                                            if (categoryColors.Count == 1)
+                                            {
+                                                var color = categoryColors.First();
+                                                style = $"background-color: {color}; border: 4px solid #4C0E7D;";
+                                                textColor = Model.GetTextColor(color);
+                                            }
+                                            else if (categoryColors.Count > 1)
+                                            {
+                                                int colorCount = categoryColors.Count;
+                                                float percentagePerColor = 100f / colorCount;
+                                                style = "background: repeating-linear-gradient(to right, ";
+
+                                                for (int j = 0; j < colorCount; j++)
+                                                {
+                                                    var color = categoryColors[j];
+                                                    var startPercent = j * percentagePerColor;
+                                                    var endPercent = (j + 1) * percentagePerColor;
+                                                    style += $"{color} {startPercent}%, {color} {endPercent}%";
+                                                    if (j < colorCount - 1)
+                                                    {
+                                                        style += ", ";
+                                                    }
+                                                }
+                                                style += "); border: 10px solid #4C0E7D;";
+                                                textColor = Model.GetTextColor(categoryColors[0]);
+                                            }
+
+                                            <a asp-page="/Teacher/Appointments/Index" asp-route-id="@booking.Id">
+                                                
+                                                    <div class="card mb-3" style="@style; color: @textColor;">
+                                                    <div class="card-header">@booking.Subject</div>
+                                                    <div class="card-body">
+                                                        @booking.StartTime.ToShortTimeString()
+                                                        @Model.GetUserName(booking.User)
+                                                    </div>
+                                                </div>                                              
+                                            </a>
+@*                                         <a asp-page="/Teacher/Appointments/Index" asp-route-id="@booking.Id">
                                         <div class="booking-event">@Model.GetUserName(booking.User) @booking.StartTime.ToShortTimeString()</div>
-                                        </a>
+                                        </a> *@
                                     }
                                     <!-- Display availabilities for the day and hour -->
-                                    @* @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour && !Model.IsAvailabilityBooked(a)))
-                                    {
-                                        <a asp-page="/Teacher/Availabilities/Upsert" asp-route-id="@availability.Id" class="availability-link">
-                                            <div class="card text-white bg-success mb-3">
-                                                <div class="card-header">Available</div>
-                                                <div class="card-body">
-                                                    @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
-                                                </div>
-                                                <br>
-                                            </div>
-                                        </a>
-                                    } *@
                                     @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour && !Model.IsAvailabilityBooked(a)))
                                         {
                                             var categoryColors = Model.GetCategoryColors(availability.Category);
@@ -166,7 +194,6 @@
                                                 float percentagePerColor = 100f / colorCount;
                                                 style = "background: repeating-linear-gradient(to right, ";
 
-                                                // Create the stripe pattern
                                                 for (int i = 0; i < colorCount; i++)
                                                 {
                                                     var color = categoryColors[i];
@@ -247,10 +274,46 @@
                                     <div class="combined-container" style="max-height: 30vh; overflow: auto;">
                                         @foreach(var booking in Model.Bookings.Where(b => b.StartTime.Date == currentDay))
                                         {
+
+                                            var categoryColors = Model.GetBookingColors(booking.objAvailability);
+                                            string style = "";
+                                            string textColor = "black";
+                                            if (categoryColors.Count == 1)
+                                            {
+                                                var color = categoryColors.First();
+                                                style = $"background-color: {color}; border: 4px solid #4C0E7D;";  // Adding border here
+                                                textColor = Model.GetTextColor(color);
+                                            }
+                                            else if (categoryColors.Count > 1)
+                                            {
+                                                int colorCount = categoryColors.Count;
+                                                float percentagePerColor = 100f / colorCount;
+                                                style = "background: repeating-linear-gradient(to right, ";
+
+                                                for (int j = 0; j < colorCount; j++)
+                                                {
+                                                    var color = categoryColors[j];
+                                                    var startPercent = j * percentagePerColor;
+                                                    var endPercent = (j + 1) * percentagePerColor;
+                                                    style += $"{color} {startPercent}%, {color} {endPercent}%";
+                                                    if (j < colorCount - 1)
+                                                    {
+                                                        style += ", ";
+                                                    }
+                                                }
+                                                style += "); border: 10px solid #4C0E7D;";
+                                                textColor = Model.GetTextColor(categoryColors[0]);
+                                            }
+
                                             <a asp-page="/Teacher/Appointments/Index" asp-route-id="@booking.Id">
                                                 
-                                                    <div class="booking-event">@Model.GetUserName(booking.User) @booking.StartTime.ToShortTimeString()</div>
-                                                
+                                                    <div class="card mb-3" style="@style; color: @textColor;">
+                                                    <div class="card-header">@booking.Subject</div>
+                                                    <div class="card-body">
+                                                        @booking.StartTime.ToShortTimeString()
+                                                        @Model.GetUserName(booking.User)
+                                                    </div>
+                                                </div>                                              
                                             </a>
                                         }
 

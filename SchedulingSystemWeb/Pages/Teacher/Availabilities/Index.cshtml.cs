@@ -75,6 +75,11 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             return luminance > 0.5 ? "black" : "white";
         }
 
+        public List<string> GetBookingColors(int avID)
+        {
+            return GetCategoryColors(_unitOfWork.Availability.GetById(avID).Category);
+        }
+
 
         public void Load()
         {
