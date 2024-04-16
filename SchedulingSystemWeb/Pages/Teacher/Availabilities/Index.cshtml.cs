@@ -29,6 +29,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         public List<DateTime> MonthDays { get; private set; }
         public string CurrentMonthName { get; private set; }
         public IEnumerable<Booking> nextBookings { get; set; }
+        public IEnumerable<Category> categoryList { get; set; }
 
 
         public IndexModel(UnitOfWork unitOfWork, ICalendarService calendarService, UserManager<ApplicationUser> userManager)
@@ -42,6 +43,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
 
         public async Task OnGetAsync()
         {
+            Load();
             CurrentDate = (DateTime?)TempData["CurrentDate"] ?? DateTime.Today;
             TempData.Keep("CurrentDate");
             CurrentMonthName = CurrentDate.ToString("MMMM");
@@ -73,8 +75,15 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             return luminance > 0.5 ? "black" : "white";
         }
 
+
+        public void Load()
+        {
+            var tempProf = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id;
+            categoryList = _unitOfWork.Category.GetAll().Where(c => c.ProviderProfile == tempProf);
+        }
         public async Task<IActionResult> OnGetPreviousWeekAsync()
         {
+            Load();
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(-7);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
@@ -83,6 +92,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         }
         public async Task<IActionResult> OnGetNextWeekAsync()
         {
+            Load();
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(7);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
@@ -91,6 +101,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         }
         public async Task<IActionResult> OnGetPreviousMonthAsync()
         {
+            Load();
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(-1);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
@@ -101,6 +112,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         }
         public async Task<IActionResult> OnGetNextMonthAsync()
         {
+            Load();
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(1);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
@@ -109,6 +121,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         }
         public async Task<IActionResult> OnGetTodayWeekAsync()
         {
+            Load();
             CurrentDate = DateTime.Today;
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
@@ -117,6 +130,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         }
         public async Task<IActionResult> OnGetTodayMonthAsync()
         {
+            Load();
             CurrentDate = DateTime.Today;
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";

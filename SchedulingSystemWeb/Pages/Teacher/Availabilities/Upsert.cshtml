@@ -262,15 +262,28 @@
                                                 if (categoryColors.Count == 1)
                                                 {
                                                     var color = categoryColors.First();
-                                                    style = $"background-color: {categoryColors.First()};";
+                                                    style = $"background-color: {color};";
                                                     textColor = Model.GetTextColor(color);
                                                 }
-                                                else
+                                                else if (categoryColors.Count > 1)
                                                 {
-                                                    style = "background: linear-gradient(to right, ";
-                                                    style += string.Join(", ", categoryColors.Select(color => $"{color} 33.33%"));
+                                                    int colorCount = categoryColors.Count;
+                                                    float percentagePerColor = 100f / colorCount;
+                                                    style = "background: repeating-linear-gradient(to right, ";
+
+                                                    for (int i = 0; i < colorCount; i++)
+                                                    {
+                                                        var color = categoryColors[i];
+                                                        var startPercent = i * percentagePerColor;
+                                                        var endPercent = (i + 1) * percentagePerColor;
+                                                        style += $"{color} {startPercent}%, {color} {endPercent}%";
+                                                        if (i < colorCount - 1)
+                                                        {
+                                                            style += ", ";
+                                                        }
+                                                    }
                                                     style += ");";
-                                                    textColor = Model.GetTextColor(categoryColors.First());
+                                                    textColor = Model.GetTextColor(categoryColors[0]);
                                                 }
                                                 <a asp-page="/Teacher/Availabilities/Upsert" asp-route-id="@availability.Id" class="availability-link">
                                                     <div class="card mb-3" style="@style; color: @textColor;">
@@ -349,15 +362,28 @@
                                             if (categoryColors.Count == 1)
                                             {
                                                 var color = categoryColors.First();
-                                                style = $"background-color: {categoryColors.First()};";
+                                                style = $"background-color: {color};";
                                                 textColor = Model.GetTextColor(color);
                                             }
-                                            else
+                                            else if (categoryColors.Count > 1)
                                             {
-                                                style = "background: linear-gradient(to right, ";
-                                                style += string.Join(", ", categoryColors.Select(color => $"{color} 33.33%"));
+                                                int colorCount = categoryColors.Count;
+                                                float percentagePerColor = 100f / colorCount;
+                                                style = "background: repeating-linear-gradient(to right, ";
+
+                                                for (int j = 0; j < colorCount; j++)
+                                                {
+                                                    var color = categoryColors[i];
+                                                    var startPercent = j * percentagePerColor;
+                                                    var endPercent = (j + 1) * percentagePerColor;
+                                                    style += $"{color} {startPercent}%, {color} {endPercent}%";
+                                                    if (j < colorCount - 1)
+                                                    {
+                                                        style += ", ";
+                                                    }
+                                                }
                                                 style += ");";
-                                                textColor = Model.GetTextColor(categoryColors.First());
+                                                textColor = Model.GetTextColor(categoryColors[0]);
                                             }
                                             <a asp-page="/Teacher/Availabilities/Upsert" asp-route-id="@availability.Id" class="availability-link">
                                                 <div class="card mb-3" style="@style; color: @textColor;">
