@@ -35,6 +35,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         public IEnumerable<Booking> ViewBookings { get; set; }
         public IEnumerable<Availability> ViewAvailabilities { get; set; }
         public IEnumerable<Availability> ViewWeekAvailabilities { get; set; }
+        public List<Category> ViewCategories { get; set; }
 
         public DateTime CurrentDate { get; private set; }
         public List<DateTime> WeekDays { get; private set; } = new List<DateTime>();
@@ -49,7 +50,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         public IList<IdentityRole> Roles;
         public IEnumerable<Infrastructure.Models.LocationType> locationTypeList;
         public IEnumerable<Infrastructure.Models.Location> Locations;
-        public IEnumerable<Category> categoryList { get; set; }
+        
         public IndexModel(UnitOfWork unitOfWork, ICalendarService calendarService, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _unitOfWork = unitOfWork;

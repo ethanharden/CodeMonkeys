@@ -23,6 +23,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
 
         public IEnumerable<Booking> ViewBookings { get; set; }
         public IEnumerable<Availability> ViewAvailabilities { get; set; }
+        public IEnumerable<Category> ViewCategories { get; set; }
         public List<ApplicationUser> Teachers{get; set;}
         public DateTime CurrentDate { get; private set; }
         public List<DateTime> WeekDays { get; private set; } = new List<DateTime>();
@@ -30,7 +31,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
         public string CurrentMonthName { get; private set; }
         public List<Location> Locations { get; set; }
         public List<ProviderProfile> Providers { get; set; }
-        public IEnumerable<Category> categoryList { get; set; }
+        //public List<Category> categoryList { get; set; }
 
         public IndexModel(UserManager<ApplicationUser> userManager, UnitOfWork unitOfWork, ICalendarService calendarService)
         {
@@ -96,16 +97,19 @@ namespace SchedulingSystemWeb.Pages.Student.Home
         }
 
 
-        public void Load()
+        public async Task LoadAsync()
         {
-            var tempProf = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id;
-            categoryList = _unitOfWork.Category.GetAll().Where(c => c.ProviderProfile == tempProf);
+            //    var tempProf = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id;
+            //    categoryList = _unitOfWork.Category.GetAll().Where(c => c.ProviderProfile == tempProf);
+            //var currentUser = await _userManager.GetUserAsync(User);
+            //var booking
+
         }
 
 
         public async Task<IActionResult> OnGetPreviousWeekAsync()
         {
-            Load();
+            LoadAsync();
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(-7);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
@@ -115,7 +119,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
 
         public async Task<IActionResult> OnGetNextWeekAsync()
         {
-            Load();
+            LoadAsync();
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(7);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
@@ -125,7 +129,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
 
         public async Task<IActionResult> OnGetPreviousMonthAsync()
         {
-            Load();
+            LoadAsync();
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(-1);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
@@ -137,7 +141,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
 
         public async Task<IActionResult> OnGetNextMonthAsync()
         {
-            Load();
+            LoadAsync();
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(1);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
@@ -147,7 +151,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
 
         public async Task<IActionResult> OnGetTodayWeekAsync()
         {
-            Load();
+            LoadAsync();
             CurrentDate = DateTime.Today;
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
@@ -157,7 +161,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
 
         public async Task<IActionResult> OnGetTodayMonthAsync()
         {
-            Load();
+            LoadAsync();
             CurrentDate = DateTime.Today;
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
@@ -171,6 +175,11 @@ namespace SchedulingSystemWeb.Pages.Student.Home
             DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
             ViewBookings = Bookings.Where(b => b.StartTime.Date >= startOfMonth && b.StartTime.Date <= endOfMonth);
+            ViewCategories = new List<Category>();
+            foreach (var b in ViewBookings)
+            {
+                ViewCategories.Append(_unitOfWork.Category.Get(c => c.Id == b.CategoryID));
+            }
 
         }
     }
