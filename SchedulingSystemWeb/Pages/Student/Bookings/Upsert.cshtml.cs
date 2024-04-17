@@ -29,6 +29,7 @@ using Microsoft.Identity.Client;
 using SendGrid.Helpers.Mail;
 using SendGrid;
 using Microsoft.AspNetCore.Authorization;
+using System;
 namespace SchedulingSystemWeb.Pages.Student.Bookings
 {
     [Authorize(Roles = "STUDENT, TUTOR")]
@@ -92,24 +93,47 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             newBooking.objAvailability = availability.Id;
             string webRootPath = _webhostenvironment.WebRootPath;
             var files = HttpContext.Request.Form.Files;
-            if (files.Count > 0)
+
+            foreach (var file in files)
             {
-                //create unique identifier
-                string fileName = Guid.NewGuid().ToString().ToString();
-                //create path to /images/products folder
-                var uploads = Path.Combine(webRootPath, @"bookingFiles\");
-                //get and preserve extension type
-                var extension = Path.GetExtension(files[0].FileName);
-                //Create full path
-                var fullPath = uploads + fileName + extension;
-                //stream the binary files to the server
-                using var fileStream = System.IO.File.Create(fullPath);
-                files[0].CopyTo(fileStream);
-                //associate real URL and save to DB
-                newBooking.Attachment[0] = @"\bookingFiles\" + fileName + extension;
+                if (file.Length > 0)
+                {
+                    // Create unique identifier
+                    string fileName = Guid.NewGuid().ToString();
+                    // Get and preserve extension type
+                    var extension = Path.GetExtension(file.FileName);
+                    // Create path to /images/products folder
+                    var uploads = Path.Combine(webRootPath, @"bookingFiles\");
+                    // Create full path
+                    var fullPath = Path.Combine(uploads, fileName + extension);
+                    // Stream the binary files to the server
+                    using var fileStream = System.IO.File.Create(fullPath);
+                    file.CopyTo(fileStream);
+                    // Associate real URL and save to DB
+                    newBooking.Attachment.Add(@"\bookingFiles\" + fileName + extension);
+                }
             }
+
+            //
+            //
+            //
+             /*<div class="form-group">
+                        < label > Categories </ label >
+                        < div id = "categoriesBox" >
+                            @foreach(var category in Model.AllCategories)
+                            {
+                                < div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="CategoryIds" id="category-@category.Id" value="@category.Id">
+                                    <label class="form-check-label" for="category-@category.Id">
+                                        <span style = "display: inline-block; width: 15px; height: 15px; background-color: @category.Color; margin-right: 5px;" ></ span >
+        @category.Name
+                                    </ label >
+                                </ div >
+                            }
+                        </div>*/
             
-            
+
+
             if (course == null)
             {
                 newBooking.Subject = "";
