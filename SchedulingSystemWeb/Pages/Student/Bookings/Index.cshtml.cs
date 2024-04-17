@@ -69,7 +69,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         }
 
 
-        public async Task OnGetAsync(string role, int? department, string? providerUserId, int? locationTypeId)
+        public async Task OnGetAsync(string role, int? department, string? providerUserId, IEnumerable<int>? locationTypeId)
         {
             //string currentTab = HttpContext.Request.Query["tab"].ToString().ToLower();
             //if (string.IsNullOrEmpty(currentTab) || (currentTab != "weekly" && currentTab != "monthly"))
@@ -87,14 +87,14 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             {
                 provProfID = _unitOfWork.ProviderProfile.Get(p => p.User == providerUserId).Id;
             }
-            if (locationTypeId != null)
-            {
+            //if (locationTypeId != null)
+          //  {
                 //locationType = _unitOfWork.Availability.Get(p => p.LocationId == LocationId).Id;
-                locationTypeId = _unitOfWork.LocationType.Get(p => p.Id == locationTypeId).Id;
-            }
+              //  locationTypeId = _unitOfWork.LocationType.Get(p => p.Id == locationTypeId).Id;
+            //}
             
             InitializeSessionStates(role, department, provProfID, locationTypeId);
-            await LoadDataAsync(provProfID);
+            await LoadDataAsync(provProfID, locationTypeId);
 
             SetupDateAndViewData();
             await FetchDataForCurrentViewAsync();
@@ -108,7 +108,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         //}
 
 
-        private void InitializeSessionStates(string role, int? department, int? providerUserId, int? LocationTypeId)
+        private void InitializeSessionStates(string role, int? department, int? providerUserId, IEnumerable<int>? LocationTypeId)
         {
             HttpContext.Session.SetString("SearchRole", role ?? HttpContext.Session.GetString("SearchRole") ?? string.Empty);
            
@@ -116,10 +116,10 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             {
                 HttpContext.Session.SetInt32("SearchDepartment", department.Value);
             }
-            if (LocationTypeId.HasValue)
-            {
-                HttpContext.Session.SetInt32("LocationTypeId", LocationTypeId.Value);
-            }
+            //if (LocationTypeId.Count != 0)
+            //{
+            //    HttpContext.Session["LocationTypeId"] =  LocationTypeId;
+            //}
             if (providerUserId != null)
             {
                 HttpContext.Session.SetInt32("SearchProvId", providerUserId.Value);
@@ -130,7 +130,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                 HttpContext.Session.SetInt32("provChecker", 0);
             }
         }
-        private async Task LoadDataAsync(int? providerUserId)
+        private async Task LoadDataAsync(int? providerUserId, IEnumerable<int>? locationType)
         {
             departmentList = _unitOfWork.Department.GetAll();
             Roles = await _roleManager.Roles.ToListAsync();
@@ -140,9 +140,14 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             var roleApplicationUserList = await _userManager.GetUsersInRoleAsync(searchRole);
             //var availabilityList
             var dep = HttpContext.Session.GetInt32("SearchDepartment");
-            var locationType = HttpContext.Session.GetInt32("LocationTypeId");
+            //var locationType = HttpContext.Session.GetInt32("LocationTypeId");
             ApplicationUserList = new List<ApplicationUser>();
+            //var LocationList = new List<Infrastructure.Models.Location>();
 
+            foreach (var lType in locationType)
+            {
+                Locations = _unitOfWork.Location.GetAll().Where(l => l.LocationType == lType);
+            }
             foreach (var u in roleApplicationUserList)
             {
                 var prov = _unitOfWork.ProviderProfile.Get(p => p.User == u.Id);
@@ -162,13 +167,13 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                 ProviderList.Add(_unitOfWork.ProviderProfile.Get(p => p.User == u.Id).Id);
             }
 
-            FilterAvailabilitiesAndBookings(ProviderList);
+            FilterAvailabilitiesAndBookings(ProviderList, Locations);
         }
-        private void FilterAvailabilitiesAndBookings(IEnumerable<int> providerList)
+        private void FilterAvailabilitiesAndBookings(IEnumerable<int> providerList, IEnumerable<Infrastructure.Models.Location>? Locations)
         {
+            //var LocationTypeId = HttpContext.Session.GetInt32("LocationTypeId");
             if (HttpContext.Session.GetInt32("provChecker") == 1)
             {
-                var LocationTypeId = HttpContext.Session.GetInt32("LocationTypeId");
                 var providerUserId = HttpContext.Session.GetInt32("SearchProvId");
                 if (providerUserId != null)
                 {
@@ -179,7 +184,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                 {
                     Availabilities = new List<Availability>();
                     Bookings = new List<Booking>();
-                    Locations = _unitOfWork.Location.GetAll().Where(l => l.LocationType == LocationTypeId);
+                    //Locations = _unitOfWork.Location.GetAll().Where(l => l.LocationType == LocationTypeId);
                     foreach (var p in providerList)
                     {
                         var AList = Availabilities.ToList();
@@ -190,17 +195,6 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                         BList.AddRange(_unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == p));
                         Bookings = BList;
                     }
-                    foreach (var location in Locations)
-                    {
-                        var AList = Availabilities.ToList();
-                        AList.AddRange(_unitOfWork.Availability.GetAll().Where(a => a.LocationId == location.LocationId));
-                        Availabilities = AList;
-
-                        //var BList = Bookings.ToList();
-                        //BList.AddRange(_unitOfWork.Booking.GetAll().Where(a => a.LocationId == location.LocationId));
-                        //Bookings = BList;
-                    }
-
                 }
             }
             
@@ -208,29 +202,41 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             {
                 Availabilities = new List<Availability>();
                 Bookings = new List<Booking>();
-
-                foreach ( var p in providerList)
+                //Locations = _unitOfWork.Location.GetAll().Where(l => l.LocationType == LocationTypeId);
+                var AList = Availabilities.ToList();
+                var BList = Bookings.ToList();
+                var AvailabilitiesList = Availabilities.ToList();
+                var BookingsList = Bookings.ToList();
+                foreach (var p in providerList)
                 {
-                    var AList = Availabilities.ToList();
                     AList.AddRange(_unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == p).ToList());
                     Availabilities = AList;
 
-                    var BList = Bookings.ToList();
                     BList.AddRange(_unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == p));
                     Bookings = BList;
                 }
-                foreach (var location in Locations)
+                if (!Locations.IsNullOrEmpty())
                 {
-                    var AList = Availabilities.ToList();
-                    AList.AddRange(_unitOfWork.Availability.GetAll().Where(a => a.LocationId == location.LocationId));
-                    Availabilities = AList;
-
-                    //var BList = Bookings.ToList();
-                    //BList.AddRange(_unitOfWork.Booking.GetAll().Where(a => a.LocationId == location.LocationId));
-                    //Bookings = BList;
+                    foreach (var location in Locations)
+                    {
+                        foreach (var avail in AList)
+                        {
+                            if (avail.LocationId == location.LocationId)
+                            {
+                                AvailabilitiesList.AddRange(_unitOfWork.Availability.GetAll().Where(a => a.LocationId == avail.LocationId));
+                                BookingsList.AddRange(_unitOfWork.Booking.GetAll().Where(a => a.LocationID == avail.LocationId));
+                            }
+                            //var Availabilites.ToList();
+                        }
+                        Availabilities = AvailabilitiesList;
+                        //var Bookings = BList;
+                        Bookings = BookingsList;
+                    }
                 }
-
+                
             }
+           
+            
         }
 
         private void SetupDateAndViewData()
@@ -242,7 +248,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             MonthDays = _calendarService.GetMonthDays(CurrentDate);
         }
 
-        public async Task<IActionResult> OnGetPreviousWeekAsync(int? providerUserId)
+        public async Task<IActionResult> OnGetPreviousWeekAsync(int? providerUserId, IEnumerable<int>? locationTypeId)
         {
             //string searchRole = HttpContext.Session.GetString("SearchRole");
             //int? searchDepartment = HttpContext.Session.GetInt32("SearchDepartment");
@@ -252,38 +258,38 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             //TempData["ActiveTab"] = "weekly";
             //await FetchDataForCurrentViewAsync();
 
-            await LoadDataAsync(providerUserId);
+            await LoadDataAsync(providerUserId, locationTypeId);
             AdjustDateAndRedirect(-7);
 
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnGetNextWeekAsync(int? providerUserId)
+        public async Task<IActionResult> OnGetNextWeekAsync(int? providerUserId, IEnumerable<int>? locationTypeId)
         {
-            await LoadDataAsync(providerUserId);
+            await LoadDataAsync(providerUserId, locationTypeId);
             AdjustDateAndRedirect(7);
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnGetPreviousMonthAsync(int? providerUserId)
+        public async Task<IActionResult> OnGetPreviousMonthAsync(int? providerUserId, IEnumerable<int>? locationTypeId)
         {
             TempData["ActiveTab"] = "monthly";
-            await LoadDataAsync(providerUserId);
+            await LoadDataAsync(providerUserId, locationTypeId);
             AdjustDateAndRedirect(0, -1);
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnGetNextMonthAsync(int? providerUserId)
+        public async Task<IActionResult> OnGetNextMonthAsync(int? providerUserId, IEnumerable<int>? locationTypeId)
         {
             TempData["ActiveTab"] = "monthly";
-            await LoadDataAsync(providerUserId);
+            await LoadDataAsync(providerUserId, locationTypeId);
             AdjustDateAndRedirect(0, 1);
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnGetToday(int? providerUserId)
+        public async Task<IActionResult> OnGetToday(int? providerUserId, IEnumerable<int>? locationTypeId)
         {
-            await LoadDataAsync(providerUserId);
+            await LoadDataAsync(providerUserId, locationTypeId);
 
             TempData["CurrentDate"] = DateTime.Today;
             return RedirectToPage();
