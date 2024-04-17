@@ -2,3 +2,39 @@
 @model SchedulingSystemWeb.Pages.Teacher.Locations.UpsertModel
 @{
 }
+
+<h2>@(Model.objLocation.LocationId == 0 ? "Create New Location" : "Edit Location")</h2>
+
+<form method="post">
+    <input type="hidden" asp-for="objLocation.LocationId" />
+
+    <div class="mb-3">
+        <label for="Name" class="form-label">Name: </label>
+        <input type="text" class="form-control" id="Name" asp-for="objLocation.LocationName" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="BuildingName" class="form-label">Building: </label>
+        <input type="text" class="form-control" id="BuildingName" asp-for="objLocation.BuildingName">
+    </div>
+
+    <div class="mb-3">
+        <label for="RoomNum" class="form-label">Room Number: </label>
+        <input type="text" class="form-control" id="RoomNum" asp-for="objLocation.RoomNumber">
+    </div>
+
+    <div class="mb-3">
+        <label for="LocationType" class="form-label">Campus:</label>
+        <select asp-for="objLocation.LocationType" class="form-control" required>
+            <option value="">-- Select Campus --</option>
+            @foreach (var type in Model.typeList)
+            {
+                <option value="@type.Id">@type.LocationTypeName</option>
+            }
+        </select>
+    </div>
+    
+
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
