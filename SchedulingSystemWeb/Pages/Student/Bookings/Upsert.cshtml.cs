@@ -53,7 +53,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         ApplicationUser user = new ApplicationUser();
         public ProviderProfile prov { get; set; }
         private IWebHostEnvironment _webhostenvironment;
-        public IEnumerable<Category> AllCategories { get; set; }
+        public IEnumerable<Category> AvCategories { get; set; }
         [BindProperty]
         public List<int> CategoryIds { get; set; } = new List<int>();
         public UpsertModel(UnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, IWebHostEnvironment webhostenvironment, IHttpClientFactory httpClientFactory)
@@ -74,7 +74,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             fullName = user.FirstName + " " + user.LastName;
             var locationID = availability.LocationId;
             location = _unitOfWork.Location.Get(l => l.LocationId == locationID);
-
+            AvCategories = _unitOfWork.Category.GetAll().Where(c => availability.Category.Contains(c.Id));
             return Page();
         }
 
@@ -86,6 +86,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             newBooking.Duration = (int)(availability.EndTime - availability.StartTime).TotalMinutes;
             newBooking.Subject = course;
             newBooking.ProviderProfileID = availability.ProviderProfileID;
+            newBooking.CategoryID = int.Parse(Request.Form["CategoryIds"]);
             //newBooking.User = await _userManager.GetUserAsync(User);
             newBooking.Note = description;
             //newBooking.MeetingTitle = title;
@@ -113,27 +114,6 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                     newBooking.Attachment.Add(@"\bookingFiles\" + fileName + extension);
                 }
             }
-
-            //
-            //
-            //
-             /*<div class="form-group">
-                        < label > Categories </ label >
-                        < div id = "categoriesBox" >
-                            @foreach(var category in Model.AllCategories)
-                            {
-                                < div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" name="CategoryIds" id="category-@category.Id" value="@category.Id">
-                                    <label class="form-check-label" for="category-@category.Id">
-                                        <span style = "display: inline-block; width: 15px; height: 15px; background-color: @category.Color; margin-right: 5px;" ></ span >
-        @category.Name
-                                    </ label >
-                                </ div >
-                            }
-                        </div>*/
-            
-
-
             if (course == null)
             {
                 newBooking.Subject = "";

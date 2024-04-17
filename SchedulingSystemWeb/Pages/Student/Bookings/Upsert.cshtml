@@ -20,7 +20,7 @@
                 fileUploadDiv.classList.add('file-upload');
                 fileUploadDiv.innerHTML = `
                         <input type="file" class="form-control" name="file[]" />
-                        <span class="remove">Remove</span>
+                                <button type="button"class="remove btn btn-danger m-10">Remove</button>
                     `;
                 fileUploadContainer.appendChild(fileUploadDiv);
 
@@ -53,6 +53,21 @@
                         <input type="text" asp-for = "course" class="form-control" id="course" placeholder="Enter course" required>
                     </div>
                     <div class="form-group">
+                        <label>Categories</label>
+                        <div id="categoriesBox">
+                            @foreach (var category in Model.AvCategories)
+                            {
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="CategoryIds" id="category-@category.Id" value="@category.Id" @(Model.newBooking.CategoryID == category.Id ? "checked" : "")>
+                                    <label class="form-check-label" for="category-@category.Id">
+                                        <span style="display: inline-block; width: 15px; height: 15px; background-color: @category.Color; margin-right: 5px;"></span>
+                                        @category.Name
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="form-group">
                         @if (Model.prov.BookingPrompt != null)
                         {
                             <label for="description">@Model.prov.BookingPrompt:</label>
@@ -67,7 +82,7 @@
                             <label class="form-label">File Upload</label>
                             <div class="file-upload">
                                 <input type="file" class="form-control" name="file[]" />
-                                <span class="add-more">Add More</span>
+                                <button type="button"class="add-more btn btn-primary m-10">Add More</button>
                             </div>
                         </div>
                     
