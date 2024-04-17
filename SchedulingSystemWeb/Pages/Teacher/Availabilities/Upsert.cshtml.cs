@@ -280,7 +280,10 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             
             return Redirect("/Index");
         }
-
+        public string GetUserName(string id)
+        {
+            return _unitOfWork.ApplicationUser.Get(i => i.Id == id).FullName;
+        }
         public List<string> GetCategoryColors(List<int> categoryIds)
         {
             var categories = _unitOfWork.Category.GetAll().Where(c => categoryIds.Contains(c.Id)).ToList();
@@ -291,6 +294,10 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             var color = ColorTranslator.FromHtml(backgroundColor);
             double luminance = (0.299 * color.R + 0.587 * color.G + 0.114 * color.B) / 255;
             return luminance > 0.5 ? "black" : "white";
+        }
+        public string GetBookingColors(int? bID)
+        {
+            return _unitOfWork.Category.Get(c => c.Id == bID).Color;
         }
         public async Task<IActionResult> OnGetPreviousWeekAsync(int? id)
         {
