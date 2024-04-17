@@ -4,9 +4,11 @@ using Infrastructure.Models;
 using Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using DataAccess;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SchedulingSystemWeb.Pages.Teacher.Categories
 {
+    [Authorize(Roles = "TUTOR, TEACHER, ADVISOR, ADMIN")]
     public class UpsertModel : PageModel
     {
         private readonly UnitOfWork _unitOfWork;
