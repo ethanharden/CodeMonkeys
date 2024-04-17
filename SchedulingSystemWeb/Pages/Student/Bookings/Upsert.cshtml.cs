@@ -94,11 +94,12 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             newBooking.objAvailability = availability.Id;
             string webRootPath = _webhostenvironment.WebRootPath;
             var files = HttpContext.Request.Form.Files;
-
+            newBooking.Attachment = new List<String>();
             foreach (var file in files)
             {
                 if (file.Length > 0)
                 {
+                    
                     // Create unique identifier
                     string fileName = Guid.NewGuid().ToString();
                     // Get and preserve extension type
@@ -112,6 +113,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                     file.CopyTo(fileStream);
                     // Associate real URL and save to DB
                     newBooking.Attachment.Add(@"\bookingFiles\" + fileName + extension);
+                    
                 }
             }
             if (course == null)
