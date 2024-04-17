@@ -143,8 +143,37 @@
                                         @* Display availabilities for the day and time slot *@
                                         @foreach (var availability in Model.ViewAvailabilities.Where(a => a.StartTime >= timeSlotStart && a.StartTime < timeSlotEnd && !Model.IsAvailabilityBooked(a)))
                                         {
+                                            var categoryColors = Model.GetCategoryColors(availability.Category);
+                                            string style = "";
+                                            string textColor = "black";
+                                            if (categoryColors.Count == 1)
+                                            {
+                                                var color = categoryColors.First();
+                                                style = $"background-color: {color};";
+                                                textColor = Model.GetTextColor(color);
+                                            }
+                                            else if (categoryColors.Count > 1)
+                                            {
+                                                int colorCount = categoryColors.Count;
+                                                float percentagePerColor = 100f / colorCount;
+                                                style = "background: repeating-linear-gradient(to right, ";
+
+                                                for (int i = 0; i < colorCount; i++)
+                                                {
+                                                    var color = categoryColors[i];
+                                                    var startPercent = i * percentagePerColor;
+                                                    var endPercent = (i + 1) * percentagePerColor;
+                                                    style += $"{color} {startPercent}%, {color} {endPercent}%";
+                                                    if (i < colorCount - 1)
+                                                    {
+                                                        style += ", ";
+                                                    }
+                                                }
+                                                style += ");";
+                                                textColor = Model.GetTextColor(categoryColors[0]);
+                                            }
                                             <a asp-page="/Student/Bookings/Upsert" asp-route-id="@availability.Id" class="availability-link">
-                                                <div class="card text-white bg-success mb-3">
+                                                <div class="card mb-3" style="@style; color: @textColor;">
                                                     <div class="card-header">@availability.ProviderFullName</div>
                                                     <div class="card-body">
                                                         @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
@@ -212,8 +241,37 @@
                                 <!-- Display availabilities for the day -->
                                 @foreach(var availability in Model.ViewAvailabilities.Where(a => a.StartTime.Date == currentDay && !Model.IsAvailabilityBooked(a)))
                                 {
+                                    var categoryColors = Model.GetCategoryColors(availability.Category);
+                                    string style = "";
+                                    string textColor = "black";
+                                    if (categoryColors.Count == 1)
+                                    {
+                                        var color = categoryColors.First();
+                                        style = $"background-color: {color};";
+                                        textColor = Model.GetTextColor(color);
+                                    }
+                                    else if (categoryColors.Count > 1)
+                                    {
+                                        int colorCount = categoryColors.Count;
+                                        float percentagePerColor = 100f / colorCount;
+                                        style = "background: repeating-linear-gradient(to right, ";
+
+                                        for (int j = 0; j < colorCount; j++)
+                                        {
+                                            var color = categoryColors[j];
+                                            var startPercent = j * percentagePerColor;
+                                            var endPercent = (j + 1) * percentagePerColor;
+                                            style += $"{color} {startPercent}%, {color} {endPercent}%";
+                                            if (j < colorCount - 1)
+                                            {
+                                                style += ", ";
+                                            }
+                                        }
+                                        style += ");";
+                                        textColor = Model.GetTextColor(categoryColors[0]);
+                                    }
                                     <a asp-page="/Student/Bookings/Upsert" asp-route-id="@availability.Id" class="availability-link">
-                                        <div class="card text-white bg-success mb-3">
+                                        <div class="card mb-3" style="@style; color: @textColor;">
                                             <div class="card-header">@availability.ProviderFullName</div>
                                             <div class="card-body">
                                                 @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")

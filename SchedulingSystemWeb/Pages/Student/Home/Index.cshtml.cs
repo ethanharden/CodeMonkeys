@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.DotNet.Scaffolding.Shared;
+using System.Drawing;
 using System.Globalization;
 using System.Security.Claims;
 
@@ -29,6 +30,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
         public string CurrentMonthName { get; private set; }
         public List<Location> Locations { get; set; }
         public List<ProviderProfile> Providers { get; set; }
+        public IEnumerable<Category> categoryList { get; set; }
 
         public IndexModel(UserManager<ApplicationUser> userManager, UnitOfWork unitOfWork, ICalendarService calendarService)
         {
@@ -72,9 +74,38 @@ namespace SchedulingSystemWeb.Pages.Student.Home
             await FetchDataForCurrentViewAsync();
         }
 
+        public string GetUserName(string id)
+        {
+            return _unitOfWork.ApplicationUser.Get(i => i.Id == id).FullName;
+        }
+        public List<string> GetCategoryColors(List<int> categoryIds)
+        {
+            var categories = _unitOfWork.Category.GetAll().Where(c => categoryIds.Contains(c.Id)).ToList();
+            return categories.Select(c => c.Color).ToList();
+        }
+        public string GetTextColor(string backgroundColor)
+        {
+            var color = ColorTranslator.FromHtml(backgroundColor);
+            double luminance = (0.299 * color.R + 0.587 * color.G + 0.114 * color.B) / 255;
+            return luminance > 0.5 ? "black" : "white";
+        }
+
+        public string GetBookingColors(int? bID)
+        {
+            return _unitOfWork.Category.Get(c => c.Id == bID).Color;
+        }
+
+
+        public void Load()
+        {
+            var tempProf = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id;
+            categoryList = _unitOfWork.Category.GetAll().Where(c => c.ProviderProfile == tempProf);
+        }
+
 
         public async Task<IActionResult> OnGetPreviousWeekAsync()
         {
+            Load();
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(-7);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
@@ -84,6 +115,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
 
         public async Task<IActionResult> OnGetNextWeekAsync()
         {
+            Load();
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddDays(7);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
@@ -93,6 +125,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
 
         public async Task<IActionResult> OnGetPreviousMonthAsync()
         {
+            Load();
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(-1);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
@@ -104,6 +137,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
 
         public async Task<IActionResult> OnGetNextMonthAsync()
         {
+            Load();
             CurrentDate = ((DateTime?)TempData["CurrentDate"] ?? DateTime.Today).AddMonths(1);
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";
@@ -113,6 +147,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
 
         public async Task<IActionResult> OnGetTodayWeekAsync()
         {
+            Load();
             CurrentDate = DateTime.Today;
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "weekly";
@@ -122,6 +157,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
 
         public async Task<IActionResult> OnGetTodayMonthAsync()
         {
+            Load();
             CurrentDate = DateTime.Today;
             TempData["CurrentDate"] = CurrentDate;
             TempData["ActiveTab"] = "monthly";

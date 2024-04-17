@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Graph.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Drawing;
 //using Microsoft.AspNet.Identity;
 
 namespace SchedulingSystemWeb.Pages.Student.Bookings
@@ -48,6 +49,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         public IList<IdentityRole> Roles;
         public IEnumerable<Infrastructure.Models.LocationType> locationTypeList;
         public IEnumerable<Infrastructure.Models.Location> Locations;
+        public IEnumerable<Category> categoryList { get; set; }
         public IndexModel(UnitOfWork unitOfWork, ICalendarService calendarService, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _unitOfWork = unitOfWork;
@@ -237,6 +239,27 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             }
            
             
+        }
+
+        public string GetUserName(string id)
+        {
+            return _unitOfWork.ApplicationUser.Get(i => i.Id == id).FullName;
+        }
+        public List<string> GetCategoryColors(List<int> categoryIds)
+        {
+            var categories = _unitOfWork.Category.GetAll().Where(c => categoryIds.Contains(c.Id)).ToList();
+            return categories.Select(c => c.Color).ToList();
+        }
+        public string GetTextColor(string backgroundColor)
+        {
+            var color = ColorTranslator.FromHtml(backgroundColor);
+            double luminance = (0.299 * color.R + 0.587 * color.G + 0.114 * color.B) / 255;
+            return luminance > 0.5 ? "black" : "white";
+        }
+
+        public string GetBookingColors(int? bID)
+        {
+            return _unitOfWork.Category.Get(c => c.Id == bID).Color;
         }
 
         private void SetupDateAndViewData()

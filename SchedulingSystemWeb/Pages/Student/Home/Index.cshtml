@@ -128,7 +128,30 @@
                                     <!-- Display bookings for the day and hour -->
                                     @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == day.Date && b.StartTime.Hour == hour))
                                     {
-                                        <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
+                                        string style = "";
+                                        string textColor = "black";
+                                        if (booking.CategoryID != null)
+                                        {
+                                            var color = Model.GetBookingColors(booking.CategoryID);
+                                            style = $"background-color: {color}; border: 4px solid #4C0E7D;";
+                                            textColor = Model.GetTextColor(color);
+                                            style += ");";
+                                        }
+                                        else
+                                        {
+                                            var color = "#4C0E7D";
+                                            style = $"background-color: {color}; border: 4px solid #000000;";
+                                            textColor = Model.GetTextColor(color);
+                                            style += ");";
+                                        }
+
+                                        <div class="card mb-3" style="@style; color: @textColor;">
+                                            <div class="card-header">@booking.Subject</div>
+                                            <div class="card-body">
+                                                @booking.StartTime.ToShortTimeString()
+                                                @Model.GetUserName(booking.User)
+                                            </div>
+                                        </div>                                              
                                     }
                                 </td>
                             }
@@ -184,7 +207,33 @@
                                 <div class="combined-container" style="max-height: 30vh; overflow: auto;">
                                     @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == currentDay))
                                     {
-                                        <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
+                                        string style = "";
+                                        string textColor = "black";
+                                        if (booking.CategoryID != null)
+                                        {
+                                            var color = Model.GetBookingColors(booking.CategoryID);
+                                            style = $"background-color: {color}; border: 4px solid #4C0E7D;";
+                                            textColor = Model.GetTextColor(color);
+                                            style += ");";
+                                        }
+                                        else
+                                        {
+                                            var color = "#4C0E7D";
+                                            style = $"background-color: {color}; border: 4px solid #000000;";
+                                            textColor = Model.GetTextColor(color);
+                                            style += ");";
+                                        }
+
+                                        <a asp-page="/Teacher/Appointments/Index" asp-route-id="@booking.Id">
+                                                
+                                            <div class="card mb-3" style="@style; color: @textColor;">
+                                                <div class="card-header">@booking.Subject</div>
+                                                <div class="card-body">
+                                                    @booking.StartTime.ToShortTimeString()
+                                                    @Model.GetUserName(booking.User)
+                                                </div>
+                                            </div>                                              
+                                        </a>
                                     }
                                 </div>
                             </td>
