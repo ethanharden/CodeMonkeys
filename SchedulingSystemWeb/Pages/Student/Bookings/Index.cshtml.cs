@@ -219,17 +219,9 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                 {
                     foreach (var location in Locations)
                     {
-                        foreach (var avail in AList)
-                        {
-                            if (avail.LocationId == location.LocationId)
-                            {
-                                AvailabilitiesList.AddRange(_unitOfWork.Availability.GetAll().Where(a => a.LocationId == avail.LocationId));
-                                BookingsList.AddRange(_unitOfWork.Booking.GetAll().Where(a => a.LocationID == avail.LocationId));
-                            }
-                            //var Availabilites.ToList();
-                        }
+                        AvailabilitiesList.AddRange(_unitOfWork.Availability.GetAll().Where(a => a.LocationId == location.LocationId));
+                        BookingsList.AddRange(_unitOfWork.Booking.GetAll().Where(a => a.LocationID == location.LocationId));
                         Availabilities = AvailabilitiesList;
-                        //var Bookings = BList;
                         Bookings = BookingsList;
                     }
                 }

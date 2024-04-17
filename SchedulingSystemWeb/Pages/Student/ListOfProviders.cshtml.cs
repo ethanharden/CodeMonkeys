@@ -19,6 +19,7 @@ namespace SchedulingSystemWeb.Pages.Student
         public IEnumerable<Department> departmentList;
         public IList<IdentityRole> Roles;
         public IList<ProviderProfile> Providers;
+        public IEnumerable<LocationType> locationTypesList;
 
         public ListOfProvidersModel(UnitOfWork unitofWork, RoleManager<IdentityRole> roleManager)
         {
@@ -30,7 +31,7 @@ namespace SchedulingSystemWeb.Pages.Student
         {
             departmentList = _unitOfWork.Department.GetAll();
             Roles = await _roleManager.Roles.ToListAsync();
-
+            locationTypesList = _unitOfWork.LocationType.GetAll();
 
             return Page();
         }
@@ -45,7 +46,7 @@ namespace SchedulingSystemWeb.Pages.Student
             return new JsonResult(providerProfiles);
         }
 
-        public async Task<IActionResult> OnPostAsync(string role, int department, int locationTypeId)
+        public async Task<IActionResult> OnPostAsync(string role, int department, IEnumerable<int>? locationTypeId)
         {
             TempData["SelectedRole"] = role;
             TempData["SelectedDepartment"] = department.ToString();
