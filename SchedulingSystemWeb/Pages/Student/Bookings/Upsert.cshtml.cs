@@ -52,6 +52,9 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         ApplicationUser user = new ApplicationUser();
         public ProviderProfile prov { get; set; }
         private IWebHostEnvironment _webhostenvironment;
+        public IEnumerable<Category> AllCategories { get; set; }
+        [BindProperty]
+        public List<int> CategoryIds { get; set; } = new List<int>();
         public UpsertModel(UnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, IWebHostEnvironment webhostenvironment, IHttpClientFactory httpClientFactory)
         {
             _unitOfWork = unitOfWork;
