@@ -434,14 +434,14 @@
                                                 style += ");";
                                                 textColor = Model.GetTextColor(categoryColors[0]);
                                             }
-                                            <a asp-page="/Teacher/Availabilities/Upsert" asp-route-id="@availability.Id" class="availability-link">
+                                            
                                                 <div class="card mb-3" style="@style; color: @textColor;">
                                                     <div class="card-header">Available</div>
                                                     <div class="card-body">
                                                         @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
                                                     </div>
                                                 </div>
-                                            </a>
+
                                         }
                                         </td>
                                 }
