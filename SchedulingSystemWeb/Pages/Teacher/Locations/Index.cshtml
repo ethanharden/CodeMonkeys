@@ -64,6 +64,10 @@
                     <p class="card-text">@location.RoomNumber</p>
                     <p class="card-text">Campus: @campusName</p>
                     <a asp-page="/Teacher/Locations/Upsert" asp-route-id="@location.LocationId" class="btn btn-primary">Edit</a>
+                    <form method="post" asp-page-handler="Delete" onsubmit="return confirm('Are you sure you want to delete this location?');">
+                        <input type="hidden" asp-for="@location.LocationId" name="id" />
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
                 </div>
             </div>
             </div>
