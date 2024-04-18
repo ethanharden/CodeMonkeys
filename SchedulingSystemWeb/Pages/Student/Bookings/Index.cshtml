@@ -61,6 +61,18 @@
 
 <br />
 <br />
+<label>Categories</label>
+<div id="categoriesBox">
+    @foreach (var category in Model.ViewCategories)
+    {
+        <div class="form-check form-check-inline">
+            <label class="form-check-label" for="category-@category.Id">
+                <span style="display: inline-block; width: 15px; height: 15px; background-color: @category.Color; margin-right: 5px;"></span>
+                @category.Name
+            </label>
+        </div>
+    }
+</div>
 <!-- Tab navigation buttons -->
 <ul class="nav nav-tabs" id="calendarTabs" role="tablist">
     <li class="nav-item" role="presentation">

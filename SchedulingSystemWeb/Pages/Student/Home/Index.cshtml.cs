@@ -178,7 +178,11 @@ namespace SchedulingSystemWeb.Pages.Student.Home
             ViewCategories = new List<Category>();
             foreach (var b in ViewBookings)
             {
-                ViewCategories.Append(_unitOfWork.Category.Get(c => c.Id == b.CategoryID));
+                var tempCat = _unitOfWork.Category.Get(c => c.Id == b.CategoryID);
+                if (!ViewCategories.Contains(tempCat))
+                {
+                    ViewCategories.Append(tempCat);
+                }
             }
 
         }

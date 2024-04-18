@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Graph.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Drawing;
+using System.Linq;
 //using Microsoft.AspNet.Identity;
 
 namespace SchedulingSystemWeb.Pages.Student.Bookings
@@ -366,7 +367,22 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             ViewBookings = Bookings.Where(b => b.StartTime.Date >= startOfMonth && b.StartTime.Date <= endOfMonth);
             // Filter availabilities within the month. Adjust this logic if your availabilities work differently.
             ViewAvailabilities = Availabilities.Where(a => a.StartTime.Date >= startOfMonth && a.StartTime.Date <= endOfMonth);
-
+            ViewCategories = new List<Category>();
+            foreach (var a in ViewBookings)
+            {
+                var tempCat = _unitOfWork.Category.Get(c => c.Id == a.CategoryID);
+                if (!ViewCategories.Contains(tempCat)){
+                    ViewCategories.Append(tempCat);
+                }
+                
+            }
+            foreach (var b in ViewBookings)
+            {
+                var tempCat = _unitOfWork.Category.Get(c => c.Id == b.CategoryID);
+                if (!ViewCategories.Contains(tempCat)){
+                    ViewCategories.Append(tempCat);
+                }
+            }
         }
 
     }
