@@ -23,7 +23,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
 
         public IEnumerable<Booking> ViewBookings { get; set; }
         public IEnumerable<Availability> ViewAvailabilities { get; set; }
-        public IEnumerable<Category> ViewCategories { get; set; }
+        public List<Category> ViewCategories { get; set; }
         public List<ApplicationUser> Teachers{get; set;}
         public DateTime CurrentDate { get; private set; }
         public List<DateTime> WeekDays { get; private set; } = new List<DateTime>();
@@ -179,9 +179,9 @@ namespace SchedulingSystemWeb.Pages.Student.Home
             foreach (var b in ViewBookings)
             {
                 var tempCat = _unitOfWork.Category.Get(c => c.Id == b.CategoryID);
-                if (!ViewCategories.Contains(tempCat))
+                if (tempCat != null && !ViewCategories.Any(c => c.Id == tempCat.Id))
                 {
-                    ViewCategories.Append(tempCat);
+                    ViewCategories.Add(tempCat);
                 }
             }
 

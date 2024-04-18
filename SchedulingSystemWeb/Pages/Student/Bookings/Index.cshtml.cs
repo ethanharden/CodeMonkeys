@@ -368,19 +368,25 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             // Filter availabilities within the month. Adjust this logic if your availabilities work differently.
             ViewAvailabilities = Availabilities.Where(a => a.StartTime.Date >= startOfMonth && a.StartTime.Date <= endOfMonth);
             ViewCategories = new List<Category>();
-            foreach (var a in ViewBookings)
+            foreach (var a in ViewAvailabilities)
             {
-                var tempCat = _unitOfWork.Category.Get(c => c.Id == a.CategoryID);
-                if (!ViewCategories.Contains(tempCat)){
-                    ViewCategories.Append(tempCat);
+                foreach(var a2 in a.Category)
+                {
+                    var tempCat = _unitOfWork.Category.Get(c => c.Id == a2);
+                    if (tempCat != null && !ViewCategories.Any(c => c.Id == tempCat.Id))
+                    {
+                        ViewCategories.Add(tempCat);
+                    }
                 }
+                
                 
             }
             foreach (var b in ViewBookings)
             {
                 var tempCat = _unitOfWork.Category.Get(c => c.Id == b.CategoryID);
-                if (!ViewCategories.Contains(tempCat)){
-                    ViewCategories.Append(tempCat);
+                if (tempCat != null && !ViewCategories.Any(c => c.Id == tempCat.Id))
+                {
+                    ViewCategories.Add(tempCat);
                 }
             }
         }
