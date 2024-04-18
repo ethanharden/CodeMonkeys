@@ -259,7 +259,9 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                     Availabilities = AvailabilitiesList;
                     Bookings = BookingsList;
                 }
-                
+                Availabilities = AList;
+                Bookings = BList;
+
             }
            
             
