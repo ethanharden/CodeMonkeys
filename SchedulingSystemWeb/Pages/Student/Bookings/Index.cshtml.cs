@@ -171,7 +171,9 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                 var providerUserId = HttpContext.Session.GetInt32("SearchProvId");
                 if (providerUserId != null)
                 {
-                    Availabilities = _unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == providerUserId);
+                    Availabilities = new List<Availability>();
+                    Bookings = new List<Booking>();
+                    Availabilities.AddRange _unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == providerUserId);
                     Bookings = _unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == providerUserId);
                 }
                 else
