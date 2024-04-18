@@ -233,6 +233,8 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                     {
                         AvailList.AddRange(_unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == providerUserId));
                         BookList.AddRange(_unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == providerUserId));
+                        Availabilities = AvailList;
+                        Bookings = BookList;
                     }
                 }
                 else
