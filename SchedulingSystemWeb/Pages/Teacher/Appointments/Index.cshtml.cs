@@ -25,7 +25,7 @@ namespace SchedulingSystemWeb.Pages.Teacher.Appointments
         public Booking booking { get; set; }
         public ApplicationUser student { get; set; }
         public ApplicationUser teacher { get; set; }
-        public string filepath { get; set; }
+        public List<string> filepath { get; set; }
         public Location location { get; set; }
         public async Task OnGet(int? id )
         {
@@ -37,12 +37,28 @@ namespace SchedulingSystemWeb.Pages.Teacher.Appointments
             student = _unitOfWork.ApplicationUser.Get(s => s.Id == booking.User);
             var aval = _unitOfWork.Availability.Get(i => i.Id == booking.objAvailability);
             location = _unitOfWork.Location.Get(l=> l.LocationId == aval.LocationId);
-            if (booking.Attachment != null)
+            filepath = new List<string>();
+            if (booking.Attachment != null && booking.Attachment.Count() > 0)
             {
                 string wwwroot = _webHostEnvironment.WebRootPath;
-                filepath = Path.Combine(wwwroot, booking.Attachment[0]);
+                foreach (var attachmentPath in booking.Attachment)
+                {
+                    // Parse the attachmentPath to remove the square brackets and quotes
+                    string[] parts = attachmentPath.ToString().Trim(new char[] { '[', ']', '"' }).Split(',');
+
+                    // Trim each part to remove leading and trailing whitespace
+                    for (int i = 0; i < parts.Length; i++)
+                    {
+                        parts[i] = parts[i].Trim();
+                    }
+
+                    // Combine the parts to get the file path
+                    filepath.Add( Path.Combine(wwwroot, parts[0]));
+
+                    // Use filePath as needed
+                }
             }
-            
+
         }
     }
 }

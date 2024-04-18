@@ -183,7 +183,7 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
                         await _userManager.AddToRoleAsync(user, "STUDENT");
                         CustomerProfile customerProfile = new CustomerProfile();
                         customerProfile.User = user.Id ;
-                        if(Input.WNumber.ToString()!=null)
+                        if(Input.WNumber!=null)
                         {
                             customerProfile.WNumber = Int32.Parse(Input.WNumber);
                         }
@@ -199,8 +199,11 @@ namespace SchedulingSystemWeb.Areas.Identity.Pages.Account
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-
-                        await _signInManager.SignInAsync(user, isPersistent: false);
+                if (User.Identity.IsAuthenticated & User.IsInRole("ADMIN"))
+                {
+                    return Redirect("/Admin/Users/UserIndex");
+                }
+                await _signInManager.SignInAsync(user, isPersistent: false);
                 if(ReturnUrl == null)
                 {
                     ReturnUrl = "/Student/Home";

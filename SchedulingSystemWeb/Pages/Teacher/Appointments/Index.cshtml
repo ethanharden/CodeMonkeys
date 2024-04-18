@@ -59,11 +59,18 @@
                                     <label>@Model.location.LocationName Room @Model.location.RoomNumber</label>
                                 }
                             </div>
-                            @if (Model.booking.Attachment != null)
-                            {
-                                <a href="@Url.Content(Model.filepath)" download="@Model.filepath" class="btn btn-info">Download File</a>
+                            @{
+                                if (Model.filepath != null && Model.filepath.Count() > 0)
+                                {
+                                    foreach (var path in Model.filepath)
+                                    {
+                                        string[] parts = path.Split('\\');
+                                        string fileName = parts[parts.Length - 1];
+                                        <a href="@Url.Content(path)" download="@fileName" class="btn btn-info">Download File</a>
+                                        <br />
+                                    }
+                                }                      
                             }
-
                         </div>
                     </div>
                     <div class="row justify-content-center">
