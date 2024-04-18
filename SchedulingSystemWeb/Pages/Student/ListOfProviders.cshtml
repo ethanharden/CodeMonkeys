@@ -1,36 +1,50 @@
 ﻿@page
 @model SchedulingSystemWeb.Pages.Student.ListOfProvidersModel
 
-<form id="searchForm" method="post">
-    <select name="role" required>
-        <option value="">-- Select Role --</option>
-        @foreach (var role in Model.Roles)
-        {
-            if (role.Name != "STUDENT" && role.Name != "ADMIN") @* this makes sure that student schedules can't be searched' *@
+<form id="searchForm" method="post" class="mt-3">
+    <div class="row">
+        <div class="col-md-4">
+            <select name="role" class="form-select" required>
+                <option value="">-- Select Role --</option>
+                @foreach (var role in Model.Roles)
+                {
+                    if (role.Name != "STUDENT" && role.Name != "ADMIN")
+                    {
+                        <option value="@role.Name">@role.Name</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-4">
+            <select name="department" class="form-select" required>
+                <option value="">-- Department --</option>
+                @foreach (var d in Model.departmentList)
+                {
+                    <option value="@d.Id">@d.Name</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-6">
+            @foreach (var location in Model.locationTypesList)
             {
-                <option value="@role.Name">@role.Name</option>
-            }          
-        }
-    </select>
+                <div class="form-check">
+                    <input type="checkbox" name="locationTypeId" value="@location.Id" class="form-check-input" id="location-@location.Id">
+                    <label class="form-check-label" for="location-@location.Id">@location.LocationTypeName</label>
+                </div>
+            }
+        </div>
+    </div>
 
-    <!-- Deparment dropdown-->
-    <select name="department" required>
-        <option value="">-- Department --</option>
-        @foreach(var d in Model.departmentList)
-        {
-            <option value ="@d.Id">@d.Name</option>
-        }
-    </select>
-    @foreach (var location in Model.locationTypesList)
-    {
-        <label>
-            <input type="checkbox" name="locationTypeId" value="@location.Id">
-            @location.LocationTypeName
-        </label>
-    }
-
-    <button type="submit">Search</button>
+    <div class="row mt-3">
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+    </div>
 </form>
+
 
 <form id="newStudentForm" method="post">
     <input type="hidden" name="role" value="ADVISOR">

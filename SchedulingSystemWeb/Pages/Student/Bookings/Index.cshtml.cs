@@ -147,10 +147,10 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             var roleApplicationUserList = await _userManager.GetUsersInRoleAsync(searchRole);
             var dep = HttpContext.Session.GetInt32("SearchDepartment");
             ApplicationUserList = new List<ApplicationUser>();
-
+            var Locations = new List<Infrastructure.Models.Location>();
             foreach (var lType in locationType)
             {
-                Locations = _unitOfWork.Location.GetAll().Where(l => l.LocationType == lType);
+                Locations.AddRange(_unitOfWork.Location.GetAll().Where(l => l.LocationType == lType));
             }
             foreach (var u in roleApplicationUserList)
             {
@@ -179,15 +179,40 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                 var providerUserId = HttpContext.Session.GetInt32("SearchProvId");
                 if (providerUserId != null)
                 {
+                    var AvailList = new List<Availability>();
+                    var BookList = new List<Booking>();
+                    var AvailabilitiesList = Availabilities.ToList();
+                    var BookingsList = Bookings.ToList();
                     if (!Locations.IsNullOrEmpty())
                     {
-                        //AvailList = _unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == providerUserId);
-                        //BookList = _unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == providerUserId);
+                        AvailList.AddRange(_unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == providerUserId));
+                        BookList.AddRange(_unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == providerUserId));
                         foreach (var location in Locations)
                         {
-                            Availabilities = _unitOfWork.Availability.GetAll().Where(a => a.LocationId == location.LocationId);
-                            Bookings = _unitOfWork.Booking.GetAll().Where(a => a.LocationID == location.LocationId);
+                            foreach (var avail in AvailList)
+                            {
+                                if (avail.LocationId == location.LocationId)
+                                {
+                                    AvailabilitiesList.Add(avail);
+                                }
+
+                            }
+                            foreach (var book in BookList)
+                            {
+                                if (book.LocationID == location.LocationId)
+                                {
+                                    BookingsList.Add(book);
+                                }
+                            }
                         }
+                        Availabilities = AvailabilitiesList;
+                        Bookings = BookingsList;
+
+                    }
+                    else
+                    {
+                        AvailList.AddRange(_unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == providerUserId));
+                        BookList.AddRange(_unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == providerUserId));
                     }
                 }
                 else
@@ -202,21 +227,42 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                     foreach (var p in providerList)
                     {
                         AList.AddRange(_unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == p).ToList());
-                        Availabilities = AList;
+                        //Availabilities = AList;
 
                         BList.AddRange(_unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == p));
-                        Bookings = BList;
+                        //Bookings = BList;
                     }
                     if (!Locations.IsNullOrEmpty())
                     {
+                        //AvailabilitiesList.AddRange(_unitOfWork.Availability.GetAll().Where(a => a.LocationId == location.LocationId));
+                        List<Availability> A2List = new List<Availability>();
                         foreach (var location in Locations)
                         {
-                            AvailabilitiesList.AddRange(_unitOfWork.Availability.GetAll().Where(a => a.LocationId == location.LocationId));
-                            BookingsList.AddRange(_unitOfWork.Booking.GetAll().Where(a => a.LocationID == location.LocationId));
-                            Availabilities = AvailabilitiesList;
-                            Bookings = BookingsList;
+                            foreach (var avail in AList)
+                            {
+                                if (avail.LocationId == location.LocationId)
+                                {
+                                    AvailabilitiesList.Add(avail);
+                                }
+
+                            }
+                            foreach (var book in BList)
+                            {
+                                if (book.LocationID == location.LocationId)
+                                {
+                                    BookingsList.Add(book);
+                                }
+                            }
                         }
+                        Availabilities = AvailabilitiesList;
+                        Bookings = BookingsList;
                     }
+                    else
+                    {
+                        Availabilities = AList;
+                        Bookings = BList;
+                    }
+
                 }
             }
             
