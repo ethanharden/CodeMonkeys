@@ -271,7 +271,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             TempData["SuccessMessage"] = "Availability saved successfully.";
             if (User.IsInRole("TEACHER"))
             {
-                return Redirect("/teacher/appointments/index");
+                return Redirect("/teacher/availabilities/index");
             }
             else if (User.IsInRole("TUTOR"))
             {
