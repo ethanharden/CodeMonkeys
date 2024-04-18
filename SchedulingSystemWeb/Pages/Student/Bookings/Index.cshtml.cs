@@ -51,13 +51,15 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         public IList<IdentityRole> Roles;
         public IEnumerable<Infrastructure.Models.LocationType> locationTypeList;
         public IEnumerable<Infrastructure.Models.Location> Locations;
-        
+        public IEnumerable<Infrastructure.Models.LocationType> locationTypesList;
+
         public IndexModel(UnitOfWork unitOfWork, ICalendarService calendarService, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _unitOfWork = unitOfWork;
             _calendarService = calendarService;
             _userManager = userManager;
             _roleManager = roleManager;
+            
 
             InitializeCollections();
         }
@@ -75,13 +77,15 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
 
         public async Task OnGetAsync(string role, int? department, string? providerUserId, IEnumerable<int>? locationTypeId)
         {
+            locationTypesList = _unitOfWork.LocationType.GetAll();
+
             //string currentTab = HttpContext.Request.Query["tab"].ToString().ToLower();
             //if (string.IsNullOrEmpty(currentTab) || (currentTab != "weekly" && currentTab != "monthly"))
             //{
             //    currentTab = "weekly"; // Default tab
             //}
             //ViewData["CurrentTab"] = currentTab;
-            
+
             ViewData["ActiveTab"] = TempData["ActiveTab"] as string ?? "weekly";
             TempData.Keep("ActiveTab");
             //int? locationType = null;
@@ -243,7 +247,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                         {
                             if(avail.LocationId == location.LocationId)
                             {
-                                AvailabilitiesList.Add(avail);
+                                 AvailabilitiesList.Add(avail);
                             }
 
                         }
@@ -253,18 +257,18 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                             {
                                 BookingsList.Add(book);
                             }
-
                         }
                     }
                     Availabilities = AvailabilitiesList;
                     Bookings = BookingsList;
                 }
-                Availabilities = AList;
-                Bookings = BList;
-
-            }
-           
-            
+                else
+                {
+                    Availabilities = AList;
+                    Bookings = BList;
+                }
+                
+            }            
         }
 
         public string GetUserName(string id)

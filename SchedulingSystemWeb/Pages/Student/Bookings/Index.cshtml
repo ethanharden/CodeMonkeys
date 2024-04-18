@@ -56,7 +56,13 @@
             <option value="@prov.Id">@prov.FullName</option>
         }
     </select>
-
+    @foreach (var location in Model.locationTypesList)
+    {
+        <label>
+            <input type="checkbox" name="locationTypeId" value="@location.Id">
+            @location.LocationTypeName
+        </label>
+    }
     
 
     <button type="submit" > Filter </button>
