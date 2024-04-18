@@ -134,15 +134,11 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         {
             departmentList = _unitOfWork.Department.GetAll();
             Roles = await _roleManager.Roles.ToListAsync();
-            //locationTypeList = _unitOfWork.LocationType.GetAll();
 
             var searchRole = HttpContext.Session.GetString("SearchRole");
             var roleApplicationUserList = await _userManager.GetUsersInRoleAsync(searchRole);
-            //var availabilityList
             var dep = HttpContext.Session.GetInt32("SearchDepartment");
-            //var locationType = HttpContext.Session.GetInt32("LocationTypeId");
             ApplicationUserList = new List<ApplicationUser>();
-            //var LocationList = new List<Infrastructure.Models.Location>();
 
             foreach (var lType in locationType)
             {
@@ -151,7 +147,6 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             foreach (var u in roleApplicationUserList)
             {
                 var prov = _unitOfWork.ProviderProfile.Get(p => p.User == u.Id);
-                //var location = _unitOfWork.LocationType.Get(p)
                 if (prov != null && prov.DeparmentId == dep)
                 {
                     ApplicationUserList.Add(u);
@@ -171,7 +166,6 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         }
         private void FilterAvailabilitiesAndBookings(IEnumerable<int> providerList, IEnumerable<Infrastructure.Models.Location>? Locations)
         {
-            //var LocationTypeId = HttpContext.Session.GetInt32("LocationTypeId");
             if (HttpContext.Session.GetInt32("provChecker") == 1)
             {
                 var providerUserId = HttpContext.Session.GetInt32("SearchProvId");
@@ -185,15 +179,27 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
                     Availabilities = new List<Availability>();
                     Bookings = new List<Booking>();
                     //Locations = _unitOfWork.Location.GetAll().Where(l => l.LocationType == LocationTypeId);
+                    var AList = Availabilities.ToList();
+                    var BList = Bookings.ToList();
+                    var AvailabilitiesList = Availabilities.ToList();
+                    var BookingsList = Bookings.ToList();
                     foreach (var p in providerList)
                     {
-                        var AList = Availabilities.ToList();
                         AList.AddRange(_unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == p).ToList());
                         Availabilities = AList;
 
-                        var BList = Bookings.ToList();
                         BList.AddRange(_unitOfWork.Booking.GetAll().Where(b => b.ProviderProfileID == p));
                         Bookings = BList;
+                    }
+                    if (!Locations.IsNullOrEmpty())
+                    {
+                        foreach (var location in Locations)
+                        {
+                            AvailabilitiesList.AddRange(_unitOfWork.Availability.GetAll().Where(a => a.LocationId == location.LocationId));
+                            BookingsList.AddRange(_unitOfWork.Booking.GetAll().Where(a => a.LocationID == location.LocationId));
+                            Availabilities = AvailabilitiesList;
+                            Bookings = BookingsList;
+                        }
                     }
                 }
             }
