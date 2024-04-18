@@ -38,22 +38,22 @@
                 <input asp-for="PhoneNum" class="form-control" disabled />
                 
             
-                    if (Model.IsProvider)
-                    {
-                        <label asp-for="RemoteLink" class="form-label"></label>
-                        <input asp-for="RemoteLink" class="form-control" disabled />
-                        <label asp-for="BookingPrompt" class="form-label"></label>
-                        <input asp-for="BookingPrompt" class="form-control" disabled />
-                        <label asp-for="Department" class="form-label"></label>
-                        <input asp-for="Department" class="form-control" disabled />
+                if (Model.IsProvider)
+                {
+                    <label asp-for="RemoteLink" class="form-label"></label>
+                    <input asp-for="RemoteLink" class="form-control" disabled />
+                    <label asp-for="BookingPrompt" class="form-label"></label>
+                    <input asp-for="BookingPrompt" class="form-control" disabled />
+                    <label asp-for="Department" class="form-label"></label>
+                    <input asp-for="Department" class="form-control" disabled />
                     <label asp-for="StartTime" class="form-label"></label>
                     <input asp-for="StartTime" class="form-control" disabled />
                     <label asp-for="EndTime" class="form-label"></label>
                     <input asp-for="EndTime" class="form-control" disabled />
-                    }
-                    else
-                    {
-                        <label asp-for="WNumber" class="form-label"></label>
+                }
+                else
+                {
+                    <label asp-for="WNumber" class="form-label"></label>
                     <input asp-for="WNumber" class="form-control" disabled />
                 }
                 <form method="post">
@@ -101,10 +101,7 @@
 
             }
         }
-        
-
-
-        
+           
     </div>
 </div>
 

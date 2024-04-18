@@ -30,6 +30,8 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         public string CurrentMonthName { get; private set; }
         public IEnumerable<Booking> nextBookings { get; set; }
         public IEnumerable<Category> categoryList { get; set; }
+        public TimeOnly? provWorkingStartHours { get; set; }
+        public TimeOnly? provWorkingEndHours { get; set; }
 
 
         public IndexModel(UnitOfWork unitOfWork, ICalendarService calendarService, UserManager<ApplicationUser> userManager)
@@ -85,6 +87,12 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         {
             var tempProf = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id;
             categoryList = _unitOfWork.Category.GetAll().Where(c => c.ProviderProfile == tempProf);
+            if (_unitOfWork.ProviderProfile.Get(p => p.Id == tempProf).workingStartHours != null && _unitOfWork.ProviderProfile.Get(p => p.Id == tempProf).workingEndHours != null)
+            {
+                provWorkingStartHours = _unitOfWork.ProviderProfile.Get(p => p.Id == tempProf).workingStartHours;
+                provWorkingEndHours = _unitOfWork.ProviderProfile.Get(p => p.Id == tempProf).workingEndHours;
+            }
+            
         }
         public async Task<IActionResult> OnGetPreviousWeekAsync()
         {

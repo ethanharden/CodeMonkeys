@@ -45,6 +45,8 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         public Dictionary<string, IList<string>> SearchRoles;
         
         public IList<ApplicationUser> ApplicationUserList;
+        public TimeOnly? provWorkingStartHours { get; set; }
+        public TimeOnly? provWorkingEndHours { get; set; }
 
         public new List<int> ProviderList;
         public IEnumerable<Department> departmentList;
@@ -140,6 +142,8 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         }
         private async Task LoadDataAsync(int? providerUserId, IEnumerable<int>? locationType)
         {
+            provWorkingStartHours = null;
+            provWorkingEndHours = null;
             departmentList = _unitOfWork.Department.GetAll();
             Roles = await _roleManager.Roles.ToListAsync();
 
@@ -164,10 +168,26 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             if (providerUserId != null)
             {
                 ProviderList.Add(_unitOfWork.ProviderProfile.Get(p => p.Id == providerUserId).Id);
+                if (provWorkingStartHours == null || provWorkingStartHours > _unitOfWork.ProviderProfile.Get(p => p.Id == providerUserId).workingStartHours)
+                {
+                    provWorkingStartHours = _unitOfWork.ProviderProfile.Get(p => p.Id == providerUserId).workingStartHours;
+                }
+                if (provWorkingEndHours == null || provWorkingEndHours < _unitOfWork.ProviderProfile.Get(p => p.Id == providerUserId).workingEndHours)
+                {
+                    provWorkingEndHours = _unitOfWork.ProviderProfile.Get(p => p.Id == providerUserId).workingEndHours;
+                }
             }
             foreach (var u in ApplicationUserList)
             {
                 ProviderList.Add(_unitOfWork.ProviderProfile.Get(p => p.User == u.Id).Id);
+                if (provWorkingStartHours == null || provWorkingStartHours > _unitOfWork.ProviderProfile.Get(p => p.User == u.Id).workingStartHours)
+                {
+                    provWorkingStartHours = _unitOfWork.ProviderProfile.Get(p => p.User == u.Id).workingStartHours;
+                }
+                if (provWorkingEndHours == null || provWorkingEndHours < _unitOfWork.ProviderProfile.Get(p => p.User == u.Id).workingEndHours)
+                {
+                    provWorkingEndHours = _unitOfWork.ProviderProfile.Get(p => p.User == u.Id).workingEndHours;
+                }
             }
 
             FilterAvailabilitiesAndBookings(ProviderList, Locations);
