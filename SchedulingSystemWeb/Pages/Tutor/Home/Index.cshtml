@@ -81,7 +81,7 @@
 
 <label>Categories</label>
 <div id="categoriesBox">
-    @* @foreach (var category in Model.categoryList)
+    @foreach (var category in Model.categoryList)
     {
         <div class="form-check form-check-inline">
             <label class="form-check-label" for="category-@category.Id">
@@ -89,7 +89,7 @@
                 @category.Name
             </label>
         </div>
-    } *@
+    }
 </div>
 
 <a class="btn btn-success" style="float:right; margin-left:10px;" asp-page="/Teacher/Availabilities/Upsert">Create Availability</a>

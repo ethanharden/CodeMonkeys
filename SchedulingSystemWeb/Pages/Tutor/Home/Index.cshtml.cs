@@ -92,7 +92,8 @@ namespace SchedulingSystemWeb.Pages.Tutor.Home
 
         public void Load()
         {
-            
+            var tempProf = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id;
+            categoryList = _unitOfWork.Category.GetAll().Where(c => c.ProviderProfile == tempProf);
         }
         public async Task<IActionResult> OnGetPreviousWeekAsync()
         {
