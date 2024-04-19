@@ -13,54 +13,77 @@
 }
 
 <h2 class="text-primary">@ViewData["Title"]</h2>
-<form method="get" id="filter">
-<select name="role" required>
-    <option value="">Select Role</option>
-    @foreach (var role in Model.Roles)
-    {
-            if (role.Name != "STUDENT") @* this makes sure that student schedules can't be searched' *@
-            {
-                if(role.Name == HttpContext.Session.GetString("SearchRole"))
+<form method="get" id="filter" class="mt-3">
+    <div class="row">
+        <div class="col-md-4">
+            <select name="role" class="form-select" required>
+                <option value="">Select Role</option>
+                @foreach (var role in Model.Roles)
                 {
-                    <option value="@role.Name" selected>@role.Name</option>
+                    if (role.Name != "STUDENT")
+                    {
+                        if(role.Name == HttpContext.Session.GetString("SearchRole"))
+                        {
+                            <option value="@role.Name" selected>@role.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@role.Name">@role.Name</option>
+                        }
+                    }        
                 }
-                else
+            </select>
+        </div>
+        <div class="col-md-4">
+            <select name="department" class="form-select" required>
+                <option value="">--- Department ---</option>
+                @foreach(var d in Model.departmentList)
                 {
-                    <option value="@role.Name">@role.Name</option>
-                }        
-        }     
-    }
-    </select>
+                    if(d.Id == HttpContext.Session.GetInt32("SearchDepartment"))
+                    {
+                        <option value="@d.Id" selected>@d.Name</option>
+                    }
+                    else
+                    {
+                        <option value="@d.Id">@d.Name</option>
+                    }
+                }
+            </select>
+        </div>
+    </div>
 
-    <!-- Deparment dropdown-->
-    <select name="department" required>
-    <option value=""> ---Department--- </option>
-        @foreach(var d in Model.departmentList)
-        {
-            if(d.Id == HttpContext.Session.GetInt32("SearchDepartment"))
+    <div class="row mt-3">
+        <div class="col-md-4">
+            <select name="providerUserId" class="form-select">
+                <option value="">----</option>
+                <option value="">All Providers</option>
+                @foreach(var prov in Model.ApplicationUserList)
+                {
+                    <option value="@prov.Id">@prov.FullName</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-6">
+            @foreach (var location in Model.locationTypesList)
             {
-                <option value ="@d.Id" selected>@d.Name</option>
+                <div class="form-check">
+                    <input type="checkbox" name="locationTypeId" value="@location.Id" class="form-check-input" id="location-@location.Id">
+                    <label class="form-check-label" for="location-@location.Id">@location.LocationTypeName</label>
+                </div>
             }
-            else
-            {
-                <option value ="@d.Id">@d.Name</option>
-            }
-            
-        }
-    </select>
-    <select name="providerUserId">
-        <option value=""> ---- </option>
-        <option value=""> All Providers </option>
-        @foreach(var prov in Model.ApplicationUserList)
-        {
-            <option value="@prov.Id">@prov.FullName</option>
-        }
-    </select>
+        </div>
+    </div>
 
-    
-
-    <button type="submit" > Filter </button>
+    <div class="row mt-3">
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </div>
 </form>
+
 
 <br />
 <br />
@@ -137,9 +160,19 @@
                         </tr>
                     </thead>
                     <tbody>
-                    @for (var hour = 6; hour < 18; hour++) // Example: from 8 AM to 6 PM
+                    @{
+                        int startHour = 0; // Default start hour
+                        int endHour = 24;  // Default end hour
+
+                        if (Model.provWorkingStartHours != null && Model.provWorkingEndHours != null)
+                        {
+                            startHour = Model.provWorkingStartHours.Value.Hour;
+                            endHour = Model.provWorkingEndHours.Value.Hour;
+                        }
+                    }
+                    @for (var hour = startHour; hour < endHour; hour++)
                     {
-                        for (var minute = 0; minute < 60; minute += 30) // Increment by 30 minutes0
+                        for (var minute = 0; minute < 60; minute += 30) // Increment by 30 minutes
                         {
                             <tr class="week-row">
                                 <td class="hour">@hour:@(minute.ToString("00"))</td>

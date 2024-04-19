@@ -85,5 +85,18 @@ namespace SchedulingSystemWeb.Pages.Teacher.Locations
             return RedirectToPage();
         }
 
+        public async Task<IActionResult> OnPostDeleteAsync(int id)
+        {
+            var location = _unitOfWork.Location.Get(l => l.LocationId == id);
+            if (location == null)
+            {
+                return NotFound();
+            }
+
+            _unitOfWork.Location.Delete(location);
+            await _unitOfWork.CommitAsync();
+            return RedirectToPage();
+        }
+
     }
 }

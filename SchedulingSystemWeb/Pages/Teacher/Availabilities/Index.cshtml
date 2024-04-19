@@ -108,7 +108,16 @@
                 {
                     <h3>@Model.CurrentMonthName</h3>
                 }
+                @{
+                    int startHour = 0; // Default start hour
+                    int endHour = 24;  // Default end hour
 
+                    if (Model.provWorkingStartHours != null && Model.provWorkingEndHours != null)
+                    {
+                        startHour = Model.provWorkingStartHours.Value.Hour;
+                        endHour = Model.provWorkingEndHours.Value.Hour;
+                    }
+                }
                 <table class="calendar">
                     <thead>
                         <tr class="week-header">
@@ -122,7 +131,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @for (var hour = 0; hour < 24; hour++)
+                    @for (var hour = startHour; hour < endHour; hour++)
                     {
                         <tr class="week-row">
                             <td class="hour">@hour:00</td>
@@ -159,7 +168,7 @@
                                                 </div>
                                             </div>                                              
                                         </a>
-@*                                      <a asp-page="/Teacher/Appointments/Index" asp-route-id="@booking.Id">
+                                        @* <a asp-page="/Teacher/Appointments/Index" asp-route-id="@booking.Id">
                                         <div class="booking-event">@Model.GetUserName(booking.User) @booking.StartTime.ToShortTimeString()</div>
                                         </a> *@
                                     }

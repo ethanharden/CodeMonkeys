@@ -58,6 +58,8 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         public IEnumerable<Category> AllCategories { get; set; }
         [BindProperty]
         public List<int> CategoryIds { get; set; } = new List<int>();
+        public TimeOnly? provWorkingStartHours { get; set; }
+        public TimeOnly? provWorkingEndHours { get; set; }
 
 
         public UpsertModel(UnitOfWork unitOfWork, ICalendarService calendarService, UserManager<ApplicationUser> userManager)
@@ -112,6 +114,11 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             RecurringTypes = _unitOfWork.RecurringType.GetAll();
             var tempProf = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id;
             AllCategories = _unitOfWork.Category.GetAll().Where(c => c.ProviderProfile == tempProf);
+            if (_unitOfWork.ProviderProfile.Get(p => p.Id == tempProf).workingStartHours != null && _unitOfWork.ProviderProfile.Get(p => p.Id == tempProf).workingEndHours != null)
+            {
+                provWorkingStartHours = _unitOfWork.ProviderProfile.Get(p => p.Id == tempProf).workingStartHours;
+                provWorkingEndHours = _unitOfWork.ProviderProfile.Get(p => p.Id == tempProf).workingEndHours;
+            }
         }
 
 
