@@ -30,6 +30,7 @@
                 });
             });
         });
+       
     </script>
 </head>
 <body>
@@ -39,7 +40,7 @@
                 <a class="nav-link text-dark" asp-area="" asp-page="/Student/Bookings/Index"><button class="btn btn-secondary">Back</button></a>
             </div>
             <div class="col-md-5">
-                <form method="post" enctype="multipart/form-data">
+                <form method="post" enctype="multipart/form-data" id="myForm">
                     <div class="form-group">
                         <label for="professorName">Professor Name:</label>
                         <input type="text" class="form-control" id="professorName" value="@Model.fullName" disabled>
@@ -49,8 +50,17 @@
                         <input type="text" class="form-control" id="location" value="@Model.location.LocationName" disabled>
                     </div>
                     <div class="form-group">
-                        <label for="course">Course:</label>
-                        <input type="text" asp-for = "course" class="form-control" id="course" placeholder="Enter course" required>
+                        @if(Model.ProvRole[0] == "ADVISOR")
+                        {
+                            <label for="course">Subject</label>
+                            <input type="text" asp-for="course" class="form-control" id="course" placeholder="Enter Subject" required>
+                        }
+                        else
+                        {
+                            <label for="course">Course:</label>
+                            <input type="text" asp-for="course" class="form-control" id="course" placeholder="Enter course" required>
+                        }
+                       
                     </div>
                     <div class="form-group">
                         <label>Categories</label>
@@ -113,6 +123,20 @@
             </div>
         </div>
     </div>
-    
+    <script>
+        document.getElementById('myForm').addEventListener('submit', function (event) {
+            const radios = document.querySelectorAll('input[type="radio"][name="CategoryIds"]');
+            let selected = false;
+            radios.forEach(function (radio) {
+                if (radio.checked) {
+                    selected = true;
+                }
+            });
+            if (!selected) {
+                event.preventDefault(); // prevent form submission
+                alert('Please select a category.'); // show warning message
+            }
+        });
+    </script>
 </body>
 </html>
