@@ -60,5 +60,9 @@ namespace SchedulingSystemWeb.Pages.Teacher.Appointments
             }
 
         }
+        public async Task OnPost()
+        {
+            //Add calendar thinggy
+        }
     }
 }

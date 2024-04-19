@@ -50,7 +50,8 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         public static int? AId;
         [BindProperty(SupportsGet = true)]
         public string description { get; set; }
-        ApplicationUser user = new ApplicationUser();
+        public ApplicationUser user { get; set; }
+        public List<string> ProvRole { get; set; }
         public ProviderProfile prov { get; set; }
         private IWebHostEnvironment _webhostenvironment;
         public IEnumerable<Category> AvCategories { get; set; }
@@ -67,10 +68,12 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
         public async Task<IActionResult> OnGetAsync(int? Id)
         {
             AId = Id;
+            
             availability = _unitOfWork.Availability.Get(a => a.Id == Id);
             startEndTime = availability.StartTime.TimeOfDay + "-" + availability.EndTime.TimeOfDay;
             prov = _unitOfWork.ProviderProfile.Get(u => u.Id == availability.ProviderProfileID);
             user = _unitOfWork.ApplicationUser.Get(u => u.Id == prov.User);
+            ProvRole = (List<string>) await _userManager.GetRolesAsync(user);
             fullName = user.FirstName + " " + user.LastName;
             var locationID = availability.LocationId;
             location = _unitOfWork.Location.Get(l => l.LocationId == locationID);
