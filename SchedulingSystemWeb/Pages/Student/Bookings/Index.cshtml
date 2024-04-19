@@ -20,7 +20,7 @@
                 <option value="">Select Role</option>
                 @foreach (var role in Model.Roles)
                 {
-                    if (role.Name != "STUDENT")
+                    if (role.Name != "STUDENT" && role.Name != "ADMIN")
                     {
                         if(role.Name == HttpContext.Session.GetString("SearchRole"))
                         {
@@ -83,7 +83,7 @@
         </div>
     </div>
 </form>
-
+d
 
 <br />
 <br />
