@@ -47,7 +47,10 @@ namespace SchedulingSystemWeb.Pages.Tutor.Home
             Bookings = new List<Booking>();
             BookingsWithMe = new List<Booking>();
             Availabilities = new List<Availability>();
+            Teachers = new List<ApplicationUser>();
             _userManager = userManager;
+            Providers = new List<ProviderProfile>();
+            Locations = new List<Location>();
         }
 
         public async Task OnGetAsync()
@@ -68,7 +71,16 @@ namespace SchedulingSystemWeb.Pages.Tutor.Home
 
             nextBookings = _unitOfWork.Booking.GetAll().Where(b => b.StartTime.Date >= DateTime.Today && b.ProviderProfileID == provId).OrderBy(b => b.StartTime).Take(5).ToList();
             nextAppointments = _unitOfWork.Booking.GetAll().Where(b => b.StartTime.Date >= DateTime.Today && b.User == userId).OrderBy(b => b.StartTime).Take(5).ToList();
-            
+
+            int i = 0;
+            foreach (var booking in Bookings) // Adds Teachers to List for names
+            {
+                Availability aval = _unitOfWork.Availability.Get(a => a.Id == booking.objAvailability);
+                Locations.Add(_unitOfWork.Location.Get(l => l.LocationId == aval.LocationId));
+                Providers.Add(_unitOfWork.ProviderProfile.Get(b => b.Id == booking.ProviderProfileID));
+                Teachers.Add(_unitOfWork.ApplicationUser.Get(u => u.Id == Providers[i].User));
+                i++;
+            }
 
             await FetchDataForCurrentViewAsync();
         }
