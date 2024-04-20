@@ -17,18 +17,19 @@
                                 <label for="info1" class="form-label"><strong>Meeting Name</strong></label>
                                 <input type="text" class="form-control" id="info1" asp-for="@Model.booking.Subject" disabled>
                             </div>
-                            @if (Model.booking.WNumber != null)
+                            @if (Model.booking.WNumber != null && !Model.isTutor)
                             {
                                 <div class="mb-3">
-                                    <label for="info8" class="form-label"><strong>WNumber</strong><label>
-                                    <input type="text" class="form-control" id="info8" asp-for="@Model.booking.WNumber" disabled>
+                                    <label for="info8" class="form-label">
+                                        <strong>WNumber</strong><label>
+                                            <input type="text" class="form-control" id="info8" asp-for="@Model.booking.WNumber" disabled>
                                 </div>
                             }
                             <div class="mb-3">
                                 <label for="info2" class="form-label"><strong>For Course</strong></label>
                                 <input type="text" class="form-control" id="info2" asp-for="@Model.booking.Subject" disabled>
                             </div>
-                            @if(Model.booking.Note != null)
+                            @if (Model.booking.Note != null)
                             {
                                 <div class="mb-3">
                                     <label for="info3" class="form-label"><strong>Meeting Description</strong></label>
@@ -39,10 +40,10 @@
                                     }
                                 </div>
                             }
-                            
+
                             <form method="post">
                                 <div class="mb-3">
-                                    
+
                                     <button type="submit" class="btn btn-success" id="info3"> Add To Google </button>
                                 </div>
                             </form>
@@ -71,14 +72,20 @@
                                     <label>@Model.location.LocationName Room @Model.location.RoomNumber</label>
                                 }
                             </div>
-                            @if(Model.studprofile.WNumber != null)
-                            {
-                                <div class="mb-3">
-                                    <label for="info9" class="form-label"><strong>Student WNumber:</strong></label>
-                                    <label>@Model.studprofile.WNumber</label>
-                                </div>
-                            }
+                            @{
+                                if (!Model.isTutor)
+                                {
+                                    if (Model.studprofile.WNumber != null)
+                                    {
+                                        <div class="mb-3">
+                                            <label for="info9" class="form-label"><strong>Student WNumber:</strong></label>
+                                            <label>@Model.studprofile.WNumber</label>
+                                        </div>
+                                    }
+                                }
+                                }
                             
+
                             @{
                                 if (Model.filepath != null && Model.filepath.Count() > 0)
                                 {
@@ -89,13 +96,13 @@
                                         <a href="@Url.Content(path)" download="@fileName" class="btn btn-info">Download File</a>
                                         <br />
                                     }
-                                }                      
+                                }
                             }
                         </div>
                     </div>
                     <div class="row justify-content-center">
                         <div class="col">
-                            @if(Model.User.IsInRole("TUTOR"))
+                            @if (Model.User.IsInRole("TUTOR"))
                             {
                                 <a href="/Tutor/Home/Index" type="button" class="btn btn-primary">Back</a>
                             }
@@ -103,7 +110,7 @@
                             {
                                 <a href="/Teacher/Availabilities" type="button" class="btn btn-primary">Back</a>
                             }
-                            
+
                             <a asp-page="/Student/Home/Delete" asp-route-id="@Model.booking.Id" class="btn btn-danger">Cancel Booking</a>
                             @{
                                 string mail = "mailto:" + @Model.student.Email;
@@ -115,7 +122,7 @@
             </div>
         </div>
     </div>
-        
-    
-    
+
+
+
 </body>
