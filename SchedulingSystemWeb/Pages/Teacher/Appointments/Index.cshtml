@@ -28,12 +28,24 @@
                                 <label for="info2" class="form-label"><strong>For Course</strong></label>
                                 <input type="text" class="form-control" id="info2" asp-for="@Model.booking.Subject" disabled>
                             </div>
-
-                            <div class="mb-3">
-                                <label for="info3" class="form-label"><strong>Meeting Description</strong></label>
-                                <input type="text" class="form-control" id="info3" asp-for="@Model.booking.Note" disabled>
-                            </div>
-
+                            @if(Model.booking.Note != null)
+                            {
+                                <div class="mb-3">
+                                    <label for="info3" class="form-label"><strong>Meeting Description</strong></label>
+                                    @{
+                                        string note = Model.booking.Note;
+                                        @Html.Raw(note)
+                                        ;
+                                    }
+                                </div>
+                            }
+                            
+                            <form method="post">
+                                <div class="mb-3">
+                                    
+                                    <button type="submit" class="btn btn-success" id="info3"> Add To Google </button>
+                                </div>
+                            </form>
                         </div>
                         <div class="col">
                             <div class="mb-3">
@@ -59,6 +71,14 @@
                                     <label>@Model.location.LocationName Room @Model.location.RoomNumber</label>
                                 }
                             </div>
+                            @if(Model.studprofile.WNumber != null)
+                            {
+                                <div class="mb-3">
+                                    <label for="info9" class="form-label"><strong>Student WNumber:</strong></label>
+                                    <label>@Model.studprofile.WNumber</label>
+                                </div>
+                            }
+                            
                             @{
                                 if (Model.filepath != null && Model.filepath.Count() > 0)
                                 {
@@ -75,7 +95,15 @@
                     </div>
                     <div class="row justify-content-center">
                         <div class="col">
-                            <a href="/Teacher/Availabilities" type="button" class="btn btn-primary">Back</a>
+                            @if(Model.User.IsInRole("TUTOR"))
+                            {
+                                <a href="/Tutor/Home/Index" type="button" class="btn btn-primary">Back</a>
+                            }
+                            else
+                            {
+                                <a href="/Teacher/Availabilities" type="button" class="btn btn-primary">Back</a>
+                            }
+                            
                             <a asp-page="/Student/Home/Delete" asp-route-id="@Model.booking.Id" class="btn btn-danger">Cancel Booking</a>
                             @{
                                 string mail = "mailto:" + @Model.student.Email;

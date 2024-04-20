@@ -32,15 +32,7 @@
                             @if (User.IsInRole("TEACHER") || User.IsInRole("ADVISOR"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-light" asp-area="" asp-page="/Teacher/Availabilities">Home</a>
-                                </li>
-
-
-                                <li class="nav-item">
-                                    <a class="nav-link text-light" asp-area="" asp-page="/About">About</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-light" asp-area="" asp-page="/Teacher/Availabilities/Index">Availability </a>
+                                    <a class="nav-link text-light" asp-area="" asp-page="/Teacher/Availabilities/Index">Home</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link text-light" asp-area="" asp-page="/Teacher/Categories/Index"> Categories </a>
@@ -80,7 +72,7 @@
                                 <li class="nav-item dropdown">
                                     <a class="nav-link text-light dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Content Managment</a>
                                     <div class="dropdown-menu">
-                                        <a class="dropdown-item" asp-area="" asp-page="/Admin/Roles/Index">Roles</a>
+                               
                                         <a class="dropdown-item" asp-area="" asp-page="/Admin/Users/UserIndex">Users</a>
                                     </div>
                                 </li>
@@ -91,10 +83,6 @@
                                     <a class="nav-link text-light" asp-area="" asp-page="/Student/Home/index">Home</a>
                                 </li>
 
-
-                                <li class="nav-item">
-                                    <a class="nav-link text-light" asp-area="" asp-page="/About">About</a>
-                                </li>
                             }
 
                         </ul>
@@ -115,10 +103,12 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2024 - SchedulingSystemWeb - <a asp-area="" asp-page="/Privacy">Privacy</a>
-        </div>
-    </footer>
+            &copy; 2024 - SchedulingSystemWeb - <a asp-area="" asp-page="/About">About This App</a>
+            
+        </div>      
+            
 
+    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
