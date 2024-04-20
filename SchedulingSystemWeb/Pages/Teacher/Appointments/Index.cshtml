@@ -44,7 +44,17 @@
                             <form method="post">
                                 <div class="mb-3">
 
-                                    <button type="submit" class="btn btn-success" id="info3"> Add To Google </button>
+                                    
+                                    @{
+                                        string startTime = @Model.booking.StartTime.ToUniversalTime().ToString("yyyyMMddTHHmmssZ");
+                                        string endTime = @Model.booking.StartTime.AddMinutes(Model.booking.Duration).ToUniversalTime().ToString("yyyyMMddTHHmmssZ");
+                                        string encodedNote = System.Web.HttpUtility.UrlEncode(@Model.booking.Note);
+                                        string encodedLocation = System.Web.HttpUtility.UrlEncode(@Model.location.LocationName);
+                                        string link = "http://www.google.com/calendar/event?action=TEMPLATE&text=" + @Model.booking.Subject + "&dates=" + @startTime +
+                                        "/" + @endTime + "&details=" + @encodedNote + "&location=" + @encodedLocation;
+                                        <a href=@link target="_blank" class="btn btn-success">Add to Google Calendar</a>
+                                    }
+                                    
                                 </div>
                             </form>
                         </div>
