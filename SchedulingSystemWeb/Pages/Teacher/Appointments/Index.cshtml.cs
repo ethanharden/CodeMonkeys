@@ -32,7 +32,7 @@ namespace SchedulingSystemWeb.Pages.Teacher.Appointments
 
             
             int provId = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id;
-            booking = _unitOfWork.Booking.Get(b => b.Id == id & b.ProviderProfileID ==provId);
+            booking = _unitOfWork.Booking.Get(b => b.Id == id & b.ProviderProfileID == provId);
             teacher = _unitOfWork.ApplicationUser.Get(u => u.Id == _userManager.GetUserId(User));
             student = _unitOfWork.ApplicationUser.Get(s => s.Id == booking.User);
             var aval = _unitOfWork.Availability.Get(i => i.Id == booking.objAvailability);

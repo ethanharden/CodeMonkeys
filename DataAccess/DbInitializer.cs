@@ -224,6 +224,11 @@ namespace DataAccess
                     User =  _unitOfWork.ApplicationUser.Get(u => u.Email == "JulieChristensen@JulieChristensen.com").Id,
                     DeparmentId = _unitOfWork.Department.Get(d => d.Name == "Computer Science").Id,
                     userFullName = _unitOfWork.ApplicationUser.Get(u => u.Email == "JulieChristensen@JulieChristensen.com").FullName,
+                    },
+                new ProviderProfile {
+                    User =  _unitOfWork.ApplicationUser.Get(u => u.Email == "JaneDoe@JaneDoe.com").Id,
+                    DeparmentId = _unitOfWork.Department.Get(d => d.Name == "Computer Science").Id,
+                    userFullName = _unitOfWork.ApplicationUser.Get(u => u.Email == "JaneDoe@JaneDoe.com").FullName,
                     }
             };
 
