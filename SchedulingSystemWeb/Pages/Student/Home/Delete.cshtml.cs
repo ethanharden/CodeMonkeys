@@ -53,7 +53,7 @@ namespace SchedulingSystemWeb.Pages.Student.Home
             Role = (List<string>)await _userManager.GetRolesAsync(user);
             if (Role.First() != "TEACHER")
             {
-                return Redirect("/Student/Home");
+                return Redirect("/Teacher/Availability/Index");
                 
             }
             else
