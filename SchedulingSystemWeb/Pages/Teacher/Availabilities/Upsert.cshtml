@@ -117,6 +117,19 @@
                 <span @* asp-validation-for="objAvailability.RecurringEndDate" *@ class="text-danger"></span>
             </div>
             <br />
+            
+            <div class="form-group">
+                <label for="location">Location</label>
+                <select asp-for="objAvailability.LocationId" class="form-control" required>
+                    <option value="">-- Select Location --</option>
+                
+                    @foreach (var loc in Model.locationLIst)
+                    {
+                     <option value="@loc.LocationId" class="text-danger"> @loc.LocationName -- @loc.BuildingName</option>
+                    }    
+                </select>
+            </div>
+            <br />
 
             <!-- Categories -->
             <div class="form-group">

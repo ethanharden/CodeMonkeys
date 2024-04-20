@@ -60,6 +60,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         public List<int> CategoryIds { get; set; } = new List<int>();
         public TimeOnly? provWorkingStartHours { get; set; }
         public TimeOnly? provWorkingEndHours { get; set; }
+        public IEnumerable<Location> locationLIst { get; set; }
 
 
         public UpsertModel(UnitOfWork unitOfWork, ICalendarService calendarService, UserManager<ApplicationUser> userManager)
@@ -119,12 +120,17 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                 provWorkingStartHours = _unitOfWork.ProviderProfile.Get(p => p.Id == tempProf).workingStartHours;
                 provWorkingEndHours = _unitOfWork.ProviderProfile.Get(p => p.Id == tempProf).workingEndHours;
             }
+            locationLIst = _unitOfWork.Location.GetAll().Where(l => l.ProfileId == tempProf);
         }
 
 
         public async Task<IActionResult> OnPostAsync()
         {
             Load();
+            if (objAvailability.LocationId <= 0)
+            {
+                ModelState.AddModelError("objAvailability.LocationId", "Please select a location.");
+            }
             if (!CategoryIds.Any())
             {
                 ModelState.AddModelError("CategoryValidation", "At least one category must be selected.");
@@ -195,7 +201,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                                 EndTime = weekEnd,
                                 ProviderProfileID = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id,
                                 ProviderFullName = _unitOfWork._ProviderProfile.Get(p => p.Id == objAvailability.ProviderProfileID).userFullName,
-                                LocationId = 1,
+                                LocationId = objAvailability.LocationId,
                                 Category = CategoryIds,
                         };
 
@@ -247,7 +253,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                             EndTime = weekEnd,
                             ProviderProfileID = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id,
                             ProviderFullName = _unitOfWork._ProviderProfile.Get(p=>p.Id == objAvailability.ProviderProfileID).userFullName,
-                            LocationId = 1,
+                            LocationId = objAvailability.LocationId,
                             Category = CategoryIds,
                         };
                         _unitOfWork.Availability.Add(newAvailability);
@@ -265,6 +271,7 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                     existingAvailability.StartTime = startTime;
                     existingAvailability.EndTime = endTime;
                     existingAvailability.DayOfTheWeek = startTime.DayOfWeek;
+                    existingAvailability.LocationId = objAvailability.LocationId;
                     _unitOfWork.Availability.Update(existingAvailability);
                 }
                 else
