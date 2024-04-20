@@ -89,23 +89,26 @@
                         <textarea id="mytextarea" class="form-control" asp-for="description" id="description" placeholder="Enter description"></textarea>
                     </div>
                         <div class="form-group" id="fileUploadContainer">
-                            <label class="form-label">File Upload</label>
+                            <label class="form-label">File Upload (optional)</label>
                             <div class="file-upload">
                                 <input type="file" class="form-control" name="file[]" />
                                 <button type="button"class="add-more btn btn-primary m-10">Add More</button>
                             </div>
                         </div>
-                    <div class="col-md-5">
-                        <div class="form-group">
-                        <input class="form-check-input" type="radio" id="addToGoogle" name="calendar" value="google">
-                        <label class="form-check-label" for="addToGoogle"> Add to Google</label>
-                    </div>
-                    
+                    <br />
                     <div class="form-group">
-                        <input class="form-check-input" type="radio" id="noCalendar" name="calendar" value="none">
-                        <label class="form-check-label" for="noCalendar"> No Calendar</label>
+                    @{
+                        string startTime = @Model.availability.StartTime.ToUniversalTime().ToString("yyyyMMddTHHmmssZ");
+                        string endTime = @Model.availability.EndTime.ToUniversalTime().ToString("yyyyMMddTHHmmssZ");
+                        string encodedNote = System.Web.HttpUtility.UrlEncode(@Model.newBooking.Note);
+                        string encodedLocation = System.Web.HttpUtility.UrlEncode(@Model.location.LocationName);
+                        string encodedName = System.Web.HttpUtility.UrlEncode(@Model.fullName);
+                        string link = "http://www.google.com/calendar/event?action=TEMPLATE&text=Meeting%20with%20" + @encodedName + "&dates=" + @startTime +
+                        "/" + @endTime + "&details=" + @encodedNote + "&location=" + @encodedLocation;
+                        <a href=@link target="_blank" class="btn btn-secondary">Add to Google Cal</a>
+                    }
                     </div>
-                    </div>
+                    <br />
                     <div class="form-group">
                         <button type="submit" class="btn btn-success">Submit</button>
                     </div>

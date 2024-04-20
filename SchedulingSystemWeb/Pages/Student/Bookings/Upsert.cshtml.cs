@@ -126,58 +126,7 @@ namespace SchedulingSystemWeb.Pages.Student.Bookings
             _unitOfWork.Booking.Add(newBooking); //Reactivate when ready.
             _unitOfWork.Commit();
             await SendEmail(newBooking);
-            var selectedCalendar = Request.Form["calendar"]; // For adding to google 
-            if (selectedCalendar.Count > 0)
-            {               
-                    var calendarType = selectedCalendar[0];
-                    
-                     if (calendarType == "google") //GOOGLE-------------------------------------------------------------------------------
-                    {
-                        UserCredential credential;
-                        string[] Scopes = { Google.Apis.Calendar.v3.CalendarService.Scope.CalendarEvents };
-                        string ApplicationName = "Code Monkeys";
-                        string CalendarId = "primary";
-                        Google.Apis.Calendar.v3.Data.Event newEvent = new Google.Apis.Calendar.v3.Data.Event()
-                        {
-                            Summary = newBooking.Subject,
-                            Location = _unitOfWork.Location.Get(l => l.LocationId == availability.LocationId).LocationName,
-                            Description = newBooking.Note,
-                            Start = new EventDateTime()
-                            {
-                                DateTime = newBooking.StartTime,
-                                TimeZone = localTimeZone.DisplayName,
-                            },
-                            End = new EventDateTime()
-                            {
-                                DateTime = newBooking.StartTime.AddMinutes(newBooking.Duration),
-                                TimeZone = localTimeZone.DisplayName,
-                            },
-                        };
-                        using (var stream = new FileStream(@"wwwroot/secret/client_secret_328091863377-8nbrlurrfk4f51on47vvosc341ajlgk1.apps.googleusercontent.com (1).json", FileMode.Open, FileAccess.Read))
-                        {
-                            string credPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-                            credPath = Path.Combine(credPath, ".credentials/calendar-dotnet-quickstart.json");
-
-                            credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                                GoogleClientSecrets.Load(stream).Secrets,
-                                Scopes,
-                                "user",
-                                CancellationToken.None,
-                                new FileDataStore(credPath, true)).Result;
-                            Console.WriteLine("Credential file saved to: " + credPath);
-                        }
-                        // Create Google Calendar API service.
-                        var service = new Google.Apis.Calendar.v3.CalendarService(new BaseClientService.Initializer()
-                        {
-                            HttpClientInitializer = credential,
-                            ApplicationName = "CodeMonkeys"
-                        });
-                        EventsResource.InsertRequest request = service.Events.Insert(newEvent, CalendarId);
-                        Google.Apis.Calendar.v3.Data.Event createdEvent = request.Execute();
-                        Console.WriteLine("Event created: {0}", createdEvent.HtmlLink);
-
-                    }
-            }
+           
             
             if (User.IsInRole("STUDENT"))
             {
