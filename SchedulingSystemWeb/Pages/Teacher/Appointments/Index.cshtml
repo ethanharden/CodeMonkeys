@@ -95,7 +95,15 @@
                     </div>
                     <div class="row justify-content-center">
                         <div class="col">
-                            <a href="/Teacher/Availabilities" type="button" class="btn btn-primary">Back</a>
+                            @if(Model.User.IsInRole("TUTOR"))
+                            {
+                                <a href="/Tutor/Home/Index" type="button" class="btn btn-primary">Back</a>
+                            }
+                            else
+                            {
+                                <a href="/Teacher/Availabilities" type="button" class="btn btn-primary">Back</a>
+                            }
+                            
                             <a asp-page="/Student/Home/Delete" asp-route-id="@Model.booking.Id" class="btn btn-danger">Cancel Booking</a>
                             @{
                                 string mail = "mailto:" + @Model.student.Email;
