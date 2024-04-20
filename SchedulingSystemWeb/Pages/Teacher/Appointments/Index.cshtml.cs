@@ -35,6 +35,12 @@ namespace SchedulingSystemWeb.Pages.Teacher.Appointments
             booking = _unitOfWork.Booking.Get(b => b.Id == id & b.ProviderProfileID == provId);
             teacher = _unitOfWork.ApplicationUser.Get(u => u.Id == _userManager.GetUserId(User));
             student = _unitOfWork.ApplicationUser.Get(s => s.Id == booking.User);
+            //if (User.IsInRole("TUTOR"))
+            //{
+            //    student = _unitOfWork.ApplicationUser.Get(u => u.Id == _userManager.GetUserId(User));
+            //    teacher = _unitOfWork.ApplicationUser.Get(s => s.Id == booking.ProviderProfileID);
+            //}
+
             var aval = _unitOfWork.Availability.Get(i => i.Id == booking.objAvailability);
             location = _unitOfWork.Location.Get(l=> l.LocationId == aval.LocationId);
             filepath = new List<string>();

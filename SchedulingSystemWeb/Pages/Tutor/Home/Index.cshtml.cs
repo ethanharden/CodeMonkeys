@@ -19,6 +19,7 @@ namespace SchedulingSystemWeb.Pages.Tutor.Home
         private readonly ICalendarService _calendarService;
         private readonly UserManager<ApplicationUser> _userManager;
         public IEnumerable<Booking> Bookings { get; set; }
+        public IEnumerable<Booking> BookingsWithMe { get; set; }
         public IEnumerable<Availability> Availabilities { get; set; }
 
         public IEnumerable<Booking> ViewBookings { get; set; }
@@ -44,6 +45,7 @@ namespace SchedulingSystemWeb.Pages.Tutor.Home
             _calendarService = calendarService;
             _unitOfWork = unitOfWork;
             Bookings = new List<Booking>();
+            BookingsWithMe = new List<Booking>();
             Availabilities = new List<Availability>();
             _userManager = userManager;
         }
@@ -62,6 +64,7 @@ namespace SchedulingSystemWeb.Pages.Tutor.Home
             string userId = _userManager.GetUserId(User);
             Availabilities = _unitOfWork.Availability.GetAll().Where(a => a.ProviderProfileID == provId);
             Bookings = _unitOfWork.Booking.GetAll().Where(p => p.User == userId);
+            BookingsWithMe = _unitOfWork.Booking.GetAll().Where(a => a.ProviderProfileID == provId);
 
             nextBookings = _unitOfWork.Booking.GetAll().Where(b => b.StartTime.Date >= DateTime.Today && b.ProviderProfileID == provId).OrderBy(b => b.StartTime).Take(5).ToList();
             nextAppointments = _unitOfWork.Booking.GetAll().Where(b => b.StartTime.Date >= DateTime.Today && b.User == userId).OrderBy(b => b.StartTime).Take(5).ToList();
@@ -155,6 +158,13 @@ namespace SchedulingSystemWeb.Pages.Tutor.Home
         public bool IsAvailabilityBooked(Availability availability)
         {
             return Bookings.Any(booking => booking.StartTime >= availability.StartTime && booking.StartTime < availability.EndTime);
+
+        }
+
+        public bool IsAvailabilityBooked1(Availability availability)
+        {
+            return BookingsWithMe.Any(booking => booking.StartTime >= availability.StartTime && booking.StartTime < availability.EndTime);
+
         }
         private async Task FetchDataForCurrentViewAsync()
         {

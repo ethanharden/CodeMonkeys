@@ -63,7 +63,7 @@
                                 <hr />
                                 <p class="card-text">Date: @booking.StartTime.ToShortDateString()</p>
                                 <p class="card-text">@booking.StartTime.ToShortTimeString() - @booking.StartTime.AddMinutes(booking.Duration).ToShortTimeString()</p>
-                                <a asp-page="/Teacher/Appointments/Index" asp-route-id="@booking.Id" class="btn btn-primary">More Info</a>       
+                                <a asp-page="Delete" asp-route-id="@booking.Id" class="btn btn-danger">Cancel Booking</a>       
                                     
                             </div>
                         </div>
@@ -189,7 +189,37 @@
                                             </div>                                              
                                         </a>
                                         }
-                                    @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour && !Model.IsAvailabilityBooked(a)))
+                                    @foreach(var booking in Model.BookingsWithMe.Where(b => b.StartTime.Date == day.Date && b.StartTime.Hour == hour))
+                                    {
+                                        string style = "";
+                                        string textColor = "black";
+                                        if (booking.CategoryID != null)
+                                        {
+                                            var color = Model.GetBookingColors(booking.CategoryID);
+                                            style = $"background-color: {color}; border: 4px solid #4C0E7D;";
+                                            textColor = Model.GetTextColor(color);
+                                            style += ");";
+                                        }
+                                        else
+                                        {
+                                            var color = "#4C0E7D";
+                                            style = $"background-color: {color}; border: 4px solid #000000;";
+                                            textColor = Model.GetTextColor(color);
+                                            style += ");";
+                                        }
+
+                                        
+                                                
+                                            <div class="card mb-3" style="@style; color: @textColor;">
+                                                <div class="card-header">@booking.Subject</div>
+                                                <div class="card-body">
+                                                    @booking.StartTime.ToShortTimeString()
+                                                    @Model.GetUserName(booking.User)
+                                                </div>
+                                            </div>                                              
+                                        
+                                        }
+                                    @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour && !Model.IsAvailabilityBooked(a) && !Model.IsAvailabilityBooked1(a)))
                                     {
                                             var categoryColors = Model.GetCategoryColors(availability.Category);
                                             string style = "";
@@ -298,6 +328,36 @@
                                                 textColor = Model.GetTextColor(color);
                                                 style += ");";
                                             }
+                                            
+                                                
+                                                    <div class="card mb-3" style="@style; color: @textColor;">
+                                                    <div class="card-header">@booking.Subject</div>
+                                                    <div class="card-body">
+                                                        @booking.StartTime.ToShortTimeString()
+                                                        @Model.GetUserName(booking.User)
+                                                    </div>
+                                                </div>                                              
+                                            
+                                        }
+                                @foreach(var booking in Model.BookingsWithMe.Where(b => b.StartTime.Date == currentDay))
+                                        {
+
+                                            string style = "";
+                                            string textColor = "black";
+                                            if (booking.CategoryID != null)
+                                            {
+                                                var color = Model.GetBookingColors(booking.CategoryID);
+                                                style = $"background-color: {color}; border: 4px solid #4C0E7D;";
+                                                textColor = Model.GetTextColor(color);
+                                                style += ");";
+                                            }
+                                            else
+                                            {
+                                                var color = "#4C0E7D";
+                                                style = $"background-color: {color}; border: 4px solid #000000;";
+                                                textColor = Model.GetTextColor(color);
+                                                style += ");";
+                                            }
                                             <a asp-page="/Teacher/Appointments/Index" asp-route-id="@booking.Id">
                                                 
                                                     <div class="card mb-3" style="@style; color: @textColor;">
@@ -309,7 +369,7 @@
                                                 </div>                                              
                                             </a>
                                         }
-                                @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == currentDay && !Model.IsAvailabilityBooked(a)))
+                                @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == currentDay && !Model.IsAvailabilityBooked(a) && !Model.IsAvailabilityBooked1(a)))
                                         {
                                             var categoryColors = Model.GetCategoryColors(availability.Category);
                                             string style = "";
