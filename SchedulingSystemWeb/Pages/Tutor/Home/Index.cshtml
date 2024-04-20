@@ -11,7 +11,6 @@
     int leadingDays = (currentDayOfWeek - firstDayOfWeek + 7) % 7;
 }
 
-  <br />
   <h2 class="text-primary">@ViewData["Title"]</h2>
   <div>
     <h4>Upcoming Bookings with Students</h4>
@@ -78,7 +77,6 @@
         <p>No upcoming appointments found.</p>
     }
 </div>
-<br />
 <label>Categories</label>
 <div id="categoriesBox">
     @foreach (var category in Model.categoryList)
@@ -300,27 +298,6 @@
                                                 textColor = Model.GetTextColor(color);
                                                 style += ");";
                                             }
-                                                @* else if (categoryColors.Count > 1)
-                                            {
-                                                int colorCount = categoryColors.Count;
-                                                float percentagePerColor = 100f / colorCount;
-                                                style = "background: repeating-linear-gradient(to right, ";
-
-                                                for (int j = 0; j < colorCount; j++)
-                                                {
-                                                    var color = categoryColors[j];
-                                                    var startPercent = j * percentagePerColor;
-                                                    var endPercent = (j + 1) * percentagePerColor;
-                                                    style += $"{color} {startPercent}%, {color} {endPercent}%";
-                                                    if (j < colorCount - 1)
-                                                    {
-                                                        style += ", ";
-                                                    }
-                                                }
-                                                style += "); border: 10px solid #4C0E7D;";
-                                                textColor = Model.GetTextColor(categoryColors[0]);
-                                            } *@
-
                                             <a asp-page="/Teacher/Appointments/Index" asp-route-id="@booking.Id">
                                                 
                                                     <div class="card mb-3" style="@style; color: @textColor;">

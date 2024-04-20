@@ -64,7 +64,8 @@ namespace SchedulingSystemWeb.Pages.Tutor.Home
             Bookings = _unitOfWork.Booking.GetAll().Where(p => p.User == userId);
 
             nextBookings = _unitOfWork.Booking.GetAll().Where(b => b.StartTime.Date >= DateTime.Today && b.ProviderProfileID == provId).OrderBy(b => b.StartTime).Take(5).ToList();
-            nextAppointments = Bookings.Where(b => b.StartTime.Date >= DateTime.Today && b.User == userId).OrderBy(b => b.StartTime).Take(5).ToList();
+            nextAppointments = _unitOfWork.Booking.GetAll().Where(b => b.StartTime.Date >= DateTime.Today && b.User == userId).OrderBy(b => b.StartTime).Take(5).ToList();
+            
 
             await FetchDataForCurrentViewAsync();
         }
