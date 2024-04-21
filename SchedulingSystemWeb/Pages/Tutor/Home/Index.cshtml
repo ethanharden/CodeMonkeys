@@ -166,16 +166,24 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @for (var hour = 0; hour < 24; hour++)
+                    @for (var hour = 0; hour < 24; hour++)
                     {
+                        for (var minute = 0; minute < 60; minute += 30)
+                        {
                         <tr class="week-row">
-                            <td class="hour">@hour:00</td>
-                            @foreach (var day in Model.WeekDays)
-                            {
-                                <td class="hour-cell @((day.Date == DateTime.Today) ? "today" : "")">
-                                    <!-- Display bookings for the day and hour -->
-                                    @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == day.Date && b.StartTime.Hour == hour))
-                                    {
+                            <td class="hour">@hour:@(minute.ToString("00"))</td>
+                                @foreach (var day in Model.WeekDays)
+                                {
+                                    <td class="hour-cell @((day.Date == DateTime.Today) ? "today" : "")">
+                                        @{
+                                            // Define the start and end of the current half-hour slot
+                                            var slotStart = new DateTime(day.Year, day.Month, day.Day, hour, minute, 0);
+                                            var slotEnd = slotStart.AddMinutes(30);
+                                        }
+
+                                        <!-- Display bookings for the day and hour -->
+                                        @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == day.Date && b.StartTime >= slotStart && b.StartTime < slotEnd))
+                                        {
                                         string style = "";
                                         string textColor = "black";
                                         if (booking.CategoryID != null)
@@ -204,38 +212,35 @@
                                             </div>                                              
                                         </a>
                                         }
-                                    @foreach(var booking in Model.BookingsWithMe.Where(b => b.StartTime.Date == day.Date && b.StartTime.Hour == hour))
-                                    {
-                                        string style = "";
-                                        string textColor = "black";
-                                        if (booking.CategoryID != null)
+                                        @foreach(var booking in Model.BookingsWithMe.Where(b => b.StartTime.Date == day.Date && b.StartTime >= slotStart && b.StartTime < slotEnd))
                                         {
-                                            var color = Model.GetBookingColors(booking.CategoryID);
-                                            style = $"background-color: {color}; border: 4px solid #4C0E7D;";
-                                            textColor = Model.GetTextColor(color);
-                                            style += ");";
-                                        }
-                                        else
-                                        {
-                                            var color = "#4C0E7D";
-                                            style = $"background-color: {color}; border: 4px solid #000000;";
-                                            textColor = Model.GetTextColor(color);
-                                            style += ");";
-                                        }
-
-                                        
-                                                
+                                            string style = "";
+                                            string textColor = "black";
+                                            if (booking.CategoryID != null)
+                                            {
+                                                var color = Model.GetBookingColors(booking.CategoryID);
+                                                style = $"background-color: {color}; border: 4px solid #4C0E7D;";
+                                                textColor = Model.GetTextColor(color);
+                                                style += ");";
+                                            }
+                                            else
+                                            {
+                                                var color = "#4C0E7D";
+                                                style = $"background-color: {color}; border: 4px solid #000000;";
+                                                textColor = Model.GetTextColor(color);
+                                                style += ");";
+                                            }
+                                            
                                             <div class="card mb-3" style="@style; color: @textColor;">
                                                 <div class="card-header">@booking.Subject</div>
                                                 <div class="card-body">
                                                     @booking.StartTime.ToShortTimeString()
                                                     @Model.GetUserName(booking.User)
                                                 </div>
-                                            </div>                                              
-                                        
+                                            </div>                                                                                     
                                         }
-                                    @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour && !Model.IsAvailabilityBooked(a) && !Model.IsAvailabilityBooked1(a)))
-                                    {
+                                        @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime >= slotStart && a.StartTime < slotEnd && a.EndTime > a.StartTime && !Model.IsAvailabilityBooked(a)))
+                                        {
                                             var categoryColors = Model.GetCategoryColors(availability.Category);
                                             string style = "";
                                             string textColor = "black";
@@ -277,6 +282,7 @@
                                 </td>
                             }
                         </tr>
+                        }
                     }
                     </tbody>
                 </table>

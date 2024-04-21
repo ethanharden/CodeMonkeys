@@ -183,13 +183,13 @@
                                     var timeSlotEnd = timeSlotStart.AddMinutes(30); // End of the time slot
 
                                     <td class="hour-cell @((day.Date == DateTime.Today) ? "today" : "")">
-                                        @* Display bookings for the day and time slot *@
-                                        @* @foreach (var booking in Model.ViewBookings.Where(b => b.StartTime >= timeSlotStart && b.StartTime < timeSlotEnd))
-                                        {
-                                            <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
-                                        } *@
+                                        @{
+                                            // Define the start and end of the current half-hour slot
+                                            var slotStart = new DateTime(day.Year, day.Month, day.Day, hour, minute, 0);
+                                            var slotEnd = slotStart.AddMinutes(30);
+                                        }
                                         @* Display availabilities for the day and time slot *@
-                                        @foreach (var availability in Model.ViewAvailabilities.Where(a => a.StartTime >= timeSlotStart && a.StartTime < timeSlotEnd && !Model.IsAvailabilityBooked(a)))
+                                        @foreach(var availability in Model.ViewAvailabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime >= slotStart && a.StartTime < slotEnd && a.EndTime > a.StartTime && !Model.IsAvailabilityBooked(a)))
                                         {
                                             var categoryColors = Model.GetCategoryColors(availability.Category);
                                             string style = "";
@@ -281,11 +281,6 @@
                             <td class="month-day @(currentDay.Date == DateTime.Today.Date ? "today" : "")">
                                  <div class="combined-container" style="max-height: 30vh; overflow: auto;">
                                 @currentDay.Day
-                                <!-- Display bookings for the day -->
-                               @*  @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == currentDay))
-                                {
-                                    <div class="booking-event">@booking.Subject @booking.StartTime.ToString("HH:mm")</div>
-                                } *@
                                 <!-- Display availabilities for the day -->
                                 @foreach(var availability in Model.ViewAvailabilities.Where(a => a.StartTime.Date == currentDay && !Model.IsAvailabilityBooked(a)))
                                 {
@@ -380,72 +375,4 @@
         switchTab(storedTab);
     });
     </script>
-
-    @* <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const tabs = {
-        'weekly': document.querySelector('#weekly-tab'),
-        'monthly': document.querySelector('#monthly-tab')
-    };
-    const tabContents = {
-        'weekly': document.querySelector('#weekly'),
-        'monthly': document.querySelector('#monthly')
-    };
-    const todayButtons = {
-        'weekly': document.querySelector('#todayWeek'),
-        'monthly': document.querySelector('#todayMonth')
-    };
-
-    function switchTab(activeTab) {
-        // Store active tab in session
-        sessionStorage.setItem('activeTab', activeTab);
-
-        Object.keys(tabs).forEach(tab => {
-            if (tab === activeTab) {
-                tabs[tab].classList.add('active');
-                tabContents[tab].classList.add('show', 'active');
-            } else {
-                tabs[tab].classList.remove('active');
-                tabContents[tab].classList.remove('show', 'active');
-            }
-        });
-    }
-    tabs.weekly.addEventListener('click', () => switchTab('weekly'));
-    tabs.monthly.addEventListener('click', () => switchTab('monthly'));
-
-    todayButtons.weekly.addEventListener('click', () => {
-        // TODO: Logic to bring the weekly view to today's date
-    });
-    todayButtons.monthly.addEventListener('click', () => {
-        // TODO: Logic to bring the monthly view to today's date
-    });
-
-
-    const storedTab = sessionStorage.getItem('activeTab') || 'weekly';
-    switchTab(storedTab);
-
-    // Today button based on the active tab
-    document.querySelector('.btn-secondary').addEventListener('click', function() {
-        const activeTab = sessionStorage.getItem('activeTab');
-        if (activeTab === 'weekly') {
-            // TODO: Implement logic for jumping to the current week
-        } else if (activeTab === 'monthly') {
-            // TODO: Implement logic for jumping to the current month
-        }
-        // TODO update UI
-    });
-});
-</script> *@
-
-
-    @* <script>
-        document.getElementById("roleDropdown").addEventListener('change', function(){
-            document.getElementById('filter').submit();
-        });
-    </script>
-    <script>
-        document.getElementById("providerFilter").addEventListener('change', function(){
-            document.getElementById('filter').submit();
-        });
-    </script> *@
 }

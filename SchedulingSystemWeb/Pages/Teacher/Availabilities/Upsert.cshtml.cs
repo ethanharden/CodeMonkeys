@@ -61,6 +61,8 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         public TimeOnly? provWorkingStartHours { get; set; }
         public TimeOnly? provWorkingEndHours { get; set; }
         public IEnumerable<Location> locationLIst { get; set; }
+        [BindProperty]
+        public int Duration { get; set; }
 
 
         public UpsertModel(UnitOfWork unitOfWork, ICalendarService calendarService, UserManager<ApplicationUser> userManager)
@@ -127,6 +129,10 @@ namespace SchedulingSystemWeb.Pages.Availabilities
         public async Task<IActionResult> OnPostAsync()
         {
             Load();
+            if (objAvailability.Id == 0 && Duration <= 0)
+            {
+                ModelState.AddModelError("Duration", "Duration is required when creating a new availability.");
+            }
             if (objAvailability.LocationId <= 0)
             {
                 ModelState.AddModelError("objAvailability.LocationId", "Please select a location.");
@@ -193,21 +199,29 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                             DateTime weekStart = startTime.AddDays(diffInDay);
                             DateTime weekEnd = endTime.AddDays(diffInDay);
 
-                            var newAvailability = new Availability
+                            DateTime slotStart = weekStart;
+                            DateTime slotEnd = slotStart.AddMinutes(Duration - 1);
+                            while (slotEnd < weekEnd)
                             {
-                                // Assign values
-                                DayOfTheWeek = day,
-                                StartTime = weekStart,
-                                EndTime = weekEnd,
-                                ProviderProfileID = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id,
-                                ProviderFullName = _unitOfWork._ProviderProfile.Get(p => p.Id == objAvailability.ProviderProfileID).userFullName,
-                                LocationId = objAvailability.LocationId,
-                                Category = CategoryIds,
-                        };
+                                var newAvailability = new Availability
+                                {
+                                    // Assign values
+                                    DayOfTheWeek = day,
+                                    StartTime = slotStart,
+                                    EndTime = slotEnd,
+                                    ProviderProfileID = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id,
+                                    ProviderFullName = _unitOfWork._ProviderProfile.Get(p => p.Id == objAvailability.ProviderProfileID).userFullName,
+                                    LocationId = objAvailability.LocationId,
+                                    Category = CategoryIds,
+                                };
 
-                            _unitOfWork.Availability.Add(newAvailability);
-                            await _unitOfWork.CommitAsync();
-                            avIds.Add(newAvailability.Id);
+                                _unitOfWork.Availability.Add(newAvailability);
+                                await _unitOfWork.CommitAsync();
+                                avIds.Add(newAvailability.Id);
+
+                                slotStart = slotEnd.AddMinutes(1);
+                                slotEnd = slotStart.AddMinutes(Duration - 1);
+                            }
                         }
                         startTime = startTime.AddDays(daysBetween);
                         endTime = endTime.AddDays(daysBetween);
@@ -245,20 +259,28 @@ namespace SchedulingSystemWeb.Pages.Availabilities
                         }
                         DateTime weekStart = startTime.AddDays(diffInDay);
                         DateTime weekEnd = endTime.AddDays(diffInDay);
-                        Availability newAvailability = new Availability
+
+                        DateTime slotStart = weekStart;
+                        DateTime slotEnd = slotStart.AddMinutes(Duration - 1);
+                        while (slotEnd < weekEnd)
                         {
-                            // Assign values
-                            DayOfTheWeek = day,
-                            StartTime = weekStart,
-                            EndTime = weekEnd,
-                            ProviderProfileID = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id,
-                            ProviderFullName = _unitOfWork._ProviderProfile.Get(p=>p.Id == objAvailability.ProviderProfileID).userFullName,
-                            LocationId = objAvailability.LocationId,
-                            Category = CategoryIds,
-                        };
-                        _unitOfWork.Availability.Add(newAvailability);
+                            Availability newAvailability = new Availability
+                            {
+                                // Assign values
+                                DayOfTheWeek = day,
+                                StartTime = slotStart,
+                                EndTime = slotEnd,
+                                ProviderProfileID = _unitOfWork.ProviderProfile.Get(p => p.User == _userManager.GetUserId(User)).Id,
+                                ProviderFullName = _unitOfWork._ProviderProfile.Get(p => p.Id == objAvailability.ProviderProfileID).userFullName,
+                                LocationId = objAvailability.LocationId,
+                                Category = CategoryIds,
+                            };
+                            _unitOfWork.Availability.Add(newAvailability);
+
+                            slotStart = slotEnd.AddMinutes(1);
+                            slotEnd = slotStart.AddMinutes(Duration-1);
+                        }                        
                     }
-                    await _unitOfWork.CommitAsync();
                 }
             }
             else
@@ -390,21 +412,6 @@ namespace SchedulingSystemWeb.Pages.Availabilities
             }
             return dates;
         }
-        //public void CreateCategory(string categoryName, string color)
-        //{
-        //    var newCategory = new Category
-        //    {
-        //        Name = categoryName,
-        //        Color = color
-        //    };
-        //    if(newCategory.Name == "")
-        //    {
-        //        newCategory.Name = "New Category";
-        //    }
-
-        //    _unitOfWork.Category.Add(newCategory);
-        //    _unitOfWork.Commit();
-        //}
 
         private async Task FetchDataForCurrentViewAsync()
         {
