@@ -37,13 +37,31 @@ namespace SchedulingSystemWeb.Pages
         {
             //var Code = Request.Query["code"].ToString();
 
+            
+
+            if (User.IsInRole("STUDENT"))
+            {
+                return LocalRedirect("/Student/Home/Index");
+            }
+            else if (User.IsInRole("TUTOR"))
+            {
+                return LocalRedirect("/Tutor/Home");
+            }
+            else if (User.IsInRole("ADMIN"))
+            {
+                return LocalRedirect("/Admin/Users/UserIndex");
+            }
+            else if (User.IsInRole("TEACHER"))
+            {
+                return LocalRedirect("/Teacher/Availabilities/Index");
+            }
+
             if (string.IsNullOrEmpty(code))
             {
                 // No code parameter, return the page without processing
                 return Page();
             }
 
-            
             return RedirectToPage("/Index");
             }
         
