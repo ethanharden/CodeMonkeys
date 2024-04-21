@@ -56,17 +56,21 @@
                 <span asp-validation-for="MeetingEndTime" class="text-danger"></span>
             </div>
 
-
             <!-- Duration -->
-            <div class="form-group">
-            <label for="duration" class="control-label">Duration</label>
-                <select id="duration" class="form-control" >
-                    @for (int i = 30; i <= 200; i += 30)
-                    {
-                        <option value="@i">@TimeSpan.FromMinutes(i).ToString(@"hh\:mm")</option>
-                    }
-                </select>
-            </div>
+            @if (Model.objAvailability.Id == 0)
+            {
+                <div class="form-group">
+                    <label for="duration" class="control-label">Duration</label>
+                    <select id="duration" name="Duration" class="form-control" required>
+                        <option value="">Select Duration</option>
+                        @for (int i = 30; i <= 200; i += 30)
+                        {
+                            <option value="@i">@TimeSpan.FromMinutes(i).ToString(@"hh\:mm")</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Duration" class="text-danger"></span>
+                </div>
+            }
 
 
             <!-- Days of Week Section-->
@@ -257,8 +261,13 @@
                                         @foreach (var day in Model.WeekDays)
                                         {
                                             <td class="hour-cell @((day.Date == DateTime.Today) ? "today" : "")">
+                                                @{
+                                                    // Define the start and end of the current half-hour slot
+                                                    var slotStart = new DateTime(day.Year, day.Month, day.Day, hour, minute, 0);
+                                                    var slotEnd = slotStart.AddMinutes(30);
+                                                }
                                                 <!-- Display bookings for the day and hour -->
-                                                @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == day.Date && b.StartTime.Hour == hour))
+                                                @foreach(var booking in Model.ViewBookings.Where(b => b.StartTime.Date == day.Date && b.StartTime >= slotStart && b.StartTime < slotEnd))
                                                 {
                                                     string style = "";
                                                     string textColor = "black";
@@ -284,63 +293,47 @@
                                                             @Model.GetUserName(booking.User)
                                                         </div>
                                                     </div>
-
-                                                    @* <div class="booking-event" style="background-color: grey; color: white; cursor: pointer;"
-                                                         onclick="showBookingDetails('@booking.Subject', '@booking.StartTime.ToString("dddd, MMMM dd, yyyy HH:mm")')">
-                                                      @booking.Subject @booking.StartTime.ToString("HH:mm") - @booking.StartTime.AddMinutes(booking.Duration).ToString("HH:mm")
-                                                    </div> *@
                                                 }
-                                                <!-- Display availabilities for the day and hour -->
-                                                 @* @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour  && !Model.IsAvailabilityBooked(a)))
+                                                @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime >= slotStart && a.StartTime < slotEnd && a.EndTime > a.StartTime && a.EndTime > a.StartTime && !Model.IsAvailabilityBooked(a)))
                                                 {
-                                                    <div class="card text-white bg-success mb-3">
-                                                        <div class="card-header">Available</div>
-                                                        <div class="card-body">
-                                                            @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
-                                                        </div>
-                                                        <br>
-                                                    </div>
-                                                } *@
-                                            @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == day.Date && a.StartTime.Hour <= hour && a.EndTime.Hour > hour && !Model.IsAvailabilityBooked(a)))
-                                            {
-                                                var categoryColors = Model.GetCategoryColors(availability.Category);
-                                                string style = "";
-                                                string textColor = "black";
-                                                if (categoryColors.Count == 1)
-                                                {
-                                                    var color = categoryColors.First();
-                                                    style = $"background-color: {color};";
-                                                    textColor = Model.GetTextColor(color);
-                                                }
-                                                else if (categoryColors.Count > 1)
-                                                {
-                                                    int colorCount = categoryColors.Count;
-                                                    float percentagePerColor = 100f / colorCount;
-                                                    style = "background: repeating-linear-gradient(to right, ";
-
-                                                    for (int i = 0; i < colorCount; i++)
+                                                    var categoryColors = Model.GetCategoryColors(availability.Category);
+                                                    string style = "";
+                                                    string textColor = "black";
+                                                    if (categoryColors.Count == 1)
                                                     {
-                                                        var color = categoryColors[i];
-                                                        var startPercent = i * percentagePerColor;
-                                                        var endPercent = (i + 1) * percentagePerColor;
-                                                        style += $"{color} {startPercent}%, {color} {endPercent}%";
-                                                        if (i < colorCount - 1)
-                                                        {
-                                                            style += ", ";
-                                                        }
+                                                        var color = categoryColors.First();
+                                                        style = $"background-color: {color};";
+                                                        textColor = Model.GetTextColor(color);
                                                     }
-                                                    style += ");";
-                                                    textColor = Model.GetTextColor(categoryColors[0]);
-                                                }
-                                                <a asp-page="/Teacher/Availabilities/Upsert" asp-route-id="@availability.Id" class="availability-link">
-                                                    <div class="card mb-3" style="@style; color: @textColor;">
-                                                        <div class="card-header">Available</div>
-                                                        <div class="card-body">
-                                                            @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
+                                                    else if (categoryColors.Count > 1)
+                                                    {
+                                                        int colorCount = categoryColors.Count;
+                                                        float percentagePerColor = 100f / colorCount;
+                                                        style = "background: repeating-linear-gradient(to right, ";
+
+                                                        for (int i = 0; i < colorCount; i++)
+                                                        {
+                                                            var color = categoryColors[i];
+                                                            var startPercent = i * percentagePerColor;
+                                                            var endPercent = (i + 1) * percentagePerColor;
+                                                            style += $"{color} {startPercent}%, {color} {endPercent}%";
+                                                            if (i < colorCount - 1)
+                                                            {
+                                                                style += ", ";
+                                                            }
+                                                        }
+                                                        style += ");";
+                                                        textColor = Model.GetTextColor(categoryColors[0]);
+                                                    }
+                                                    <a asp-page="/Teacher/Availabilities/Upsert" asp-route-id="@availability.Id" class="availability-link">
+                                                        <div class="card mb-3" style="@style; color: @textColor;">
+                                                            <div class="card-header">Available</div>
+                                                            <div class="card-body">
+                                                                @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                </a>
-                                            }
+                                                    </a>
+                                                }
                                 
                                             </td>
                                         }
@@ -412,20 +405,15 @@
                                                 style += ");";
                                             }
                                             <div class="card mb-3" style="@style; color: @textColor;">
-                                                    <div class="card-header">@booking.Subject</div>
-                                                    <div class="card-body">
-                                                        @booking.StartTime.ToShortTimeString()
-                                                        @Model.GetUserName(booking.User)
-                                                    </div>
-                                                </div> 
-
-                                            @* <div class="booking-event" style="background-color: grey; color: white; cursor: pointer;"
-                                                 onclick="showBookingDetails('@booking.Subject', '@booking.StartTime.ToString("dddd, MMMM dd, yyyy HH:mm")')">
-                                              @booking.Subject @booking.StartTime.ToString("HH:mm") - @booking.StartTime.AddMinutes(booking.Duration).ToString("HH:mm")
-                                            </div> *@
+                                                <div class="card-header">@booking.Subject</div>
+                                                <div class="card-body">
+                                                    @booking.StartTime.ToShortTimeString()
+                                                    @Model.GetUserName(booking.User)
+                                                </div>
+                                            </div> 
                                         }
                                         <!-- Display availabilities for the day -->    
-                                        @foreach(var availability in Model.Availabilities.Where(a => a.StartTime.Date == currentDay && !Model.IsAvailabilityBooked(a)))
+                                        @foreach(var availability in Model.ViewAvailabilities.Where(a => a.StartTime.Date == currentDay && !Model.IsAvailabilityBooked(a)))
                                         {
                                             var categoryColors = Model.GetCategoryColors(availability.Category);
                                             string style = "";
@@ -547,62 +535,6 @@
 
             // reload page if recurring is checked when editing
             toggleRecurringEndDate();
-        });
-    </script>
-    <!--Duration/ EndTime-->
-    <script>
-        function updateEndTimeOnStartTimeChange() {
-            var startTimeInput = document.getElementById('MeetingStartTime');
-            var endTimeInput = document.getElementById('MeetingEndTime');
-            var durationSelect = document.getElementById('duration');
-
-            if (startTimeInput.value) {
-                var startTime = new Date('1970-01-01T' + startTimeInput.value + 'Z');
-                var existingEndTime = new Date('1970-01-01T' + endTimeInput.value + 'Z');
-
-                // Check if end time is less than 30 minutes after start time
-                if (existingEndTime - startTime < 30 * 60000) {
-                    var updatedEndTime = new Date(startTime.getTime() + 30 * 60000);
-                    endTimeInput.value = updatedEndTime.toISOString().slice(11, 16); // Update the end time
-                }
-
-                // Update duration based on the new end time
-                updateDurationBasedOnEndTime();
-            }
-        }
-
-        // Update EndTime by Duration
-        function updateEndTimeBasedOnDuration() {
-            var startTimeInput = document.getElementById('MeetingStartTime');
-            var durationSelect = document.getElementById('duration');
-            var endTimeInput = document.getElementById('MeetingEndTime');
-
-            if(startTimeInput.value && durationSelect.value) {
-                var startTime = startTimeInput.valueAsDate || new Date('1970-01-01T' + startTimeInput.value + 'Z');
-                var duration = parseInt(durationSelect.value);
-                var endTime = new Date(startTime.getTime() + duration * 60000);
-                endTimeInput.value = endTime.toISOString().slice(11, 16); // Updates the end time
-            }
-        }
-        function updateDurationBasedOnEndTime() {
-            var startTimeInput = document.getElementById('MeetingStartTime');
-            var endTimeInput = document.getElementById('MeetingEndTime');
-            var durationSelect = document.getElementById('duration');
-
-            if (startTimeInput.value && endTimeInput.value) {
-                var startTime = new Date('1970-01-01T' + startTimeInput.value + 'Z');
-                var endTime = new Date('1970-01-01T' + endTimeInput.value + 'Z');
-                var durationInMinutes = (endTime - startTime) / 60000;
-        
-                durationSelect.value = durationInMinutes.toString();
-            }
-        }
-
-        // Event listener
-        document.addEventListener('DOMContentLoaded', function () {
-            document.getElementById('MeetingStartTime').addEventListener('change', updateEndTimeOnStartTimeChange);
-            document.getElementById('MeetingEndTime').addEventListener('change', updateDurationBasedOnEndTime);
-            document.querySelector('#duration').addEventListener('change', updateEndTimeBasedOnDuration);
         });
     </script>
     <!--Show Booking Details-->
